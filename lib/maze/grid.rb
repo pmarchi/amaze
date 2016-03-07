@@ -8,13 +8,13 @@ class Maze::Grid
   attr_reader :grid
   
   # The size of the cell, when printed to the terminal
-  attr_accessor :size
+  attr_accessor :cell_size
   
   def initialize rows, columns
     @rows = rows
     @columns = columns
     
-    @size = 1
+    @cell_size = 1
     
     prepare_grid
     configure_cell
@@ -59,24 +59,32 @@ class Maze::Grid
     end
   end
 
+  def random_cell
+    self[rand(rows), rand(columns)]
+  end
+
+  def size
+    rows * columns
+  end
+
   def to_s
-    output = "+" + ("-" * size * 3 + "+") * columns + "\n"
+    output = "+" + ("-" * cell_size * 3 + "+") * columns + "\n"
     
     each_row do |row|
       top = "|"
       bottom = "+"
       
       row.each do |cell|
-        body = " " * size * 3
+        body = " " * cell_size * 3
         east_boundary = cell.linked?(cell.east) ? ' ' : '|'
         top << body << east_boundary
         
-        south_boundary = (cell.linked?(cell.south) ? ' ' : '-') * size * 3
+        south_boundary = (cell.linked?(cell.south) ? ' ' : '-') * cell_size * 3
         corner = "+"
         bottom << south_boundary << corner
       end
       
-      size.times do
+      cell_size.times do
         output << top << "\n"
       end
       output << bottom << "\n"

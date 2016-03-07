@@ -33,4 +33,8 @@ class Maze::Cell
   def inspect
     "cell(#{row},#{column})"
   end
+  
+  def to_s
+    "(#{row},#{column})"
+  end
 end

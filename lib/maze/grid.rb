@@ -68,7 +68,8 @@ class Maze::Grid
   end
 
   def to_s marked_cell=nil
-    output = "+" + ("-" * cell_size * 3 + "+") * columns + "\n"
+    output = "\e[H\e[2J" # clear screen
+    output += "+" + ("-" * cell_size * 3 + "+") * columns + "\n"
     
     each_row do |row|
       top = "|"
@@ -91,7 +92,7 @@ class Maze::Grid
       end
       
       cell_size.times do |i|
-        if marked_cell && cell_size/2 == i
+        if cell_size/2 == i
           output << marked << "\n"
         else
           output << top << "\n"

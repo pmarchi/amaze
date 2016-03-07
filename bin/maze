@@ -45,7 +45,11 @@ grid = Maze::Grid.new options[:rows], options[:columns]
 grid.cell_size = options[:size]
 
 algorithm = Kernel.const_get("Maze::Algorithm::#{options[:algorithm].split('_').map(&:capitalize).join}").new
-algorithm.on grid
-
+algorithm.on grid do |cell|
+  print "\e[H\e[2J"
+  puts grid.to_s(cell)
+  sleep algorithm.speed
+end
+print "\e[H\e[2J"
 puts grid
 puts algorithm.status

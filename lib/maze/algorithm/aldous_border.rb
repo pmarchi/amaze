@@ -17,9 +17,15 @@ class Maze::Algorithm::AldousBorder < Maze::Algorithm
         unvisited -= 1
       end
   
+      yield cell if block_given?
+
       cell = neighbor
       @iterations += 1
     end
+  end
+  
+  def speed
+    0.02
   end
   
   def status

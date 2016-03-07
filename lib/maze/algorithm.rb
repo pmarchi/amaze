@@ -6,9 +6,15 @@ class Maze::Algorithm
   
   def on grid
     @duration = Benchmark.realtime do
-      work grid
+      work grid do |cell|
+        yield cell if block_given?
+      end
     end
     grid
+  end
+  
+  def speed
+    0.1
   end
   
   autoload :AldousBorder, 'maze/algorithm/aldous_border'

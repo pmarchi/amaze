@@ -6,6 +6,7 @@ class Maze::Algorithm::BinaryTree < Maze::Algorithm
       links = [cell.north, cell.east].compact
       next if links.empty?
       cell.link links[rand(links.size)]
+      yield cell if block_given?
     end
   end
   

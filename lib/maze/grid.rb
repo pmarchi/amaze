@@ -67,11 +67,12 @@ class Maze::Grid
     rows * columns
   end
 
-  def to_s
+  def to_s marked_cell=nil
     output = "+" + ("-" * cell_size * 3 + "+") * columns + "\n"
     
     each_row do |row|
       top = "|"
+      marked = "|"
       bottom = "+"
       
       row.each do |cell|
@@ -79,13 +80,22 @@ class Maze::Grid
         east_boundary = cell.linked?(cell.east) ? ' ' : '|'
         top << body << east_boundary
         
+        if cell == marked_cell
+          body = "*".center(cell_size * 3)
+        end
+        marked << body << east_boundary
+        
         south_boundary = (cell.linked?(cell.south) ? ' ' : '-') * cell_size * 3
         corner = "+"
         bottom << south_boundary << corner
       end
       
-      cell_size.times do
-        output << top << "\n"
+      cell_size.times do |i|
+        if marked_cell && cell_size/2 == i
+          output << marked << "\n"
+        else
+          output << top << "\n"
+        end
       end
       output << bottom << "\n"
       

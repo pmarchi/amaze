@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+#require "bundler/setup"
+require 'maze'
+
+options = {rows: 4, columns: 4, size: 1}
+parser = OptionParser.new do |opts|
+  opts.banner = "
+Create a maze using the binary tree algorithm.
+
+Usage #{File.basename $0} [options]
+
+"
+  opts.on('-g', '--grid [SIZE]', Integer, 'Rows and columns of the grid') do |g|
+    options[:rows] = g
+    options[:columns] = g
+  end
+
+  opts.on('-r', '--rows [ROWS]', Integer, 'Rows') do |r|
+    options[:rows] = r
+  end
+
+  opts.on('-c', '--columns [COLUMNS]', Integer, 'Columns') do |c|
+    options[:columns] = c
+  end
+
+  opts.on('-s', '--SIZE [SIZE]', Integer, 'The size of the cell') do |s|
+    options[:size] = s
+  end
+end
+parser.parse!(ARGV)
+
+grid = Maze::Grid.new options[:rows], options[:columns]
+grid.size = options[:size]
+Maze::Algorithm::BinaryTree.on grid
+
+puts grid

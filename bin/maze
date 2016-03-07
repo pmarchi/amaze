@@ -4,7 +4,11 @@ require 'optparse'
 #require "bundler/setup"
 require 'maze'
 
-options = {rows: 4, columns: 4, size: 1}
+algorithms = %w(
+  binary_tree
+  aldous_border
+)
+options = {rows: 4, columns: 4, size: 1, algorithm: algorithms.first}
 parser = OptionParser.new do |opts|
   opts.banner = "
 Create a maze using the binary tree algorithm.
@@ -28,11 +32,20 @@ Usage #{File.basename $0} [options]
   opts.on('-s', '--SIZE [SIZE]', Integer, 'The size of the cell') do |s|
     options[:size] = s
   end
+  
+  opts.on('-a', '--algorithm [ALGORITHM]', algorithms, 'Choose the algorithm to generate the maze.') do |a|
+    options[:algorithm] = a
+  end
 end
+
 parser.parse!(ARGV)
+# p [:options, options]
 
 grid = Maze::Grid.new options[:rows], options[:columns]
-grid.size = options[:size]
-Maze::Algorithm::BinaryTree.on grid
+grid.cell_size = options[:size]
+
+algorithm = Kernel.const_get("Maze::Algorithm::#{options[:algorithm].split('_').map(&:capitalize).join}").new
+algorithm.on grid
 
 puts grid
+puts algorithm.status

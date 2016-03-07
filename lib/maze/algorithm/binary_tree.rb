@@ -1,11 +1,15 @@
 
-class Maze::Algorithm::BinaryTree
-  def self.on grid
+class Maze::Algorithm::BinaryTree < Maze::Algorithm
+
+  def work grid
     grid.each_cell do |cell|
       links = [cell.north, cell.east].compact
       next if links.empty?
       cell.link links[rand(links.size)]
     end
-    grid
+  end
+  
+  def status
+    "Binary tree algorithm: #{duration}s"
   end
 end

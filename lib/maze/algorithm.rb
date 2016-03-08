@@ -18,5 +18,6 @@ class Maze::Algorithm
   end
   
   autoload :AldousBorder, 'maze/algorithm/aldous_border'
+  autoload :AldousBorder2, 'maze/algorithm/aldous_border2'
   autoload :BinaryTree, 'maze/algorithm/binary_tree'
 end

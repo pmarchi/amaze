@@ -7,6 +7,7 @@ require 'maze'
 algorithms = %w(
   binary_tree
   aldous_border
+  aldous_border2
 )
 options = {rows: 4, columns: 4, size: 1, algorithm: algorithms.first, visualize: false}
 parser = OptionParser.new do |opts|

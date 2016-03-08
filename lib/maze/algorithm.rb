@@ -14,7 +14,7 @@ class Maze::Algorithm
   end
   
   def speed
-    0.1
+    0.06
   end
   
   autoload :AldousBorder, 'maze/algorithm/aldous_border'

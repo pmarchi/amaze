@@ -42,11 +42,16 @@ Usage #{File.basename $0} [options]
   opts.on('-v', '--visualize', 'Visualize the progress of the algorithm') do
     options[:visualize] = true
   end
+
+  opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
+    options[:seed] = seed
+  end
 end
 
 parser.parse!(ARGV)
 # p [:options, options]
 
+srand(options[:seed]) if options[:seed]
 grid = Maze::Grid.new options[:rows], options[:columns]
 grid.cell_size = options[:size]
 

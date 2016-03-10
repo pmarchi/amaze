@@ -33,14 +33,14 @@ class Maze::HexGrid < Maze::Grid
   def to_s marked_cells=[]
     line = "___" * cell_size
     space = "   " * cell_size
+    marked = "*".center(cell_size*3)
     upper_east = "\\"
     lower_east = "/"
     upper_west = "/"
     lower_west = "\\"
     empty_side = " "
     
-    # output = "\e[H\e[2J" # clear screen
-    output = ""
+    output = "\e[H\e[2J" # clear screen
 
     # top row
     repeat = ((columns + 0.5) / 2).round - 1
@@ -60,7 +60,7 @@ class Maze::HexGrid < Maze::Grid
         if cell.column.even?
           cell_size.times do |i|
             # upper half of cell
-            north = space + " " * i * 2
+            north = " " * i + ((Array(marked_cells).include?(cell) && i == (cell_size-1)) ? marked : space) + " " * i
             north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
             upper[i] << north << north_east
 
@@ -71,7 +71,7 @@ class Maze::HexGrid < Maze::Grid
           end
         else
           cell_size.times do |i|
-            # lower half of cell
+            # lower half of cell from row above
             south = (i < (cell_size-1) || cell.linked?(cell.north)) ? space + " " * (cell_size-1-i) * 2 : line
             south_east = (cell.north || cell.northeast) ? 
               (cell.north && cell.northeast && cell.north.linked?(cell.northeast)) ? 
@@ -80,8 +80,8 @@ class Maze::HexGrid < Maze::Grid
               ""
             upper[i] << south << south_east
 
-            # upper half of cell
-            north = space + " " * i * 2
+            # upper half of cell from current row
+            north = " " * i + ((Array(marked_cells).include?(cell) && i == (cell_size-1)) ? marked : space) + " " * i
             north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
             lower[i] << north << north_east
           end

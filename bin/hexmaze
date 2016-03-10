@@ -6,6 +6,7 @@ require 'maze'
 
 algorithms = %w(
   aldous_border
+  aldous_border2
 )
 options = {rows: 4, columns: 4, size: 1, algorithm: algorithms.first, visualize: false}
 parser = OptionParser.new do |opts|
@@ -50,8 +51,8 @@ grid.cell_size = options[:size]
 algorithm = Kernel.const_get("Maze::Algorithm::#{options[:algorithm].split('_').map(&:capitalize).join}").new
 algorithm.on grid do |cell|
   next unless options[:visualize]
-  puts grid.to_s(cell)
   sleep algorithm.speed
+  puts grid.to_s(cell)
 end
 puts grid
 puts algorithm.status

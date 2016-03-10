@@ -11,12 +11,22 @@ algorithms = {
   sidewinder: Maze::Algorithm::Sidewinder,
   growing_tree: Maze::Algorithm::GrowingTree,
 }
+
 types = {
   ortho: Maze::Grid,
   sigma: Maze::HexGrid,
 }
 
-options = {type: types[:ortho], rows: 4, columns: 4, size: 1, algorithm: algorithms[:growing_tree], visualize: false}
+# default options
+options = {
+  type: types[:ortho], 
+  rows: 4, 
+  columns: 4, 
+  size: 1, 
+  algorithm: algorithms[:growing_tree],
+  visualize: false,
+}
+
 parser = OptionParser.new do |opts|
   opts.banner = "
 Maze generator
@@ -63,9 +73,12 @@ end
 parser.parse!(ARGV)
 
 srand(options[:seed]) if options[:seed]
+
+# Initialize the grid
 grid = options[:type].new options[:rows], options[:columns]
 grid.cell_size = options[:size]
 
+# Run the algorithm
 algorithm = options[:algorithm].new
 algorithm.on grid do |cell|
   next unless options[:visualize]

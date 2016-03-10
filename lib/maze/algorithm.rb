@@ -20,4 +20,5 @@ class Maze::Algorithm
   autoload :AldousBorder, 'maze/algorithm/aldous_border'
   autoload :AldousBorder2, 'maze/algorithm/aldous_border2'
   autoload :BinaryTree, 'maze/algorithm/binary_tree'
+  autoload :Sidewinder, 'maze/algorithm/sidewinder'
 end

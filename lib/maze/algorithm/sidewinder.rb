@@ -24,6 +24,7 @@ class Maze::Algorithm::Sidewinder < Maze::Algorithm
 
       run = []
     end
+    grid
   end
   
   def speed

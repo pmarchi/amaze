@@ -8,6 +8,7 @@ class Maze::Algorithm::BinaryTree < Maze::Algorithm
       cell.link links[rand(links.size)]
       yield cell if block_given?
     end
+    grid
   end
   
   def status

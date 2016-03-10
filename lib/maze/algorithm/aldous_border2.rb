@@ -21,6 +21,7 @@ class Maze::Algorithm::AldousBorder2 < Maze::Algorithm
       cell = neighbor
       @iterations += 1
     end
+    grid
   end
     
   def status

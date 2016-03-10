@@ -22,6 +22,7 @@ class Maze::Algorithm::AldousBorder < Maze::Algorithm
       cell = neighbor
       @iterations += 1
     end
+    grid
   end
   
   def speed

@@ -1,16 +1,19 @@
 
 class Maze::Algorithm::GrowingTree < Maze::Algorithm
   
+  def initialize
+    @select = Proc.new {|active| active.last }
+  end
+  
+  def select
+    @select = Proc.new  # implicit conversion of passed block
+  end
+  
   def work grid
     active = [grid.random_cell]
     
     while active.any?
-      
-      # selecting the last element is recursive backtracker
-      # choose whatever you want
-      # cell = (rand(3) == 0) ? active.sample : active.last
-      # cell = active[active.size/2..-1].sample
-      cell = active.last
+      cell = @select.call active
       
       neighbor = cell.neighbors.select {|neighbor| neighbor.links.empty? }.sample
       

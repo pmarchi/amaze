@@ -80,6 +80,9 @@ grid.cell_size = options[:size]
 
 # Run the algorithm
 algorithm = options[:algorithm].new
+# Set the way growing tree selects an active cell
+algorithm.select {|active| active.sample } if algorithm.class == algorithms[:growing_tree]
+
 algorithm.on grid do |cell|
   next unless options[:visualize]
   puts grid.to_s(cell)

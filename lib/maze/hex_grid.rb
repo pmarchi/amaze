@@ -57,33 +57,26 @@ class Maze::HexGrid < Maze::Grid
       end
 
       row.each do |cell|
-        if cell.column.even?
-          cell_size.times do |i|
-            # upper half of cell
-            north = " " * i + ((Array(marked_cells).include?(cell) && i == (cell_size-1)) ? marked : space) + " " * i
-            north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
-            upper[i] << north << north_east
+        cell_size.times do |i|
+          north = " " * i + ((Array(marked_cells).include?(cell) && i == (cell_size-1)) ? marked : space) + " " * i
+          north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
 
-            # lower half of cell
+          if cell.column.even?
             south = (i < (cell_size-1) || cell.linked?(cell.south)) ? space + " " * (cell_size-1-i) * 2 : line
             south_east = (cell.linked? cell.southeast) ? empty_side : lower_east
-            lower[i] << south << south_east
-          end
-        else
-          cell_size.times do |i|
-            # lower half of cell from row above
+
+            upper[i] << north << north_east   # upper half of cell
+            lower[i] << south << south_east   # lower half of cell
+          else
             south = (i < (cell_size-1) || cell.linked?(cell.north)) ? space + " " * (cell_size-1-i) * 2 : line
             south_east = (cell.north || cell.northeast) ? 
               (cell.north && cell.northeast && cell.north.linked?(cell.northeast)) ? 
                 empty_side : 
                 lower_east :
               ""
-            upper[i] << south << south_east
 
-            # upper half of cell from current row
-            north = " " * i + ((Array(marked_cells).include?(cell) && i == (cell_size-1)) ? marked : space) + " " * i
-            north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
-            lower[i] << north << north_east
+            upper[i] << south << south_east   # lower half of cell from row above
+            lower[i] << north << north_east   # upper half of cell from current row
           end
         end
       end

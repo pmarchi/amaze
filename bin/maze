@@ -1,24 +1,33 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-#require "bundler/setup"
+require "bundler/setup"
 require 'maze'
 
-algorithms = %w(
-  binary_tree
-  aldous_border
-  aldous_border2
-  sidewinder
-  growing_tree
-)
-options = {rows: 4, columns: 4, size: 1, algorithm: algorithms.first, visualize: false}
+algorithms = {
+  binary_tree: Maze::Algorithm::BinaryTree,
+  aldous_border: Maze::Algorithm::AldousBorder,
+  aldous_border2: Maze::Algorithm::AldousBorder2,
+  sidewinder: Maze::Algorithm::Sidewinder,
+  growing_tree: Maze::Algorithm::GrowingTree,
+}
+types = {
+  ortho: Maze::Grid,
+  sigma: Maze::HexGrid,
+}
+
+options = {type: types[:ortho], rows: 4, columns: 4, size: 1, algorithm: algorithms[:growing_tree], visualize: false}
 parser = OptionParser.new do |opts|
   opts.banner = "
-Create a maze using the binary tree algorithm.
+Maze generator
 
-Usage #{File.basename $0} [options]
+Usage: #{File.basename $0} [options]
 
 "
+  opts.on('-t', '--type [TYPE]', types.keys, 'The type of the maze.', "One of #{types.keys.join(', ')}") do |t|
+    options[:type] = types[t]
+  end
+
   opts.on('-g', '--grid [SIZE]', Integer, 'Rows and columns of the grid') do |g|
     options[:rows] = g
     options[:columns] = g
@@ -36,7 +45,7 @@ Usage #{File.basename $0} [options]
     options[:size] = s
   end
   
-  opts.on('-a', '--algorithm [ALGORITHM]', algorithms, 'Choose the algorithm to generate the maze.') do |a|
+  opts.on('-a', '--algorithm [ALGORITHM]', algorithms.keys, 'The algorithm to generate the maze.', "One of #{algorithms.keys.join(', ')}") do |a|
     options[:algorithm] = a
   end
 
@@ -47,16 +56,17 @@ Usage #{File.basename $0} [options]
   opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
     options[:seed] = seed
   end
+  
+  opts.separator ""
 end
 
 parser.parse!(ARGV)
-# p [:options, options]
 
 srand(options[:seed]) if options[:seed]
-grid = Maze::Grid.new options[:rows], options[:columns]
+grid = options[:type].new options[:rows], options[:columns]
 grid.cell_size = options[:size]
 
-algorithm = Kernel.const_get("Maze::Algorithm::#{options[:algorithm].split('_').map(&:capitalize).join}").new
+algorithm = options[:algorithm].new
 algorithm.on grid do |cell|
   next unless options[:visualize]
   puts grid.to_s(cell)

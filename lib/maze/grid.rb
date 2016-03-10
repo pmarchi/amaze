@@ -67,7 +67,7 @@ class Maze::Grid
     rows * columns
   end
 
-  def to_s marked_cell=nil
+  def to_s marked_cells=[]
     output = "\e[H\e[2J" # clear screen
     output += "+" + ("-" * cell_size * 3 + "+") * columns + "\n"
     
@@ -81,7 +81,7 @@ class Maze::Grid
         east_boundary = cell.linked?(cell.east) ? ' ' : '|'
         top << body << east_boundary
         
-        if cell == marked_cell
+        if Array(marked_cells).include? cell
           body = "*".center(cell_size * 3)
         end
         marked << body << east_boundary

@@ -21,4 +21,5 @@ class Maze::Algorithm
   autoload :AldousBorder2, 'maze/algorithm/aldous_border2'
   autoload :BinaryTree, 'maze/algorithm/binary_tree'
   autoload :Sidewinder, 'maze/algorithm/sidewinder'
+  autoload :GrowingTree, 'maze/algorithm/growing_tree'
 end

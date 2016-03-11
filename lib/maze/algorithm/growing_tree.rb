@@ -1,19 +1,24 @@
 
 class Maze::Algorithm::GrowingTree < Maze::Algorithm
   
+  # The configuration of the algorithm
+  # In this instance the way the next cell gets picked
+  # from the list of active cells.
+  attr_reader :config
+  
   def initialize
-    @select = Proc.new {|active| active.last }
+    @config = Proc.new {|active| active.last }
   end
   
-  def select
-    @select = Proc.new  # implicit conversion of passed block
+  def configure block
+    @config = block
   end
   
   def work grid
     active = [grid.random_cell]
     
     while active.any?
-      cell = @select.call active
+      cell = config.call active
       
       neighbor = cell.neighbors.select {|neighbor| neighbor.links.empty? }.sample
       

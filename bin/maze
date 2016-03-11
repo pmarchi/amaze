@@ -5,11 +5,15 @@ require "bundler/setup"
 require 'maze'
 
 algorithms = {
-  binary_tree: Maze::Algorithm::BinaryTree,
-  aldous_border: Maze::Algorithm::AldousBorder,
-  aldous_border2: Maze::Algorithm::AldousBorder2,
-  sidewinder: Maze::Algorithm::Sidewinder,
-  growing_tree: Maze::Algorithm::GrowingTree,
+  bt:  { class: Maze::Algorithm::BinaryTree,    configurations: [] },
+  ab:  { class: Maze::Algorithm::AldousBorder,  configurations: [] },
+  ab2: { class: Maze::Algorithm::AldousBorder2, configurations: [] },
+  sw:  { class: Maze::Algorithm::Sidewinder,    configurations: [] },
+  gt:  { class: Maze::Algorithm::GrowingTree,   configurations: [
+    Proc.new {|active| active.last },
+    Proc.new {|active| active.sample },
+    Proc.new {|active| (rand(2) == 0) ? active.last : active.sample },
+  ] },
 }
 
 types = {
@@ -20,10 +24,10 @@ types = {
 # default options
 options = {
   type: types[:ortho], 
-  rows: 4, 
-  columns: 4, 
-  size: 1, 
-  algorithm: algorithms[:growing_tree],
+  grid_size: [4, 4],
+  cell_size: 1, 
+  algorithm: algorithms[:gt],
+  algorithm_configuration: 0,
   visualize: false,
 }
 
@@ -34,39 +38,36 @@ Maze generator
 Usage: #{File.basename $0} [options]
 
 "
-  opts.on('-t', '--type [TYPE]', types.keys, 'The type of the maze.', "One of #{types.keys.join(', ')}") do |t|
-    options[:type] = types[t]
-  end
+  opts.separator "\nGrid options:\n\n"
 
-  opts.on('-g', '--grid [SIZE]', Integer, 'Rows and columns of the grid') do |g|
-    options[:rows] = g
-    options[:columns] = g
+  opts.on('-t', '--type TYPE', types.keys, 'The type of the maze.', "One of #{types.keys.join(', ')}") do |type|
+    options[:type] = types[type]
   end
-
-  opts.on('-r', '--rows [ROWS]', Integer, 'Rows') do |r|
-    options[:rows] = r
+  opts.on('-g', '--grid-size ROWS,COLUMNS', Array, 'The number of rows and columns of the grid') do |v|
+    options[:grid_size] = v.first(2).map(&:to_i)
   end
-
-  opts.on('-c', '--columns [COLUMNS]', Integer, 'Columns') do |c|
-    options[:columns] = c
-  end
-
-  opts.on('-s', '--SIZE [SIZE]', Integer, 'The size of the cell') do |s|
-    options[:size] = s
+  opts.on('-c', '--cell-size SIZE', Integer, 'The size of the cell') do |cell_size|
+    options[:cell_size] = cell_size
   end
   
-  opts.on('-a', '--algorithm [ALGORITHM]', algorithms.keys, 'The algorithm to generate the maze.', "One of #{algorithms.keys.join(', ')}") do |a|
-    options[:algorithm] = a
+  opts.separator "\nAlgorithm options:\n\n"
+
+  opts.on('-a', '--algorithm ALGORITHM', algorithms.keys, 'The algorithm to generate the maze.', "One of #{algorithms.keys.join(', ')}") do |algorithm|
+    options[:algorithm] = algorithms[algorithm]
   end
+  opts.on('--conf NUMBER', Integer, 'Choose a configuration for an algorithm', 'Configurations exists for:', %Q%#{algorithms.map{|k,v| "#{k}: #{v[:configurations].size}" unless v[:configurations].empty?}.compact.join(', ')}%) do |conf|
+    options[:algorithm_configuration] = conf-1
+  end
+  opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
+    options[:seed] = seed
+  end
+  
+  opts.separator "\nMisc:\n\n"
 
   opts.on('-v', '--visualize', 'Visualize the progress of the algorithm') do
     options[:visualize] = true
   end
 
-  opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
-    options[:seed] = seed
-  end
-  
   opts.separator ""
 end
 
@@ -75,18 +76,21 @@ parser.parse!(ARGV)
 srand(options[:seed]) if options[:seed]
 
 # Initialize the grid
-grid = options[:type].new options[:rows], options[:columns]
-grid.cell_size = options[:size]
+grid = options[:type].new *options[:grid_size]
+grid.cell_size = options[:cell_size]
 
-# Run the algorithm
-algorithm = options[:algorithm].new
-# Set the way growing tree selects an active cell
-algorithm.select {|active| active.sample } if algorithm.class == algorithms[:growing_tree]
+# Instanziate and optionally configure the algorithm
+algorithm = options[:algorithm][:class].new
+unless options[:algorithm][:configurations].empty?
+  algorithm.configure options[:algorithm][:configurations][options[:algorithm_configuration]]
+end
 
+# Run the algorithm on the grid
 algorithm.on grid do |cell|
   next unless options[:visualize]
   puts grid.to_s(cell)
   sleep algorithm.speed
 end
+
 puts grid
 puts algorithm.status

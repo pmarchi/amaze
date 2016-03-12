@@ -18,7 +18,7 @@ algorithms = {
 
 types = {
   ortho: Maze::Grid,
-  sigma: Maze::HexGrid,
+  sigma: Maze::SigmaGrid,
   delta: Maze::DeltaGrid,
 }
 

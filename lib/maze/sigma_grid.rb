@@ -1,10 +1,10 @@
 
-class Maze::HexGrid < Maze::Grid
+class Maze::SigmaGrid < Maze::Grid
   
   def prepare_grid
     @grid = Array.new(rows) do |row|
       Array.new(columns) do |column|
-        Maze::HexCell.new row, column
+        Maze::SigmaCell.new row, column
       end
     end
   end

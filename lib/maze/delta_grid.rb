@@ -21,10 +21,10 @@ class Maze::DeltaGrid < Maze::Grid
     side_a = "/"
     side_b = "\\"
     space = "  "
+    marked = " .".center(height)
     base = "__" * (height - 1)
     
-    # output = "\e[H\e[2J" # clear screen
-    output = ""
+    output = "\e[H\e[2J" # clear screen
     
     repeat = (columns-1) / 2
     output << " " << base << ("  " + base) * repeat << "\n"
@@ -45,11 +45,19 @@ class Maze::DeltaGrid < Maze::Grid
       row.each do |cell|
         height.times do |i|
           if (cell.row+cell.column).even?
-            line[i] << "  " * (height-1-i) + (cell.linked?(cell.east) ? " " : side_a)
+            body = (i == cell_size-1 && Array(marked_cells).include?(cell)) ? marked : space * (height-1-i)
+            # body = space * (height-1-i)
+            wall = (cell.linked?(cell.east) ? " " : side_a)
           else
-            body = (i < height-1 || cell.linked?(cell.south)) ? space * i : base
-            line[i] << body + (cell.linked?(cell.east) ? " " : side_b)
+            if i < height-1 || cell.linked?(cell.south)
+              body = (i == cell_size && Array(marked_cells).include?(cell)) ? marked : space * i
+              # body = space * i
+            else
+              body = base
+            end
+            wall = (cell.linked?(cell.east) ? " " : side_b)
           end
+          line[i] << body << wall
         end
       end
 

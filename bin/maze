@@ -30,6 +30,7 @@ options = {
   algorithm: algorithms[:gt],
   algorithm_configuration: 0,
   visualize: false,
+  marker: true,
 }
 
 parser = OptionParser.new do |opts|
@@ -68,6 +69,9 @@ Usage: #{File.basename $0} [options]
   opts.on('-v', '--visualize', 'Visualize the progress of the algorithm') do
     options[:visualize] = true
   end
+  opts.on('-m', '--marker', 'Visualize the progress of the algorithm') do
+    options[:marker] = false
+  end
 
   opts.separator ""
 end
@@ -89,7 +93,8 @@ end
 # Run the algorithm on the grid
 algorithm.on grid do |cell|
   next unless options[:visualize]
-  puts grid.to_s(cell)
+  list = options[:marker] ? cell : []
+  puts grid.to_s(list)
   sleep algorithm.speed
 end
 

@@ -19,6 +19,7 @@ algorithms = {
 types = {
   ortho: Maze::Grid,
   sigma: Maze::HexGrid,
+  delta: Maze::DeltaGrid,
 }
 
 # default options

@@ -29,6 +29,7 @@ class Maze::Algorithm::GrowingTree < Maze::Algorithm
       mode = !!neighbor
       stat.active = active
       stat.segment = prev_mode ^ mode
+      stat.info = "Current active cells: #{active.size}"
       yield stat if block_given?
       prev_mode = mode
       

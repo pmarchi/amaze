@@ -3,14 +3,14 @@ require 'benchmark'
 
 class Maze::Algorithm
   
-  class Stat < Struct.new(:active, :segment); end
+  class Stat < Struct.new(:active, :segment, :info); end
   
   # The time the algorithm takes to generate the maze
   attr_reader :duration
   
   # The current stat of the algorithm
   def stat
-    @stat ||= Stat.new([], true)
+    @stat ||= Stat.new([], true, false)
   end
   
   def on grid

@@ -115,6 +115,7 @@ algorithm.on grid do |stat|
 
   # print the maze
   puts grid.to_s(options[:highlight] ? stat.active : [])
+  puts stat.info if stat.info
   sleep algorithm.speed
   
   # wait for keystroke ?

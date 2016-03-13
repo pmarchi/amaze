@@ -40,6 +40,8 @@ types = {
   delta: Maze::DeltaGrid,
 }
 
+visualization_modes = [:run, :segment, :step]
+
 # default options
 options = {
   type: types[:ortho], 
@@ -85,7 +87,7 @@ Usage: #{File.basename $0} [options]
   
   opts.separator "\nMisc:\n\n"
 
-  opts.on('-v', '--visualize [MODE]', [:run, :segment, :step], 'Visualize the progress of the algorithm') do |mode|
+  opts.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
     options[:visualize] = mode || :run
   end
   opts.on('--off', 'Do not highlight the current cells') do

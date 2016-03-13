@@ -4,10 +4,28 @@ require 'optparse'
 require "bundler/setup"
 require 'maze'
 
+require 'io/console'
+
+# Reads keypresses from the user including 2 and 3 escape character sequences.
+def read_char
+  STDIN.echo = false
+  STDIN.raw!
+
+  input = STDIN.getc.chr
+  if input == "\e" then
+    input << STDIN.read_nonblock(3) rescue nil
+    input << STDIN.read_nonblock(2) rescue nil
+  end
+ensure
+  STDIN.echo = true
+  STDIN.cooked!
+
+  return input
+end
+
 algorithms = {
   bt:  { class: Maze::Algorithm::BinaryTree,    configurations: [] },
   ab:  { class: Maze::Algorithm::AldousBorder,  configurations: [] },
-  ab2: { class: Maze::Algorithm::AldousBorder2, configurations: [] },
   sw:  { class: Maze::Algorithm::Sidewinder,    configurations: [] },
   gt:  { class: Maze::Algorithm::GrowingTree,   configurations: [
     Proc.new {|active| active.last },
@@ -30,7 +48,7 @@ options = {
   algorithm: algorithms[:gt],
   algorithm_configuration: 0,
   visualize: false,
-  marker: true,
+  highlight: true,
 }
 
 parser = OptionParser.new do |opts|
@@ -45,8 +63,9 @@ Usage: #{File.basename $0} [options]
   opts.on('-t', '--type TYPE', types.keys, 'The type of the maze.', "One of #{types.keys.join(', ')}") do |type|
     options[:type] = types[type]
   end
-  opts.on('-g', '--grid-size ROWS,COLUMNS', Array, 'The number of rows and columns of the grid') do |v|
+  opts.on('-g', '--grid-size ROWS[,COLUMNS]', Array, 'The number of rows and columns of the grid') do |v|
     options[:grid_size] = v.first(2).map(&:to_i)
+    options[:grid_size][1] = options[:grid_size].first unless options[:grid_size][1]
   end
   opts.on('-c', '--cell-size SIZE', Integer, 'The size of the cell') do |cell_size|
     options[:cell_size] = cell_size
@@ -61,24 +80,22 @@ Usage: #{File.basename $0} [options]
     options[:algorithm_configuration] = conf-1
   end
   opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
-    options[:seed] = seed
+    srand(seed)
   end
   
   opts.separator "\nMisc:\n\n"
 
-  opts.on('-v', '--visualize', 'Visualize the progress of the algorithm') do
-    options[:visualize] = true
+  opts.on('-v', '--visualize [MODE]', [:run, :segment, :step], 'Visualize the progress of the algorithm') do |mode|
+    options[:visualize] = mode || :run
   end
-  opts.on('-m', '--marker', 'Visualize the progress of the algorithm') do
-    options[:marker] = false
+  opts.on('--off', 'Do not highlight the current cells') do
+    options[:highlight] = false
   end
 
   opts.separator ""
 end
 
 parser.parse!(ARGV)
-
-srand(options[:seed]) if options[:seed]
 
 # Initialize the grid
 grid = options[:type].new *options[:grid_size]
@@ -91,11 +108,17 @@ unless options[:algorithm][:configurations].empty?
 end
 
 # Run the algorithm on the grid
-algorithm.on grid do |cell|
+algorithm.on grid do |stat|
   next unless options[:visualize]
-  list = options[:marker] ? cell : []
-  puts grid.to_s(list)
+
+  # print the maze
+  puts grid.to_s(options[:highlight] ? stat.active : [])
   sleep algorithm.speed
+  
+  # wait for keystroke ?
+  if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)
+    break if read_char == "\e"
+  end
 end
 
 puts grid

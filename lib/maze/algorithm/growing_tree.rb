@@ -15,12 +15,22 @@ class Maze::Algorithm::GrowingTree < Maze::Algorithm
   end
   
   def work grid
+    # true when active gets cells added
+    # false when active gets cells deleted
+    prev_mode = true
+
     active = [grid.random_cell]
     
     while active.any?
       cell = config.call active
       
       neighbor = cell.neighbors.select {|neighbor| neighbor.links.empty? }.sample
+      
+      mode = !!neighbor
+      stat.active = active
+      stat.segment = prev_mode ^ mode
+      yield stat if block_given?
+      prev_mode = mode
       
       if neighbor
         cell.link neighbor
@@ -29,7 +39,6 @@ class Maze::Algorithm::GrowingTree < Maze::Algorithm
         active.delete cell
       end
       
-      yield active
     end
     
     grid

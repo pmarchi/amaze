@@ -11,15 +11,18 @@ class Maze::Algorithm::AldousBorder < Maze::Algorithm
 
     while unvisited > 0
       neighbor = cell.neighbors.sample
-  
+      
+      stat.active = [cell]
+      yield stat if block_given?
+      stat.segment = neighbor.links.empty?
+
       if neighbor.links.empty?
         cell.link neighbor
         unvisited -= 1
       end
   
-      yield cell if block_given?
-
       cell = neighbor
+
       @iterations += 1
     end
     grid

@@ -40,7 +40,7 @@ types = {
   delta: Maze::DeltaGrid,
 }
 
-visualization_modes = [:run, :segment, :step]
+visualization_modes = [:run, :runsegment, :segment, :step]
 
 # default options
 options = {
@@ -117,6 +117,7 @@ algorithm.on grid do |stat|
   puts grid.to_s(options[:highlight] ? stat.active : [])
   puts stat.info if stat.info
   sleep algorithm.speed
+  sleep 1 if options[:visualize] == :runsegment && stat.segment
   
   # wait for keystroke ?
   if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)

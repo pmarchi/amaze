@@ -7,4 +7,5 @@ module Maze
   autoload :SigmaGrid, 'maze/sigma_grid'
   autoload :DeltaGrid, 'maze/delta_grid'
   autoload :Algorithm, 'maze/algorithm'
+  autoload :Formatter, 'maze/formatter'
 end

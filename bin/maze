@@ -35,16 +35,16 @@ algorithms = {
 }
 
 types = {
-  ortho: Maze::Grid,
-  sigma: Maze::SigmaGrid,
-  delta: Maze::DeltaGrid,
+  delta: { grid: Maze::DeltaGrid, ascii_formatter: Maze::Formatter::Ascii::Delta },
+  ortho: { grid: Maze::Grid,      ascii_formatter: Maze::Formatter::Ascii::Ortho },
+  sigma: { grid: Maze::SigmaGrid, ascii_formatter: Maze::Formatter::Ascii::Sigma },
 }
 
 visualization_modes = [:run, :runsegment, :segment, :step]
 
 # default options
 options = {
-  type: types[:ortho], 
+  type: :ortho, 
   grid_size: [4, 4],
   cell_size: 1, 
   algorithm: algorithms[:gt],
@@ -63,7 +63,7 @@ Usage: #{File.basename $0} [options]
   opts.separator "\nGrid options:\n\n"
 
   opts.on('-t', '--type TYPE', types.keys, 'The type of the maze.', "One of #{types.keys.join(', ')}") do |type|
-    options[:type] = types[type]
+    options[:type] = type
   end
   opts.on('-g', '--grid-size ROWS[,COLUMNS]', Array, 'The number of rows and columns of the grid') do |v|
     options[:grid_size] = v.first(2).map(&:to_i)
@@ -100,7 +100,9 @@ end
 parser.parse!(ARGV)
 
 # Initialize the grid
-grid = options[:type].new *options[:grid_size]
+grid_class = types[options[:type]][:grid]
+ascii_formatter_class = types[options[:type]][:ascii_formatter]
+grid = grid_class.new *options[:grid_size]
 grid.cell_size = options[:cell_size]
 
 # Instanziate and optionally configure the algorithm

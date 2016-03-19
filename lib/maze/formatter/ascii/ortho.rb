@@ -1,11 +1,13 @@
 
-module Maze::Formatter::Ascii::Ortho
+class Maze::Formatter::Ascii::Ortho < Maze::Formatter::Ascii
 
-  def to_s marked_cells=[]
+  def render grid, highlighted_cells=[]
     output = "\e[H\e[2J" # clear screen
-    output += "+" + ("-" * cell_size * 3 + "+") * columns + "\n"
+    output += "+" + ("-" * cell_size * 3 + "+") * grid.columns + "\n"
     
-    each_row do |row|
+    # h_line = "-" * cell_size * 3
+    
+    grid.each_row do |row|
       top = "|"
       marked = "|"
       bottom = "+"
@@ -15,7 +17,7 @@ module Maze::Formatter::Ascii::Ortho
         east_boundary = cell.linked?(cell.east) ? ' ' : '|'
         top << body << east_boundary
         
-        if Array(marked_cells).include? cell
+        if Array(highlighted_cells).include? cell
           body = "*".center(cell_size * 3)
         end
         marked << body << east_boundary

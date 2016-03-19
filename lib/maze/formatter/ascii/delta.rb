@@ -1,20 +1,20 @@
 
-module Maze::Formatter::Ascii::Delta
+class Maze::Formatter::Ascii::Delta < Maze::Formatter::Ascii
 
-  def to_s marked_cells=[]
+  def render grid, highlighted_cells=[]
     height = cell_size * 2
     side_a = "/"
     side_b = "\\"
     space = "  "
-    marked = " .".center(height)
+    highlighted = " .".center(height)
     base = "__" * (height - 1)
     
     output = "\e[H\e[2J" # clear screen
     
-    repeat = (columns-1) / 2
+    repeat = (grid.columns-1) / 2
     output << " " << base << ("  " + base) * repeat << "\n"
     
-    each_row do |row|
+    grid.each_row do |row|
       line = Array.new(height) { "" }
 
       # left side of first cell of row
@@ -30,12 +30,12 @@ module Maze::Formatter::Ascii::Delta
       row.each do |cell|
         height.times do |i|
           if (cell.row+cell.column).even?
-            body = (i == cell_size-1 && Array(marked_cells).include?(cell)) ? marked : space * (height-1-i)
+            body = (i == cell_size-1 && Array(highlighted_cells).include?(cell)) ? highlighted : space * (height-1-i)
             # body = space * (height-1-i)
             wall = (cell.linked?(cell.east) ? " " : side_a)
           else
             if i < height-1 || cell.linked?(cell.south)
-              body = (i == cell_size && Array(marked_cells).include?(cell)) ? marked : space * i
+              body = (i == cell_size && Array(highlighted_cells).include?(cell)) ? highlighted : space * i
               # body = space * i
             else
               body = base

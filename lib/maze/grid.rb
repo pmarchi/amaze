@@ -1,22 +1,15 @@
 
 class Maze::Grid
   
-  include Maze::Formatter::Ascii::Ortho
-  
   # The dimension of the maze
   attr_reader :rows, :columns
   
   # The grid
   attr_reader :grid
   
-  # The size of the cell, when printed to the terminal
-  attr_accessor :cell_size
-  
   def initialize rows, columns
     @rows = rows
     @columns = columns
-    
-    @cell_size = 1
     
     prepare_grid
     configure_cell

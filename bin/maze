@@ -101,9 +101,9 @@ parser.parse!(ARGV)
 
 # Initialize the grid
 grid_class = types[options[:type]][:grid]
-ascii_formatter_class = types[options[:type]][:ascii_formatter]
+formatter_class = types[options[:type]][:ascii_formatter]
 grid = grid_class.new *options[:grid_size]
-grid.cell_size = options[:cell_size]
+formatter = formatter_class.new cell_size: options[:cell_size]
 
 # Instanziate and optionally configure the algorithm
 algorithm = options[:algorithm][:class].new
@@ -116,7 +116,7 @@ algorithm.on grid do |stat|
   next unless options[:visualize]
 
   # print the maze
-  puts grid.to_s(options[:highlight] ? stat.active : [])
+  puts formatter.render grid, options[:highlight] ? stat.active : []
   puts stat.info if stat.info
   sleep algorithm.speed
   sleep 1 if options[:visualize] == :runsegment && stat.segment
@@ -127,5 +127,5 @@ algorithm.on grid do |stat|
   end
 end
 
-puts grid
+puts formatter.render grid
 puts algorithm.status

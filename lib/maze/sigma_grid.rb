@@ -1,8 +1,6 @@
 
 class Maze::SigmaGrid < Maze::Grid
   
-  include Maze::Formatter::Ascii::Sigma
-  
   def prepare_grid
     @grid = Array.new(rows) do |row|
       Array.new(columns) do |column|

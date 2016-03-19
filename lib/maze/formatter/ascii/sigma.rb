@@ -1,10 +1,10 @@
 
-module Maze::Formatter::Ascii::Sigma
+class Maze::Formatter::Ascii::Sigma < Maze::Formatter::Ascii
 
-  def to_s marked_cells=[]
+  def render grid, highlighted_cells=[]
     line = "___" * cell_size
     space = "   " * cell_size
-    marked = ".".center(cell_size*3)
+    highlighted = ".".center(cell_size*3)
     upper_east = "\\"
     lower_east = "/"
     upper_west = "/"
@@ -14,11 +14,11 @@ module Maze::Formatter::Ascii::Sigma
     output = "\e[H\e[2J" # clear screen
 
     # top row
-    repeat = ((columns + 0.5) / 2).round - 1
+    repeat = ((grid.columns + 0.5) / 2).round - 1
     output << " " * cell_size << line
     output << (" " * cell_size * 2 + space + line) * repeat << "\n"
     
-    each_row do |row|
+    grid.each_row do |row|
       upper = Array.new(cell_size) { "" }
       lower = Array.new(cell_size) { "" }
       
@@ -29,7 +29,7 @@ module Maze::Formatter::Ascii::Sigma
 
       row.each do |cell|
         cell_size.times do |i|
-          north = " " * i + ((Array(marked_cells).include?(cell) && i == (cell_size-1)) ? marked : space) + " " * i
+          north = " " * i + ((Array(highlighted_cells).include?(cell) && i == (cell_size-1)) ? highlighted : space) + " " * i
           north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
 
           if cell.column.even?
@@ -57,7 +57,7 @@ module Maze::Formatter::Ascii::Sigma
     end
     
     # last lower half of cells
-    repeat = columns / 2
+    repeat = grid.columns / 2
     cell_size.times do |i|
       south = (i < (cell_size-1)) ? space : line
       output << " " * (cell_size-i)

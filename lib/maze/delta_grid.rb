@@ -1,8 +1,6 @@
 
 class Maze::DeltaGrid < Maze::Grid
   
-  include Maze::Formatter::Ascii::Delta
-  
   def configure_cell
     each_cell do |cell|
       row, column = cell.row, cell.column

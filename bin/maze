@@ -35,9 +35,9 @@ algorithms = {
 }
 
 types = {
-  delta: { grid: Maze::DeltaGrid, ascii_formatter: Maze::Formatter::Ascii::Delta },
-  ortho: { grid: Maze::Grid,      ascii_formatter: Maze::Formatter::Ascii::Ortho },
-  sigma: { grid: Maze::SigmaGrid, ascii_formatter: Maze::Formatter::Ascii::Sigma },
+  delta: { grid: Maze::Grid::Delta, ascii_formatter: Maze::Formatter::Ascii::Delta },
+  ortho: { grid: Maze::Grid::Ortho, ascii_formatter: Maze::Formatter::Ascii::Ortho },
+  sigma: { grid: Maze::Grid::Sigma, ascii_formatter: Maze::Formatter::Ascii::Sigma },
 }
 
 visualization_modes = [:run, :runsegment, :segment, :step]
@@ -116,7 +116,8 @@ algorithm.on grid do |stat|
   next unless options[:visualize]
 
   # print the maze
-  puts formatter.render grid, options[:highlight] ? stat.active : []
+  highlighted_cells = options[:highlight] ? stat.active : []
+  puts formatter.render grid, highlighted_cells
   puts stat.info if stat.info
   sleep algorithm.speed
   sleep 1 if options[:visualize] == :runsegment && stat.segment

@@ -1,5 +1,5 @@
 
-class Maze::SigmaGrid < Maze::Grid
+class Maze::Grid::Sigma < Maze::Grid
   
   def prepare_grid
     @grid = Array.new(rows) do |row|

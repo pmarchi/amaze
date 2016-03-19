@@ -1,5 +1,13 @@
 
-class Maze::DeltaGrid < Maze::Grid
+class Maze::Grid::Delta < Maze::Grid
+
+  def prepare_grid
+    @grid = Array.new(rows) do |row|
+      Array.new(columns) do |column|
+        Maze::Cell.new row, column
+      end
+    end
+  end
   
   def configure_cell
     each_cell do |cell|

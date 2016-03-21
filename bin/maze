@@ -42,6 +42,11 @@ types = {
 
 visualization_modes = [:run, :runsegment, :segment, :step]
 
+# Initialize random number generator
+srand
+seed = srand
+srand(seed)
+
 # default options
 options = {
   type: :ortho, 
@@ -51,6 +56,7 @@ options = {
   algorithm_configuration: 0,
   visualize: false,
   highlight: true,
+  seed: seed
 }
 
 parser = OptionParser.new do |opts|
@@ -82,6 +88,7 @@ Usage: #{File.basename $0} [options]
     options[:algorithm_configuration] = conf-1
   end
   opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
+    options[:seed] = seed
     srand(seed)
   end
   
@@ -130,3 +137,4 @@ end
 
 puts formatter.render grid
 puts algorithm.status
+puts "Random seed: #{options[:seed]}"

@@ -4,6 +4,7 @@ class Maze::Grid
   autoload :Ortho, 'maze/grid/ortho'
   autoload :Delta, 'maze/grid/delta'
   autoload :Sigma, 'maze/grid/sigma'
+  autoload :Upsilon, 'maze/grid/upsilon'
   
   # The dimension of the maze
   attr_reader :rows, :columns

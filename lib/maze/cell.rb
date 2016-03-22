@@ -1,11 +1,10 @@
 
 class Maze::Cell
+  autoload :Square, 'maze/cell/square'
+  autoload :Hex, 'maze/cell/hex'
   
   # The position of the cell in the grid
   attr_reader :row, :column
-  
-  # The neighbor cells
-  attr_accessor :north, :east, :south, :west
   
   # Links (Path) to other cells
   attr_reader :links
@@ -15,10 +14,6 @@ class Maze::Cell
     @column = column
     
     @links = {}
-  end
-  
-  def neighbors
-    [north, east, south, west].compact
   end
   
   def link cell, bidi=true

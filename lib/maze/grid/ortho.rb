@@ -4,7 +4,7 @@ class Maze::Grid::Ortho < Maze::Grid
   def prepare_grid
     @grid = Array.new(rows) do |row|
       Array.new(columns) do |column|
-        Maze::Cell.new row, column
+        Maze::Cell::Square.new row, column
       end
     end
   end
@@ -20,3 +20,19 @@ class Maze::Grid::Ortho < Maze::Grid
     end
   end
 end
+
+__END__
+
++---+---+
+|   |   |
++---+---+
+|   |   |
++---+---+
+
++------+------+
+|      |      |
+|      |      |
++------+------+
+|      |      |
+|      |      |
++------+------+

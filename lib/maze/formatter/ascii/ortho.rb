@@ -2,40 +2,36 @@
 class Maze::Formatter::Ascii::Ortho < Maze::Formatter::Ascii
 
   def render grid, highlighted_cells=[]
+    v_line = '|'
+    v_space = ' '
+    h_line = '-' * cell_size * 3
+    h_space = ' ' * cell_size * 3
+    corner = '+'
+    highlighted = '*'.center(cell_size * 3)
+
     output = "\e[H\e[2J" # clear screen
-    output += "+" + ("-" * cell_size * 3 + "+") * grid.columns + "\n"
-    
-    # h_line = "-" * cell_size * 3
+    output << corner << (h_line + corner) * grid.columns << "\n"
     
     grid.each_row do |row|
-      top = "|"
-      marked = "|"
-      bottom = "+"
+      top = v_line.dup      # all without bottom and middle line
+      middle = v_line.dup   # exact middle
+      bottom = corner.dup
       
       row.each do |cell|
-        body = " " * cell_size * 3
-        east_boundary = cell.linked?(cell.east) ? ' ' : '|'
-        top << body << east_boundary
+        east_boundary = cell.linked?(cell.east) ? v_space : v_line
+        top << h_space << east_boundary
         
-        if Array(highlighted_cells).include? cell
-          body = "*".center(cell_size * 3)
-        end
-        marked << body << east_boundary
+        body = Array(highlighted_cells).include?(cell) ? highlighted : h_space
+        middle << body << east_boundary
         
-        south_boundary = (cell.linked?(cell.south) ? ' ' : '-') * cell_size * 3
-        corner = "+"
+        south_boundary = cell.linked?(cell.south) ? h_space : h_line
         bottom << south_boundary << corner
       end
       
       cell_size.times do |i|
-        if cell_size/2 == i
-          output << marked << "\n"
-        else
-          output << top << "\n"
-        end
+        output << (cell_size/2 == i ? middle : top) << "\n"
       end
       output << bottom << "\n"
-      
     end
     
     output

@@ -41,7 +41,7 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
           else
             south = (i < (cell_size-1) || cell.linked?(cell.north)) ? space + " " * (cell_size-1-i) * 2 : line
             south_east = (cell.north || cell.northeast) ? 
-              (cell.north && cell.northeast && cell.north.linked?(cell.northeast)) ? 
+              (cell.north && cell.north.linked?(cell.northeast)) ? 
                 empty_side : 
                 lower_east :
               ""

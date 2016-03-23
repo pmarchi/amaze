@@ -1,5 +1,5 @@
 
-class Maze::Formatter::Ascii
+class Maze::Formatter::ASCII
   autoload :Delta, 'maze/formatter/ascii/delta'
   autoload :Ortho, 'maze/formatter/ascii/ortho'
   autoload :Sigma, 'maze/formatter/ascii/sigma'

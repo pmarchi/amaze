@@ -1,4 +1,4 @@
 
 module Maze::Formatter
-  autoload :Ascii, 'maze/formatter/ascii'
+  autoload :ASCII, 'maze/formatter/ascii'
 end

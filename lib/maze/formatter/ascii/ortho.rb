@@ -1,5 +1,5 @@
 
-class Maze::Formatter::Ascii::Ortho < Maze::Formatter::Ascii
+class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
 
   def render grid, highlighted_cells=[]
     v_line = '|'

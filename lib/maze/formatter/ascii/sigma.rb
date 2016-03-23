@@ -1,5 +1,5 @@
 
-class Maze::Formatter::Ascii::Sigma < Maze::Formatter::Ascii
+class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
   def render grid, highlighted_cells=[]
     line = "___" * cell_size

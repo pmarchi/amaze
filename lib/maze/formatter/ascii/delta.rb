@@ -1,5 +1,5 @@
 
-class Maze::Formatter::Ascii::Delta < Maze::Formatter::Ascii
+class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
 
   def render grid, highlighted_cells=[]
     height = cell_size * 2

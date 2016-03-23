@@ -18,6 +18,6 @@ class Maze::Factory
   end
   
   def create_ascii_formatter *args
-    Maze::Formatter::Ascii.const_get(type.to_s.capitalize).new *args
+    Maze::Formatter::ASCII.const_get(type.to_s.capitalize).new *args
   end
 end

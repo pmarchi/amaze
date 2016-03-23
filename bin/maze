@@ -23,17 +23,6 @@ ensure
   return input
 end
 
-algorithms = {
-  bt:  { class: Maze::Algorithm::BinaryTree,    configurations: [] },
-  ab:  { class: Maze::Algorithm::AldousBorder,  configurations: [] },
-  sw:  { class: Maze::Algorithm::Sidewinder,    configurations: [] },
-  gt:  { class: Maze::Algorithm::GrowingTree,   configurations: [
-    proc {|active| active.last },
-    proc {|active| active.sample },
-    proc {|active| (rand(2) == 0) ? active.last : active.sample },
-  ] },
-}
-
 visualization_modes = [:run, :runsegment, :segment, :step]
 
 # Initialize random number generator
@@ -46,11 +35,11 @@ options = {
   type: :ortho, 
   grid_size: [4, 4],
   cell_size: 1, 
-  algorithm: algorithms[:gt],
-  algorithm_configuration: 0,
+  algorithm: :gt1,
   visualize: false,
   highlight: true,
   seed: seed,
+  image: false,
   png_cell: 50,
   png_wall: 1,
   png_border: 0,
@@ -78,11 +67,8 @@ Usage: #{File.basename $0} [options]
   
   opts.separator "\nAlgorithm options:\n\n"
 
-  opts.on('-a', '--algorithm ALGORITHM', algorithms.keys, 'The algorithm to generate the maze.', "One of #{algorithms.keys.join(', ')}") do |algorithm|
-    options[:algorithm] = algorithms[algorithm]
-  end
-  opts.on('--conf NUMBER', Integer, 'Choose a configuration for an algorithm', 'Configurations exists for:', %Q%#{algorithms.map{|k,v| "#{k}: #{v[:configurations].size}" unless v[:configurations].empty?}.compact.join(', ')}%) do |conf|
-    options[:algorithm_configuration] = conf-1
+  opts.on('-a', '--algorithm ALGORITHM', Maze::Factory.algorithms, 'The algorithm to generate the maze.', "One of #{Maze::Factory.algorithms.join(', ')}") do |algorithm|
+    options[:algorithm] = algorithm
   end
   opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
     options[:seed] = seed
@@ -91,6 +77,9 @@ Usage: #{File.basename $0} [options]
   
   opts.separator "\nPNG Options:\n\n"
   
+  opts.on('--[no-]image', 'Render a PNG image.') do |image|
+    options[:image] = image
+  end
   opts.on('--cell-width [PIXEL]', Integer, 'The width of a cell.') do |px|
     options[:png_cell] = px
   end
@@ -120,11 +109,8 @@ factory = Maze::Factory.new options[:type]
 grid = factory.create_grid *options[:grid_size]
 formatter = factory.create_ascii_formatter cell_size: options[:cell_size]
 
-# Instanziate and optionally configure the algorithm
-algorithm = options[:algorithm][:class].new
-unless options[:algorithm][:configurations].empty?
-  algorithm.configure options[:algorithm][:configurations][options[:algorithm_configuration]]
-end
+# Instanziate the algorithm
+algorithm = factory.create_algorithm options[:algorithm]
 
 # Run the algorithm on the grid
 algorithm.on grid do |stat|
@@ -147,6 +133,8 @@ puts formatter.render grid
 puts algorithm.status
 puts "Random seed: #{options[:seed]}"
 
-png_formatter = factory.create_png_formatter cell_size: options[:png_cell], border: options[:png_border], thickness: options[:png_wall]
-image = png_formatter.render grid
-image.save "maze.png"
+if options[:image]
+  png_formatter = factory.create_png_formatter cell_size: options[:png_cell], border: options[:png_border], thickness: options[:png_wall]
+  image = png_formatter.render grid
+  image.save "maze.png"
+end

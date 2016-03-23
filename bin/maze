@@ -50,7 +50,10 @@ options = {
   algorithm_configuration: 0,
   visualize: false,
   highlight: true,
-  seed: seed
+  seed: seed,
+  png_cell: 50,
+  png_wall: 1,
+  png_border: 0,
 }
 
 parser = OptionParser.new do |opts|
@@ -85,6 +88,18 @@ Usage: #{File.basename $0} [options]
     options[:seed] = seed
     srand(seed)
   end
+  
+  opts.separator "\nPNG Options:\n\n"
+  
+  opts.on('--cell-width [PIXEL]', Integer, 'The width of a cell.') do |px|
+    options[:png_cell] = px
+  end
+  opts.on('--line [PIXEL]', Integer, 'The width of the walls.') do |px|
+    options[:png_wall] = px
+  end
+  opts.on('--border [PIXEL]', Integer, 'The width of the border around the maze.') do |px|
+    options[:png_border] = px
+  end  
   
   opts.separator "\nMisc:\n\n"
 
@@ -131,3 +146,7 @@ end
 puts formatter.render grid
 puts algorithm.status
 puts "Random seed: #{options[:seed]}"
+
+png_formatter = factory.create_png_formatter cell_size: options[:png_cell], border: options[:png_border], thickness: options[:png_wall]
+image = png_formatter.render grid
+image.save "maze.png"

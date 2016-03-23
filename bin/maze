@@ -50,9 +50,8 @@ parser = OptionParser.new do |opts|
 Maze generator
 
 Usage: #{File.basename $0} [options]
-
 "
-  opts.separator "\nGrid options:\n\n"
+  opts.separator "\nGrid options:"
 
   opts.on('-t', '--type TYPE', Maze::Factory.types, 'The type of the maze.', "One of #{Maze::Factory.types.join(', ')}") do |type|
     options[:type] = type
@@ -65,7 +64,7 @@ Usage: #{File.basename $0} [options]
     options[:cell_size] = cell_size
   end
   
-  opts.separator "\nAlgorithm options:\n\n"
+  opts.separator "\nAlgorithm options:"
 
   opts.on('-a', '--algorithm ALGORITHM', Maze::Factory.algorithms, 'The algorithm to generate the maze.', "One of #{Maze::Factory.algorithms.join(', ')}") do |algorithm|
     options[:algorithm] = algorithm
@@ -75,7 +74,7 @@ Usage: #{File.basename $0} [options]
     srand(seed)
   end
   
-  opts.separator "\nPNG Options:\n\n"
+  opts.separator "\nPNG Options:"
   
   opts.on('--[no-]image', 'Render a PNG image.') do |image|
     options[:image] = image
@@ -90,7 +89,7 @@ Usage: #{File.basename $0} [options]
     options[:png_border] = px
   end  
   
-  opts.separator "\nMisc:\n\n"
+  opts.separator "\nMisc:"
 
   opts.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
     options[:visualize] = mode || :run

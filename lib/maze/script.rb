@@ -150,7 +150,7 @@ class Maze::Script
   end
   
   def png
-    @png ||= factory.create_png_formatter cell_size: options[:png_cell], border: options[:png_border], thickness: options[:png_wall]
+    @png ||= factory.create_png_formatter cell_size: options[:png_cell], border: options[:png_border], line_width: options[:png_wall]
   end
 
   def initialize_random_seed

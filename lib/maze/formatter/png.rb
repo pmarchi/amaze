@@ -11,11 +11,11 @@ class Maze::Formatter::PNG
   attr_reader :border
   
   # The thickness of the lines
-  attr_reader :thickness
+  attr_reader :line_width
   
   def initialize options={}
     @cell_size = options.fetch(:cell_size, 10)
     @border = options.fetch(:border, 0)
-    @thickness = options.fetch(:thickness, 1) / 2 * 2 + 1 # only odd numbers!
+    @line_width = options.fetch(:line_width, 1) / 2 * 2 + 1 # only odd numbers!
   end
 end

@@ -7,10 +7,12 @@ class Maze::Algorithm::GrowingTree < Maze::Algorithm
   attr_reader :config
   
   def initialize
+    @description = "last from list"
     @config = Proc.new {|active| active.last }
   end
   
-  def configure block
+  def configure description, block
+    @description = description
     @config = block
   end
   
@@ -46,6 +48,6 @@ class Maze::Algorithm::GrowingTree < Maze::Algorithm
   end
   
   def status
-    "Growing tree algorithm: #{duration}s"
+    "Growing tree (#{@description}) algorithm: #{duration}s"
   end
 end

@@ -34,6 +34,7 @@ srand(seed)
 options = {
   type: :ortho, 
   grid_size: [4, 4],
+  ascii: true,
   cell_size: 1, 
   algorithm: :gt1,
   visualize: false,
@@ -60,9 +61,6 @@ Usage: #{File.basename $0} [options]
     options[:grid_size] = v.first(2).map(&:to_i)
     options[:grid_size][1] = options[:grid_size].first unless options[:grid_size][1]
   end
-  opts.on('-c', '--cell-size SIZE', Integer, 'The size of the cell') do |cell_size|
-    options[:cell_size] = cell_size
-  end
   
   opts.separator "\nAlgorithm options:"
 
@@ -74,9 +72,18 @@ Usage: #{File.basename $0} [options]
     srand(seed)
   end
   
+  opts.separator "\nASCII Options:"
+  
+  opts.on('--[no-]ascii', 'Render the maze with ASCII on the terminal.') do |ascii|
+    options[:ascii] = ascii
+  end
+  opts.on('-c', '--cell-size SIZE', Integer, 'The size of the cell') do |cell_size|
+    options[:cell_size] = cell_size
+  end
+
   opts.separator "\nPNG Options:"
   
-  opts.on('--[no-]image', 'Render a PNG image.') do |image|
+  opts.on('--[no-]image', 'Render the maze as PNG image.') do |image|
     options[:image] = image
   end
   opts.on('--cell-width [PIXEL]', Integer, 'The width of a cell.') do |px|
@@ -102,6 +109,7 @@ Usage: #{File.basename $0} [options]
 end
 
 parser.parse!(ARGV)
+options[:visualize] = false unless options[:ascii]
 
 # Initialize the grid and a ascii formatter
 factory = Maze::Factory.new options[:type]
@@ -128,7 +136,10 @@ algorithm.on grid do |stat|
   end
 end
 
-puts formatter.render grid
+if options[:ascii]
+  puts formatter.render grid
+end
+
 puts algorithm.status
 puts "Random seed: #{options[:seed]}"
 
@@ -136,4 +147,5 @@ if options[:image]
   png_formatter = factory.create_png_formatter cell_size: options[:png_cell], border: options[:png_border], thickness: options[:png_wall]
   image = png_formatter.render grid
   image.save "maze.png"
+  puts "Maze 'maze.png' saved."
 end

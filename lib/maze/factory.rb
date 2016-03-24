@@ -34,27 +34,33 @@ class Maze::Factory
   def create_algorithm algorithm
     raise "#{algorithm} is not supported" unless self.class.algorithms.include? algorithm
     
-    # TODO: constrain to maze type
-
-    instance = {
-      bt:  Maze::Algorithm::BinaryTree,
-      sw:  Maze::Algorithm::Sidewinder,
+    # Alogrithms for all mazes
+    select = {
       ab:  Maze::Algorithm::AldousBorder,
       gt1: Maze::Algorithm::GrowingTree,
       gt2: Maze::Algorithm::GrowingTree,
       gt3: Maze::Algorithm::GrowingTree,
       gt4: Maze::Algorithm::GrowingTree,
-    }[algorithm].new
+    }
+    
+    # Algorithms only for ortho mazes
+    select.merge(
+      bt: Maze::Algorithm::BinaryTree,
+      sw: Maze::Algorithm::Sidewinder
+    ) if type == :ortho
+    
+    raise "Alogrithm not supported on #{type} maze." unless select[algorithm]
+    instance = select[algorithm].new
 
     case algorithm
     when :gt1
-      instance.configure proc {|active| active.last }
+      instance.configure "last from list", proc {|active| active.last }
     when :gt2
-      instance.configure proc {|active| active.sample }
+      instance.configure "random from list", proc {|active| active.sample }
     when :gt3
-      instance.configure proc {|active| (rand(2) > 0) ? active.last : active.sample }
+      instance.configure "last/random 1/1 from list", proc {|active| (rand(2) > 0) ? active.last : active.sample }
     when :gt4
-      instance.configure proc {|active| (rand(3) > 0) ? active.last : active.sample }
+      instance.configure "last/random 2/1 from list", proc {|active| (rand(3) > 0) ? active.last : active.sample }
     end
     
     instance 

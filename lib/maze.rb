@@ -1,6 +1,7 @@
 require "maze/version"
 
 module Maze
+  autoload :Script, 'maze/script'
   autoload :Factory, 'maze/factory'
   autoload :Cell, 'maze/cell'
   autoload :Grid, 'maze/grid'

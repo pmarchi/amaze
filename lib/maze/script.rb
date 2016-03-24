@@ -103,6 +103,9 @@ class Maze::Script
       o.on('--wall PIXEL', Integer, 'The width of the walls.') do |px|
         options[:png_wall] = px
       end
+      
+      # TODO: option for wall color
+      
       o.on('--border PIXEL', Integer, 'The width of the border around the maze.') do |px|
         options[:png_border] = px
       end  

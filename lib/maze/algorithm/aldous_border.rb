@@ -28,10 +28,6 @@ class Maze::Algorithm::AldousBorder < Maze::Algorithm
     grid
   end
   
-  def speed
-    0.02
-  end
-  
   def status
     "Aldous-Border algorithm: #{@iterations} iterations in #{duration}s"
   end

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require "bundler/setup"
+require 'bundler/setup'
 require 'maze'
 
 Maze::Script.new.run ARGV

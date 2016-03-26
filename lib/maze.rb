@@ -10,4 +10,6 @@ module Maze
   autoload :DeltaGrid, 'maze/delta_grid'
   autoload :Algorithm, 'maze/algorithm'
   autoload :Formatter, 'maze/formatter'
+  autoload :Distances, 'maze/distances'
+  autoload :DistancesModule, 'maze/distances_module'
 end

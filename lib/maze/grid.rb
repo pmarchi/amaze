@@ -5,8 +5,6 @@ class Maze::Grid
   autoload :Sigma, 'maze/grid/sigma'
   autoload :Upsilon, 'maze/grid/upsilon'
   
-  include Maze::DistancesModule
-  
   # The dimension of the maze
   attr_reader :rows, :columns
   

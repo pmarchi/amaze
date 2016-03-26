@@ -1,17 +1,17 @@
 
 class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
-  def render grid, highlighted_cells=[]
+  def render
     line = "___" * cell_size
     space = "   " * cell_size
-    highlighted = ".".center(cell_size*3)
+    highlighted = content_highlighted.center(cell_size*3).blue
     upper_east = "\\"
     lower_east = "/"
     upper_west = "/"
     lower_west = "\\"
     empty_side = " "
     
-    output = "\e[H\e[2J" # clear screen
+    output = ansi_clear
 
     # top row
     repeat = ((grid.columns + 0.5) / 2).round - 1
@@ -29,7 +29,7 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
       row.each do |cell|
         cell_size.times do |i|
-          north = " " * i + ((Array(highlighted_cells).include?(cell) && i == (cell_size-1)) ? highlighted : space) + " " * i
+          north = " " * i + ((highlighted_cell?(cell) && i == (cell_size-1)) ? highlighted : space) + " " * i
           north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
 
           if cell.column.even?

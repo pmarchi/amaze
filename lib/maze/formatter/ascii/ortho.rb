@@ -1,8 +1,8 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
 
-  def render grid, highlighted_cells=[]
-    output = "\e[H\e[2J" # clear screen
+  def render
+    output = ansi_clear
     output << corner << (h_line + corner) * grid.columns << "\n"
     
     grid.each_row do |row|
@@ -14,9 +14,8 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
         east_boundary = cell.linked?(cell.east) ? v_space : v_line
         top << h_space << east_boundary
         
-        content = contents_of(cell).center(cell_size * 3)
-        body = Array(highlighted_cells).include?(cell) ? highlighted : content
-        middle << body.blue << east_boundary
+        body = (highlighted_cell?(cell) ? content_highlighted : contents_of(cell)).center(cell_size * 3).blue
+        middle << body << east_boundary
         
         south_boundary = cell.linked?(cell.south) ? h_space : h_line
         bottom << south_boundary << corner
@@ -49,9 +48,5 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
   def corner
     '+'
-  end
-  
-  def highlighted
-    '*'.center(cell_size * 3)
   end
 end

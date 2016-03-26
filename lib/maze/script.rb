@@ -31,31 +31,34 @@ class Maze::Script
     initialize_random_seed
     
     # Run the algorithm on the grid
-    algorithm.on grid do |stat|
-      next unless visualize?
-
-      # print the maze
-      highlighted_cells = options[:highlight] ? stat.active : []
-      puts ascii.render grid, highlighted_cells
-      puts stat.info if stat.info
-      sleep algorithm.speed
-      sleep 1 if options[:visualize] == :runsegment && stat.segment
+    if visualize?
+      algorithm.on grid do |stat|
+        # print the maze
+        ascii = factory.create_ascii_formatter grid, 
+          cell_size: options[:cell_size],
+          highlighted_cells: stat.active
+          
+        puts ascii.render
+        
+        puts stat.info if stat.info
+        sleep algorithm.speed
+        sleep 1 if options[:visualize] == :runsegment && stat.segment
   
-      # wait for keystroke ?
-      if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)
-        break if read_char == "\e"
+        # wait for keystroke ?
+        if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)
+          break if read_char == "\e"
+        end
       end
+    else
+      algorithm.on grid
     end
     
     # Calculate the distances from a given cell
-    if options[:distances]
-      distances = grid[*options[:distances]].distances
-      ascii.distances = distances
-      # grid.distances 
-    end
+    distances = options[:distances] ? grid[*options[:distances]].distances : nil
 
     if ascii?
-      puts ascii.render grid
+      ascii = factory.create_ascii_formatter grid, cell_size: options[:cell_size], distances: distances
+      puts ascii.render
     end
 
     puts algorithm.status
@@ -126,9 +129,6 @@ class Maze::Script
       visualization_modes = [:run, :runsegment, :segment, :step]
       o.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
         options[:visualize] = mode || :run
-      end
-      o.on('--off', 'Do not highlight the current cells') do
-        options[:highlight] = false
       end
 
       o.separator ""

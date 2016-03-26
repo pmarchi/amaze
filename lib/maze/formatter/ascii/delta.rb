@@ -1,15 +1,14 @@
 
 class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
 
-  def render grid, highlighted_cells=[]
-    height = cell_size * 2
+  def render
     side_a = "/"
     side_b = "\\"
     space = "  "
-    highlighted = " .".center(height)
+    highlighted = content_highlighted.center(height).blue
     base = "__" * (height - 1)
     
-    output = "\e[H\e[2J" # clear screen
+    output = ansi_clear
     
     repeat = (grid.columns-1) / 2
     output << " " << base << ("  " + base) * repeat << "\n"
@@ -30,12 +29,12 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
       row.each do |cell|
         height.times do |i|
           if (cell.row+cell.column).even?
-            body = (i == cell_size-1 && Array(highlighted_cells).include?(cell)) ? highlighted : space * (height-1-i)
+            body = (i == cell_size-1 && highlighted_cell?(cell)) ? highlighted : space * (height-1-i)
             # body = space * (height-1-i)
             wall = (cell.linked?(cell.east) ? " " : side_a)
           else
             if i < height-1 || cell.linked?(cell.south)
-              body = (i == cell_size && Array(highlighted_cells).include?(cell)) ? highlighted : space * i
+              body = (i == cell_size && highlighted_cell?(cell)) ? highlighted : space * i
               # body = space * i
             else
               body = base
@@ -54,5 +53,9 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
     end
     
     output
+  end
+  
+  def height
+    cell_size * 2
   end
 end

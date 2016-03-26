@@ -1,17 +1,18 @@
 
 class Maze::Grid
-  
   autoload :Ortho, 'maze/grid/ortho'
   autoload :Delta, 'maze/grid/delta'
   autoload :Sigma, 'maze/grid/sigma'
   autoload :Upsilon, 'maze/grid/upsilon'
+  
+  include Maze::DistancesModule
   
   # The dimension of the maze
   attr_reader :rows, :columns
   
   # The grid
   attr_reader :grid
-  
+    
   def initialize rows, columns
     @rows = rows
     @columns = columns

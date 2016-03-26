@@ -12,6 +12,7 @@ class Maze::Script
     @options = {
       type: :ortho, 
       grid_size: [4, 4],
+      distances: false,
       ascii: true,
       cell_size: 1, 
       algorithm: :gt1,
@@ -44,6 +45,13 @@ class Maze::Script
       if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)
         break if read_char == "\e"
       end
+    end
+    
+    # Calculate the distances from a given cell
+    if options[:distances]
+      distances = grid[*options[:distances]].distances
+      ascii.distances = distances
+      # grid.distances 
     end
 
     if ascii?
@@ -81,6 +89,9 @@ class Maze::Script
       end
       o.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
         options[:seed] = seed
+      end
+      o.on('--[no-]distances [ROW,COLUMN]', Array, 'Calculate the distances from cell(ROW/COLUMN) to all other cells of the grid.') do |distances|
+        options[:distances] = (distances || [0,0]).map(&:to_i)
       end
   
       o.separator "\nASCII Options:"

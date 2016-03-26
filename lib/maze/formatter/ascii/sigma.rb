@@ -2,15 +2,6 @@
 class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
   def render
-    line = "___" * cell_size
-    space = "   " * cell_size
-    highlighted = content_highlighted.center(cell_size*3).blue
-    upper_east = "\\"
-    lower_east = "/"
-    upper_west = "/"
-    lower_west = "\\"
-    empty_side = " "
-    
     output = ansi_clear
 
     # top row
@@ -29,7 +20,13 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
       row.each do |cell|
         cell_size.times do |i|
-          north = " " * i + ((highlighted_cell?(cell) && i == (cell_size-1)) ? highlighted : space) + " " * i
+          north = " " * i
+          if i == cell_size-1
+            north << (highlighted_cell?(cell) ? content_highlighted : contents_of(cell)).center(cell_size * 3).blue
+          else
+            north << space
+          end
+          north << " " * i
           north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
 
           if cell.column.even?
@@ -66,5 +63,33 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
     end
 
     output
+  end
+  
+  def line
+    "___" * cell_size
+  end
+  
+  def space
+    "   " * cell_size
+  end
+
+  def upper_east
+    "\\"
+  end
+
+  def lower_east
+    "/"
+  end
+  
+  def upper_west
+    "/"
+  end
+  
+  def lower_west
+    "\\"
+  end
+  
+  def empty_side
+    " "
   end
 end

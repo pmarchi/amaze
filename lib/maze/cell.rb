@@ -6,9 +6,6 @@ class Maze::Cell
   # The position of the cell in the grid
   attr_reader :row, :column
   
-  # Links (Path) to other cells
-  attr_reader :links
-  
   def initialize row, column
     @row = row
     @column = column
@@ -16,13 +13,17 @@ class Maze::Cell
     @links = {}
   end
   
+  def links
+    @links.keys
+  end
+  
   def link cell, bidi=true
-    links[cell] = true
+    @links[cell] = true
     cell.link self, false if bidi
   end
   
   def linked? cell
-    links.key? cell
+    @links.key? cell
   end
   
   def inspect
@@ -31,5 +32,26 @@ class Maze::Cell
   
   def to_s
     "(#{row},#{column})"
+  end
+  
+  def distances
+    distances = Maze::Distances.new self
+    frontier = [self]
+    
+    while frontier.any?
+      new_frontier = []
+      
+      frontier.each do |cell|
+        cell.links.each do |linked|
+          next if distances[linked]
+          distances[linked] = distances[cell] + 1
+          new_frontier << linked
+        end
+      end
+      
+      frontier = new_frontier
+    end
+    
+    distances
   end
 end

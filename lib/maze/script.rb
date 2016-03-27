@@ -53,14 +53,16 @@ class Maze::Script
       algorithm.on grid
     end
     
-    # Calculate the distances from a given cell
-    distances = options[:distances] ? grid[*options[:distances]].distances : nil
+    # Calculate the distances from a given start cell
+    distances = distances? ? grid[*origin].distances : nil
+    # And the solution to a given end cell
+    distances = distances.path_to grid[*goal] if solution?
 
     if ascii?
       ascii = factory.create_ascii_formatter grid, cell_size: options[:cell_size], distances: distances
       puts ascii.render
     end
-
+    
     puts algorithm.status
     puts "Random seed: #{seed}"
 
@@ -95,6 +97,9 @@ class Maze::Script
       end
       o.on('--[no-]distances [ROW,COLUMN]', Array, 'Calculate the distances from cell(ROW/COLUMN) to all other cells of the grid.') do |distances|
         options[:distances] = (distances || [0,0]).map(&:to_i)
+      end
+      o.on('--[no-]solution [ROW,COLUMN]', Array, 'Find the shortest path to cell(ROW/COLUMN).') do |solution|
+        options[:solution] = (solution || [-1,-1]).map(&:to_i)
       end
   
       o.separator "\nASCII Options:"
@@ -144,7 +149,23 @@ class Maze::Script
   end
   
   def visualize?
-    @options[:ascii] && options[:visualize]
+    @options[:ascii] && !!@options[:visualize]
+  end
+  
+  def distances?
+    !!@options[:distances] || !!@options[:solution]
+  end
+  
+  def solution?
+    !!@options[:solution]
+  end
+  
+  def origin
+    @options[:distances] || [0,0]
+  end
+  
+  def goal
+    @options[:solution].first == -1 ? [grid.rows - 1,0] : @options[:solution]
   end
   
   def factory

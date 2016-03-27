@@ -38,6 +38,10 @@ class Maze::Formatter::ASCII
     options[:distances]
   end
   
+  # Returns the content of a cell:
+  # a) the cell is in the list of the cells to be highlighted => '*'
+  # b) distances have been assigned, the current distance as 36 based integer, e.g. => '1F'
+  # c) empty cell => ' '
   def contents_of cell
     if highlighted_cell? cell
       content_highlighted

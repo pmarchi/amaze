@@ -22,7 +22,7 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
         cell_size.times do |i|
           north = " " * i
           if i == cell_size-1
-            north << (highlighted_cell?(cell) ? content_highlighted : contents_of(cell)).center(cell_size * 3).blue
+            north << contents_of(cell).center(cell_size * 3).blue
           else
             north << space
           end

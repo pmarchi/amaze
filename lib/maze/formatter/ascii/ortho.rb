@@ -14,7 +14,7 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
         east_boundary = cell.linked?(cell.east) ? v_space : v_line
         top << h_space << east_boundary
         
-        body = (highlighted_cell?(cell) ? content_highlighted : contents_of(cell)).center(cell_size * 3).blue
+        body = contents_of(cell).center(cell_size * 3).blue
         middle << body << east_boundary
         
         south_boundary = cell.linked?(cell.south) ? h_space : h_line

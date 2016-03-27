@@ -2,11 +2,7 @@
 class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
 
   def render
-    side_a = "/"
-    side_b = "\\"
-    space = "  "
     highlighted = content_highlighted.center(height).blue
-    base = "__" * (height - 1)
     
     output = ansi_clear
     
@@ -29,17 +25,19 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
       row.each do |cell|
         height.times do |i|
           if (cell.row+cell.column).even?
-            body = (i == cell_size-1 && highlighted_cell?(cell)) ? highlighted : space * (height-1-i)
-            # body = space * (height-1-i)
-            wall = (cell.linked?(cell.east) ? " " : side_a)
+            body = (i == cell_size-1 ? contents_of(cell) : '').center((height-1-i)*2).blue
+            wall = cell.linked?(cell.east) ? " " : side_a
           else
             if i < height-1 || cell.linked?(cell.south)
-              body = (i == cell_size && highlighted_cell?(cell)) ? highlighted : space * i
+              body = (i == cell_size ? contents_of(cell) : '').center(i*2).blue
               # body = space * i
             else
+              # FIX: if cell_size == 1 the body of the cell and the bottom of the cell
+              # will be drawn by the same characters. Use underline? Underline will 
+              # cause problems with the color. Don't fix it for the moment.
               body = base
             end
-            wall = (cell.linked?(cell.east) ? " " : side_b)
+            wall = cell.linked?(cell.east) ? " " : side_b
           end
           line[i] << body << wall
         end
@@ -57,5 +55,21 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
   
   def height
     cell_size * 2
+  end
+
+  def side_a
+    "/"
+  end
+  
+  def side_b
+    "\\"
+  end
+  
+  def space
+    "  "
+  end
+  
+  def base
+    "__" * (height - 1)
   end
 end

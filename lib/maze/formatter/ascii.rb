@@ -5,8 +5,6 @@ class Maze::Formatter::ASCII
   autoload :Ortho, 'maze/formatter/ascii/ortho'
   autoload :Sigma, 'maze/formatter/ascii/sigma'
 
-  include Maze::DistancesModule
-  
   # The grid
   attr_reader :grid
   
@@ -38,5 +36,17 @@ class Maze::Formatter::ASCII
   # Distances
   def distances
     options[:distances]
+  end
+  
+  def contents_of cell
+    if highlighted_cell? cell
+      content_highlighted
+    else
+      if distances && distances[cell]
+        distances[cell].to_s(36).upcase # 0..9a..z
+      else
+        ' '
+      end
+    end
   end
 end

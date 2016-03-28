@@ -62,7 +62,19 @@ class Maze::Script
     if solution?
       distances = distances.path_to grid[*goal]
       highlighted_cells = distances.cells
-      content_color = :red
+      content_color = Hash.new(:magenta)
+      content_color[grid[*origin]] = :red
+      content_color[grid[*goal]] = :red
+    end
+    
+    if longest?
+      new_start, distance = distances.max
+      new_distances = new_start.distances
+      new_goal, distance = new_distances.max
+      distances = new_distances.path_to new_goal
+      content_color = Hash.new(:magenta)
+      content_color[new_start] = :red
+      content_color[new_goal] = :red
     end
 
     # Render the maze, set defaults for missing options
@@ -120,6 +132,9 @@ class Maze::Script
       o.on('--[no-]solution [ROW,COLUMN]', Array, 'Find the shortest path to cell(ROW/COLUMN).') do |solution|
         options[:solution] = (solution || [-1,-1]).map(&:to_i)
       end
+      o.on('--[no-]longest', 'Find the longest path of the maze.') do |longest|
+        options[:longest] = longest
+      end
   
       o.separator "\nASCII Options:"
   
@@ -165,11 +180,15 @@ class Maze::Script
   end
   
   def distances?
-    !!@options[:distances] || !!@options[:solution]
+    !!@options[:distances] || !!@options[:solution] || !!options[:longest]
   end
   
   def solution?
     !!@options[:solution]
+  end
+  
+  def longest?
+    !!@options[:longest]
   end
   
   def origin

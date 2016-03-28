@@ -25,11 +25,11 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
       row.each do |cell|
         height.times do |i|
           if (cell.row+cell.column).even?
-            body = (i == cell_size-1 ? contents_of(cell) : '').center((height-1-i)*2).send(content_color)
+            body = (i == cell_size-1 ? content_of(cell) : '').center((height-1-i)*2).send(content_color_of(cell))
             wall = cell.linked?(cell.east) ? " " : side_a
           else
             if i < height-1 || cell.linked?(cell.south)
-              body = (i == cell_size ? contents_of(cell) : '').center(i*2).send(content_color)
+              body = (i == cell_size ? content_of(cell) : '').center(i*2).send(content_color_of(cell))
               # body = space * i
             else
               # FIX: if cell_size == 1 the body of the cell and the bottom of the cell

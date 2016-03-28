@@ -33,6 +33,16 @@ class Maze::Formatter::ASCII
     '*'
   end
   
+  def content_color_of cell
+    if @options[:content_color].is_a? Hash
+      @options[:content_color][cell]
+    elsif @options[:content_color].is_a? Symbol
+      @options[:content_color]
+    else
+      :blue
+    end
+  end
+
   def content_color
     @options[:content_color] || :blue
   end
@@ -46,7 +56,7 @@ class Maze::Formatter::ASCII
   # a) the cell is in the list of the cells to be highlighted => '*'
   # b) distances have been assigned, the current distance as 36 based integer, e.g. => '1F'
   # c) empty cell => ' '
-  def contents_of cell
+  def content_of cell
     if highlighted_cell? cell
       content_highlighted
     else

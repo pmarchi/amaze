@@ -44,7 +44,7 @@ class Maze::Factory
     }
     
     # Algorithms only for ortho mazes
-    select.merge(
+    select.merge!(
       bt: Maze::Algorithm::BinaryTree,
       sw: Maze::Algorithm::Sidewinder
     ) if type == :ortho

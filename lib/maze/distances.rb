@@ -36,4 +36,18 @@ class Maze::Distances
     
     breadcrumbs
   end
+  
+  def max
+    max_cell = @root
+    max_distance = 0
+    
+    @cells.each do |cell, distance|
+      if distance > max_distance
+        max_cell = cell
+        max_distance = distance
+      end
+    end
+    
+    [max_cell, max_distance]
+  end
 end

@@ -54,12 +54,24 @@ class Maze::Script
     end
     
     # Calculate the distances from a given start cell
-    distances = distances? ? grid[*origin].distances : nil
-    # And the solution to a given end cell
-    distances = distances.path_to grid[*goal] if solution?
+    if distances?
+      distances = grid[*origin].distances
+    end
 
+    # And the solution to a given end cell
+    if solution?
+      distances = distances.path_to grid[*goal]
+      highlighted_cells = distances.cells
+      content_color = :red
+    end
+
+    # Render the maze, set defaults for missing options
     if ascii?
-      ascii = factory.create_ascii_formatter grid, cell_size: options[:cell_size], distances: distances
+      ascii = factory.create_ascii_formatter grid, 
+        cell_size: options[:cell_size], 
+        distances: distances || nil,
+        highlighted_cells: highlighted_cells || [],
+        content_color: content_color || :blue
       puts ascii.render
     end
     
@@ -95,6 +107,13 @@ class Maze::Script
       o.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
         options[:seed] = seed
       end
+      visualization_modes = [:run, :runsegment, :segment, :step]
+      o.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
+        options[:visualize] = mode || :run
+      end
+
+      o.separator "\nSolution options:"
+
       o.on('--[no-]distances [ROW,COLUMN]', Array, 'Calculate the distances from cell(ROW/COLUMN) to all other cells of the grid.') do |distances|
         options[:distances] = (distances || [0,0]).map(&:to_i)
       end
@@ -129,13 +148,6 @@ class Maze::Script
         options[:png_border] = px
       end  
   
-      o.separator "\nMisc:"
-
-      visualization_modes = [:run, :runsegment, :segment, :step]
-      o.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
-        options[:visualize] = mode || :run
-      end
-
       o.separator ""
     end
   end

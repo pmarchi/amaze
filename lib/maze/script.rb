@@ -61,6 +61,7 @@ class Maze::Script
     # And the solution to a given end cell
     if solution?
       distances = distances.path_to grid[*goal]
+      path_length = distances[grid[*goal]]
       highlighted_cells = distances.cells
       content_color = Hash.new(:magenta)
       content_color[grid[*origin]] = :red
@@ -72,6 +73,8 @@ class Maze::Script
       new_distances = new_start.distances
       new_goal, distance = new_distances.max
       distances = new_distances.path_to new_goal
+      path_length = distance
+      highlighted_cells = distances.cells
       content_color = Hash.new(:magenta)
       content_color[new_start] = :red
       content_color[new_goal] = :red
@@ -89,6 +92,7 @@ class Maze::Script
     
     puts algorithm.status
     puts "Random seed: #{seed}"
+    puts "Path length: #{path_length}" if path_length
 
     if image?
       image = png.render grid

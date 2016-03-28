@@ -33,6 +33,10 @@ class Maze::Formatter::ASCII
     '*'
   end
   
+  def content_color
+    @options[:content_color] || :blue
+  end
+  
   # Distances
   def distances
     options[:distances]

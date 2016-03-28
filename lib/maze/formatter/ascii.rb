@@ -36,10 +36,8 @@ class Maze::Formatter::ASCII
   def content_color_of cell
     if @options[:content_color].is_a? Hash
       @options[:content_color][cell]
-    elsif @options[:content_color].is_a? Symbol
-      @options[:content_color]
     else
-      :blue
+      @options[:content_color] || :blue
     end
   end
 

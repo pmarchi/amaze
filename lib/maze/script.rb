@@ -95,8 +95,15 @@ class Maze::Script
     puts "Path length: #{path_length}" if path_length
 
     if image?
-      image = png.render grid
-      image.save "maze.png"
+      png = factory.create_png_formatter grid,
+        cell_size: options[:png_cell],
+        border: options[:png_border],
+        line_width: options[:png_wall],
+        distances: distances || nil
+
+      png.render_background
+      png.render
+      png.image.save "maze.png"
       puts "Maze 'maze.png' saved."
     end
   end
@@ -215,14 +222,6 @@ class Maze::Script
     @algorithm ||= factory.create_algorithm options[:algorithm]
   end
   
-  def ascii
-    @ascii ||= factory.create_ascii_formatter cell_size: options[:cell_size]
-  end
-  
-  def png
-    @png ||= factory.create_png_formatter cell_size: options[:png_cell], border: options[:png_border], line_width: options[:png_wall]
-  end
-
   def initialize_random_seed
     if options[:seed]
       @seed = options[:seed]

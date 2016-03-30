@@ -1,23 +1,15 @@
 
 class Maze::Formatter::PNG::Ortho < Maze::Formatter::PNG
   
-  def background_color
-    ChunkyPNG::Color::WHITE
+  def render_background
+    grid.each_cell do |cell|
+      x1, y1, x2, y2 = coordinates cell
+      color = background_color_for cell
+      image.rect x1, y1, x2, y2, color, color if color      
+    end
   end
   
-  def wall_color
-    ChunkyPNG::Color.html_color(:black)
-  end
-  
-  # The image object
-  attr_reader :image
-  
-  def render grid
-    image_width = cell_size * grid.columns + border * 2 + line_width
-    image_height = cell_size * grid.rows + border * 2 + line_width
-
-    @image = ChunkyPNG::Image.new image_width, image_height, background_color
-    
+  def render
     grid.each_cell do |cell|
       x1, y1, x2, y2 = coordinates cell
       
@@ -53,5 +45,25 @@ class Maze::Formatter::PNG::Ortho < Maze::Formatter::PNG
       (cell.column + 1) * cell_size + offset,
       (cell.row + 1) * cell_size + offset,
     ]
+  end
+
+  def image
+    @image ||= ChunkyPNG::Image.new image_width, image_height, background_color
+  end
+    
+  def image_width
+    cell_size * grid.columns + border * 2 + line_width
+  end
+  
+  def image_height
+    cell_size * grid.rows + border * 2 + line_width
+  end
+  
+  def background_color
+    ChunkyPNG::Color::WHITE
+  end
+  
+  def wall_color
+    ChunkyPNG::Color.html_color(:black)
   end
 end

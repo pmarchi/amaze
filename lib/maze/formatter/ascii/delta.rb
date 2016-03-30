@@ -32,7 +32,7 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
               body = (i == cell_size ? content_of(cell) : '').center(i*2).send(content_color_of(cell))
               # body = space * i
             else
-              # FIX: if cell_size == 1 the body of the cell and the bottom of the cell
+              # FIXME: if cell_size == 1 the body of the cell and the bottom of the cell
               # will be drawn by the same characters. Use underline? Underline will 
               # cause problems with the color. Don't fix it for the moment.
               body = base

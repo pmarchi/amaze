@@ -30,7 +30,7 @@ class Maze::Formatter::PNG
   end
 
   def background_color
-    ChunkyPNG::Color::WHITE
+    ChunkyPNG::Color.html_color(@options[:background_color] || :white)
   end
   
   def wall_color
@@ -77,5 +77,9 @@ class Maze::Formatter::PNG
     #   Gradient::Point.new(0.75, Color::RGB.new(255, 255,   0), 1.0), # yellow
     #   Gradient::Point.new(1,    Color::RGB.new(255, 255, 255), 1.0), # white
     # )
+  end
+  
+  def self.colors
+    ChunkyPNG::Color::PREDEFINED_COLORS.keys
   end
 end

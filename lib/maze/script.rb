@@ -1,6 +1,5 @@
 
 require 'io/console'
-require 'oily_png'
 
 class Maze::Script
 
@@ -22,8 +21,9 @@ class Maze::Script
       image: false,
       png_cell: 50,
       png_wall: 1,
-      png_border: 0,
       png_wall_color: :black,
+      png_border: 0,
+      png_background_color: :white,
     }
   end
 
@@ -99,6 +99,7 @@ class Maze::Script
     if image?
       png = factory.create_png_formatter grid,
         cell_size: options[:png_cell],
+        background_color: options[:png_background_color],
         border: options[:png_border],
         line_width: options[:png_wall],
         line_color: options[:png_wall_color],
@@ -167,14 +168,17 @@ class Maze::Script
       o.on('--cell-width PIXEL', Integer, 'The width of a cell.') do |px|
         options[:png_cell] = px
       end
+      o.on('--border PIXEL', Integer, 'The width of the border around the maze.') do |px|
+        options[:png_border] = px
+      end
       o.on('--wall PIXEL', Integer, 'The width of the walls.') do |px|
         options[:png_wall] = px
       end
-      o.on('--border PIXEL', Integer, 'The width of the border around the maze.') do |px|
-        options[:png_border] = px
-      end  
-      o.on('--wall-color NAME', ChunkyPNG::Color::PREDEFINED_COLORS.keys, 'The color of the walls.', 'Use a HTML color name.') do |color|
+      o.on('--wall-color NAME', Maze::Formatter::PNG.colors, 'The color of the walls. Provide a HTML color name.') do |color|
         options[:png_wall_color] = color
+      end
+      o.on('--background-color NAME', Maze::Formatter::PNG.colors, 'The background color. Provide a HTML color name.') do |color|
+        options[:png_background_color] = color
       end
   
       o.separator ""

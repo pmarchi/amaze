@@ -11,5 +11,4 @@ module Maze
   autoload :Algorithm, 'maze/algorithm'
   autoload :Formatter, 'maze/formatter'
   autoload :Distances, 'maze/distances'
-  autoload :ColorGradient, 'maze/color_gradient'
 end

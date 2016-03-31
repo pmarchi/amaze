@@ -54,7 +54,7 @@ class Maze::Formatter::PNG
   def gradient
     @gradient ||= Gradient::Map.new(
       Gradient::Point.new(0,    Color::RGB.new(  0,   0, 128), 1.0), # blue
-      Gradient::Point.new(0.5,  Color::RGB.new(  0, 191, 255), 1.0), # cyan
+      Gradient::Point.new(0.6,  Color::RGB.new(  0, 191, 255), 1.0), # cyan
       Gradient::Point.new(1,    Color::RGB.new(255, 255, 255), 1.0), # white
     )
     # @gradient ||= Gradient::Map.new(

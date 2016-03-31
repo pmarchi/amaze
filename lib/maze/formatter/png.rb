@@ -59,6 +59,8 @@ class Maze::Formatter::PNG
     ChunkyPNG::Color.from_hex(gradient.at(intensity).color.hex)
   end
   
+  # TODO: provide a script options for different gradients
+  
   def gradient
     # @gradient ||= Gradient::Map.new(
     #   Gradient::Point.new(0,    Color::RGB.new(  0,   0,   0), 1.0), # blue

@@ -1,7 +1,6 @@
 
 # require 'chunky_png'
 require 'oily_png'
-require 'gradient'
 
 class Maze::Formatter::PNG
   autoload :Ortho, 'maze/formatter/png/ortho'
@@ -59,24 +58,8 @@ class Maze::Formatter::PNG
     ChunkyPNG::Color.from_hex(gradient.at(intensity).color.hex)
   end
   
-  # TODO: provide a script options for different gradients
-  
   def gradient
-    # @gradient ||= Gradient::Map.new(
-    #   Gradient::Point.new(0,    Color::RGB.new(  0,   0,   0), 1.0), # blue
-    #   Gradient::Point.new(1,    Color::RGB.new(255, 255, 255), 1.0), # white
-    # )
-    @gradient ||= Gradient::Map.new(
-      Gradient::Point.new(0,    Color::RGB.new(  0,   0, 128), 1.0), # blue
-      Gradient::Point.new(0.6,  Color::RGB.new(  0, 191, 255), 1.0), # cyan
-      Gradient::Point.new(1,    Color::RGB.new(255, 255, 255), 1.0), # white
-    )
-    # @gradient ||= Gradient::Map.new(
-    #   Gradient::Point.new(0,    Color::RGB.new(128,   0,   0), 1.0), # dark red
-    #   Gradient::Point.new(0.5,  Color::RGB.new(255, 128,   0), 1.0), # light red yellow
-    #   Gradient::Point.new(0.75, Color::RGB.new(255, 255,   0), 1.0), # yellow
-    #   Gradient::Point.new(1,    Color::RGB.new(255, 255, 255), 1.0), # white
-    # )
+    options[:gradient_map]
   end
   
   def self.colors

@@ -168,6 +168,9 @@ class Maze::Script
       o.on('--background-color NAME', Maze::Formatter::PNG.colors, 'The background color. Provide a HTML color name.') do |color|
         options[:png_background_color] = color
       end
+      o.on('--gradient-map NAME', Maze::Factory.gradient_maps, 'The gradient map to use for the distances color.', "One of #{Maze::Factory.gradient_maps.join(', ')}") do |map|
+        options[:gradient_map] = map
+      end
   
       o.separator ""
     end
@@ -186,6 +189,7 @@ class Maze::Script
       border: options[:png_border] || 0,
       line_width: options[:png_wall] || 1,
       line_color: options[:png_wall_color] || :black,
+      gradient_map: factory.gradient_map(options[:gradient_map] || :warm),
     }.merge runtime_options
   end
   

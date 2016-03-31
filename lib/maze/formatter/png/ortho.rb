@@ -24,15 +24,18 @@ class Maze::Formatter::PNG::Ortho < Maze::Formatter::PNG
   end
   
   def orthogonal_line x1, x2, y1, y2, color, width
-    length_offset = line_width / 2
+    length1_offset = width / 2        #  odd width: length1_offset == length2_offset
+                                      #   line length grows on both side by width/2
+    length2_offset = (width-1) / 2    # even width: length1_offset == length2_offset + 1
+                                      #   line length grows on one side by width/2 and on the other side by 1 less
     width.times do |w|
       position_offset = w - width / 2
       if x1 == x2
         # vertical line
-        image.line x1+position_offset, y1-length_offset, x2+position_offset, y2+length_offset, wall_color
+        image.line x1+position_offset, y1-length1_offset, x2+position_offset, y2+length2_offset, wall_color
       else
         # horizontal line
-        image.line x1-length_offset, y1+position_offset, x2+length_offset, y2+position_offset, wall_color
+        image.line x1-length1_offset, y1+position_offset, x2+length2_offset, y2+position_offset, wall_color
       end
     end
   end

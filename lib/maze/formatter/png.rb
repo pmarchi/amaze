@@ -25,7 +25,7 @@ class Maze::Formatter::PNG
   end
   
   def line_width
-    (@options[:line_width] || 1) / 2 * 2 + 1 # only odd numbers!
+    @options[:line_width] || 1
   end
 
   def background_color

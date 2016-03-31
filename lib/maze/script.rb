@@ -14,16 +14,10 @@ class Maze::Script
       grid_size: [4, 4],
       distances: false,
       ascii: true,
-      cell_size: 1, 
       algorithm: :gt1,
       visualize: false,
       highlight: true,
       image: false,
-      png_cell: 50,
-      png_wall: 1,
-      png_wall_color: :black,
-      png_border: 0,
-      png_background_color: :white,
     }
   end
 
@@ -36,9 +30,8 @@ class Maze::Script
     if visualize?
       algorithm.on grid do |stat|
         # print the maze
-        ascii = factory.create_ascii_formatter grid, 
-          cell_size: options[:cell_size],
-          highlighted_cells: stat.active
+        ascii = factory.create_ascii_formatter grid,
+          ascii_options(highlighted_cells: stat.active)
           
         puts ascii.render
         
@@ -84,11 +77,11 @@ class Maze::Script
 
     # Render the maze, set defaults for missing options
     if ascii?
-      ascii = factory.create_ascii_formatter grid, 
-        cell_size: options[:cell_size], 
+      ascii = factory.create_ascii_formatter grid,
+        ascii_options(
         distances: distances || nil,
         highlighted_cells: highlighted_cells || [],
-        content_color: content_color || :blue
+        content_color: content_color || :blue)
       puts ascii.render
     end
     
@@ -98,12 +91,7 @@ class Maze::Script
 
     if image?
       png = factory.create_png_formatter grid,
-        cell_size: options[:png_cell],
-        background_color: options[:png_background_color],
-        border: options[:png_border],
-        line_width: options[:png_wall],
-        line_color: options[:png_wall_color],
-        distances: distances || nil
+        png_options(distances: (distances || nil))
 
       png.render_background
       png.render
@@ -183,6 +171,22 @@ class Maze::Script
   
       o.separator ""
     end
+  end
+  
+  def ascii_options runtime_options={}
+    { 
+      cell_size: options[:cell_size] || 1, 
+    }.merge runtime_options
+  end
+  
+  def png_options runtime_options={}
+    { 
+      cell_size: options[:png_cell] || 50,
+      background_color: options[:png_background_color] || :white,
+      border: options[:png_border] || 0,
+      line_width: options[:png_wall] || 1,
+      line_color: options[:png_wall_color] || :black,
+    }.merge runtime_options
   end
   
   def ascii?

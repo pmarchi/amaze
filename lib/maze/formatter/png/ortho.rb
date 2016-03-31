@@ -58,12 +58,4 @@ class Maze::Formatter::PNG::Ortho < Maze::Formatter::PNG
   def image_height
     cell_size * grid.rows + border * 2 + line_width
   end
-  
-  def background_color
-    ChunkyPNG::Color::WHITE
-  end
-  
-  def wall_color
-    ChunkyPNG::Color.html_color(:black)
-  end
 end

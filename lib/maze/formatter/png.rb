@@ -29,6 +29,14 @@ class Maze::Formatter::PNG
     (@options[:line_width] || 1) / 2 * 2 + 1 # only odd numbers!
   end
 
+  def background_color
+    ChunkyPNG::Color::WHITE
+  end
+  
+  def wall_color
+    ChunkyPNG::Color.html_color(@options[:line_color] || :black)
+  end
+
   def distances
     options[:distances]
   end
@@ -52,6 +60,10 @@ class Maze::Formatter::PNG
   end
   
   def gradient
+    # @gradient ||= Gradient::Map.new(
+    #   Gradient::Point.new(0,    Color::RGB.new(  0,   0,   0), 1.0), # blue
+    #   Gradient::Point.new(1,    Color::RGB.new(255, 255, 255), 1.0), # white
+    # )
     @gradient ||= Gradient::Map.new(
       Gradient::Point.new(0,    Color::RGB.new(  0,   0, 128), 1.0), # blue
       Gradient::Point.new(0.6,  Color::RGB.new(  0, 191, 255), 1.0), # cyan

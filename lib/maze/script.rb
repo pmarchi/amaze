@@ -1,5 +1,6 @@
 
 require 'io/console'
+require 'oily_png'
 
 class Maze::Script
 
@@ -22,12 +23,13 @@ class Maze::Script
       png_cell: 50,
       png_wall: 1,
       png_border: 0,
+      png_wall_color: :black,
     }
   end
 
   def run args
     parser.parse!(args)
-
+    
     initialize_random_seed
     
     # Run the algorithm on the grid
@@ -99,6 +101,7 @@ class Maze::Script
         cell_size: options[:png_cell],
         border: options[:png_border],
         line_width: options[:png_wall],
+        line_color: options[:png_wall_color],
         distances: distances || nil
 
       png.render_background
@@ -167,12 +170,12 @@ class Maze::Script
       o.on('--wall PIXEL', Integer, 'The width of the walls.') do |px|
         options[:png_wall] = px
       end
-      
-      # TODO: option for wall color
-      
       o.on('--border PIXEL', Integer, 'The width of the border around the maze.') do |px|
         options[:png_border] = px
       end  
+      o.on('--wall-color NAME', ChunkyPNG::Color::PREDEFINED_COLORS.keys, 'The color of the walls.', 'Use a HTML color name.') do |color|
+        options[:png_wall_color] = color
+      end
   
       o.separator ""
     end

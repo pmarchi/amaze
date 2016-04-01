@@ -19,8 +19,6 @@ class Maze::Formatter::PNG::Ortho < Maze::Formatter::PNG
       orthogonal_line x2, x2, y1, y2, wall_color, line_width unless cell.linked? cell.east
       orthogonal_line x1, x2, y2, y2, wall_color, line_width unless cell.linked? cell.south
     end
-    
-    image
   end
   
   def orthogonal_line x1, x2, y1, y2, color, width

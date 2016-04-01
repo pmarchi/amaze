@@ -50,6 +50,14 @@ class Maze::Grid
   def random_cell
     self[rand(rows), rand(columns)]
   end
+  
+  def deadends
+    list = []
+    each_cell do |cell|
+      list << cell if cell.links.size == 1
+    end
+    list
+  end
 
   def size
     rows * columns

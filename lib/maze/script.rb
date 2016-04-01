@@ -86,8 +86,9 @@ class Maze::Script
     end
     
     puts algorithm.status
-    puts "Random seed: #{seed}"
+    puts "Dead ends: #{grid.deadends.size} of #{grid.size} (#{(100.to_f / grid.size * grid.deadends.size).to_i}%)"
     puts "Path length: #{path_length}" if path_length
+    puts "Random seed: #{seed}"
 
     if image?
       png = factory.create_png_formatter grid,

@@ -11,6 +11,8 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
       bottom = corner.dup
       
       row.each do |cell|
+        cell ||= Maze::Cell::Square.new(-1, -1) # assign dummy cell for masked cells
+        
         east_boundary = cell.linked?(cell.east) ? v_space : v_line
         top << h_space << east_boundary
         

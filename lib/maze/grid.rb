@@ -42,7 +42,7 @@ class Maze::Grid
   def each_cell
     each_row do |row|
       row.each do |cell|
-        yield cell
+        yield cell if cell
       end
     end
   end

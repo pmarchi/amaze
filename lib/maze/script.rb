@@ -50,29 +50,29 @@ class Maze::Script
     
     # Calculate the distances from a given start cell
     if distances?
-      distances = grid[*origin].distances
+      distances = start_cell.distances
     end
 
     # And the solution to a given end cell
     if solution?
-      distances = distances.path_to grid[*goal]
-      path_length = distances[grid[*goal]]
+      distances = distances.path_to finish_cell
+      path_length = distances[finish_cell]
       highlighted_cells = distances.cells
       content_color = Hash.new(:magenta)
-      content_color[grid[*origin]] = :red
-      content_color[grid[*goal]] = :red
+      content_color[start_cell] = :red
+      content_color[finish_cell] = :red
     end
     
     if longest?
       new_start, distance = distances.max
       new_distances = new_start.distances
-      new_goal, distance = new_distances.max
-      distances = new_distances.path_to new_goal
+      new_finish, distance = new_distances.max
+      distances = new_distances.path_to new_finish
       path_length = distance
       highlighted_cells = distances.cells
       content_color = Hash.new(:magenta)
       content_color[new_start] = :red
-      content_color[new_goal] = :red
+      content_color[new_finish] = :red
     end
 
     # Render the maze, set defaults for missing options
@@ -218,12 +218,12 @@ class Maze::Script
     !!@options[:longest]
   end
   
-  def origin
-    @options[:distances] || [0,0]
+  def start_cell
+    grid[*(@options[:distances] || [0,0])]
   end
   
-  def goal
-    @options[:solution].first == -1 ? [grid.rows - 1,0] : @options[:solution]
+  def finish_cell
+    grid[*(@options[:solution].first == -1 ? [grid.rows - 1,0] : @options[:solution])]
   end
   
   def factory

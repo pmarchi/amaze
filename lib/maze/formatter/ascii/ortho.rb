@@ -1,5 +1,7 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
+  
+  # TODO: render ascii output with char arrays
 
   def render
     output = ansi_clear
@@ -11,7 +13,7 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
       bottom = corner.dup
       
       row.each do |cell|
-        cell ||= Maze::Cell::Square.new(-1, -1) # assign dummy cell for masked cells
+        cell ||= dummy_cell # assign dummy cell for masked cells
         
         east_boundary = cell.linked?(cell.east) ? v_space : v_line
         top << h_space << east_boundary
@@ -30,6 +32,10 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     end
     
     output
+  end
+  
+  def dummy_cell
+    Maze::Cell::Square.new -1, -1
   end
 
   def v_line

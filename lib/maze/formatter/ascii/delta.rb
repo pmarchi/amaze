@@ -1,6 +1,8 @@
 
 class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
 
+  # FIXME render does not work for masked grids
+
   def render
     highlighted = content_highlighted.center(height).blue
     

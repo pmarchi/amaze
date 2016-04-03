@@ -1,5 +1,7 @@
 
 class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
+  
+  # FIXME: render does not work for masked grids
 
   def render
     output = ansi_clear
@@ -19,6 +21,7 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
       end
 
       row.each do |cell|
+        cell ||= dummy_cell
         cell_size.times do |i|
           north = " " * i
           if i == cell_size-1
@@ -63,6 +66,10 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
     end
 
     output
+  end
+  
+  def dummy_cell
+    Maze::Cell::Hex.new -4, -4
   end
   
   def line

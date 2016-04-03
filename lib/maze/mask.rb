@@ -1,4 +1,6 @@
 
+require 'chunky_png'
+
 class Maze::Mask
   
   # The rows and columns of the mask
@@ -49,7 +51,20 @@ class Maze::Mask
     
     mask.rows.times do |row|
       mask.columns.times do |column|
-        mask[row,column] = (lines[row][column] == 'X' ? false : true)
+        mask[row,column] = lines[row][column] != 'X'
+      end
+    end
+    
+    mask
+  end
+  
+  def self.from_png file
+    image = ChunkyPNG::Image.from_file file
+    mask = new image.height, image.width
+
+    mask.rows.times do |row|
+      mask.columns.times do |column|
+        mask[row,column] = image[column, row] != ChunkyPNG::Color::BLACK
       end
     end
     

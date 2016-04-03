@@ -20,11 +20,21 @@ class Maze::Factory
     Maze::Grid.const_get(type.to_s.capitalize).new *args
   end
   
-  def create_masked_grid maskfile
+  def create_masked_grid file
     klass = Maze::Grid.const_get(type.to_s.capitalize)
     klass.prepend Maze::MaskedGrid
-    mask = Maze::Mask.from_txt maskfile
-    klass.new mask
+    klass.new create_mask(file)
+  end
+  
+  def create_mask file
+    case File.extname file
+    when '.txt'
+      Maze::Mask.from_txt file
+    when '.png'
+      Maze::Mask.from_png file
+    else
+      raise "Mask file of type #{File.extname(file)} is not supported."
+    end
   end
   
   def create_ascii_formatter *args

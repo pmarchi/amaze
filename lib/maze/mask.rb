@@ -31,6 +31,7 @@ class Maze::Mask
         count += 1 if @bits[row][column]
       end
     end
+    count
   end
   
   def random_location

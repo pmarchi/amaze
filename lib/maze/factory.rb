@@ -20,6 +20,13 @@ class Maze::Factory
     Maze::Grid.const_get(type.to_s.capitalize).new *args
   end
   
+  def create_masked_grid maskfile
+    klass = Maze::Grid.const_get(type.to_s.capitalize)
+    klass.prepend Maze::MaskedGrid
+    mask = Maze::Mask.from_txt maskfile
+    klass.new mask
+  end
+  
   def create_ascii_formatter *args
     Maze::Formatter::ASCII.const_get(type.to_s.capitalize).new *args
   end

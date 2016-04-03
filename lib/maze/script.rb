@@ -20,7 +20,7 @@ class Maze::Script
       image: false,
     }
   end
-
+  
   def run args
     parser.parse!(args)
     
@@ -113,6 +113,9 @@ class Maze::Script
       o.on('-g', '--grid-size ROWS[,COLUMNS]', Array, 'The number of rows and columns of the grid') do |v|
         options[:grid_size] = v.first(2).map(&:to_i)
         options[:grid_size][1] ||= options[:grid_size][0]
+      end
+      o.on('-m', '--mask MASKFILE', String, 'MASKFILE is either a ASCII file or a PNG file.') do |mask|
+        options[:mask] = mask
       end
   
       o.separator "\nAlgorithm options:"
@@ -231,7 +234,11 @@ class Maze::Script
   end
   
   def grid
-    @grid ||= factory.create_grid *options[:grid_size]
+    @grid ||= if options[:mask]
+      factory.create_masked_grid options[:mask]
+    else
+      factory.create_grid *options[:grid_size]
+    end
   end
   
   def algorithm

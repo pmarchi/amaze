@@ -11,4 +11,6 @@ module Maze
   autoload :Algorithm, 'maze/algorithm'
   autoload :Formatter, 'maze/formatter'
   autoload :Distances, 'maze/distances'
+  autoload :Mask, 'maze/mask'
+  autoload :MaskedGrid, 'maze/masked_grid'
 end

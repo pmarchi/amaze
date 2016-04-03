@@ -188,7 +188,7 @@ class Maze::Script
   
   def png_options runtime_options={}
     { 
-      cell_size: options[:png_cell] || 50,
+      cell_size: options[:png_cell] || 10,
       background_color: options[:png_background_color] || :white,
       border: options[:png_border] || 0,
       line_width: options[:png_wall] || 1,
@@ -220,6 +220,10 @@ class Maze::Script
   def longest?
     !!@options[:longest]
   end
+  
+  # TODO: Start and finish cell should be random, when not specified.
+  # prevent chosing masked cell.
+  # Maybe support for top left bottom right center ...
   
   def start_cell
     grid[*(@options[:distances] || [0,0])]

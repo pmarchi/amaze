@@ -3,7 +3,7 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
   # TODO: render ascii output with char arrays
 
-  def render
+  def render2
     output = ansi_clear
     output << corner << (h_line + corner) * grid.columns << "\n"
     
@@ -33,6 +33,59 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     
     output
   end
+  
+  def render
+    grid.each_cell do |cell|
+      draw cell
+    end
+    
+    char.map{|l| l.join }.join("\n")
+  end
+  
+  def draw cell
+    left, right, top, bottom = coord cell
+    
+    # corners
+    char[top][left] = corner
+    char[top][right] = corner
+    char[bottom][left] = corner
+    char[bottom][right] = corner
+    # top & bottom
+    (left+1).upto(right-1) {|i| char[top][i] = h; char[bottom][i] = h }
+    # left & right
+    (top+1).upto(bottom-1) {|i| char[i][left] = v; char[i][right] = v }
+  end
+  
+  def char
+    @char ||= Array.new(y(grid.rows) + 1) do |x|
+      Array.new(x(grid.columns) + 1) do |y|
+        ' '
+      end
+    end
+  end  
+
+  # left, right, top, bottom
+  def coord cell
+    [x(cell.column), x(cell.column+1), y(cell.row), y(cell.row+1)]
+  end
+  
+  def x column
+    (cell_size * 3 + 1) * column
+  end
+  
+  def y row
+    (cell_size + 1) * row
+  end
+  
+  def h
+    '-'
+  end
+  
+  def v
+    '|'
+  end
+  
+  # OLD
   
   def dummy_cell
     Maze::Cell::Square.new -1, -1

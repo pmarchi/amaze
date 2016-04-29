@@ -69,7 +69,7 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     left.upto(mx-1) do |i|
       char[my][i] = h.color(content_color_of cell) if path?(:west, cell)
     end if left <= mx-1
-    # center
+    # center, select the char depeding on how many paths cross the cell
     center_char = center
     center_char = v if path?(:north, cell) && path?(:south, cell)
     center_char = h if path?(:east, cell) && path?(:west, cell)

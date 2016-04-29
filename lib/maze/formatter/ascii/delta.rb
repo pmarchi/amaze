@@ -4,7 +4,7 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
   # FIXME render does not work for masked grids
 
   def render
-    highlighted = content_highlighted.center(height).blue
+    highlighted = content_highlighted.center(height).color(:blue)
     
     output = ansi_clear
     
@@ -27,11 +27,11 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
       row.each do |cell|
         height.times do |i|
           if (cell.row+cell.column).even?
-            body = (i == cell_size-1 ? content_of(cell) : '').center((height-1-i)*2).send(content_color_of(cell))
+            body = (i == cell_size-1 ? content_of(cell) : '').center((height-1-i)*2).color(content_color_of(cell))
             wall = cell.linked?(cell.east) ? " " : side_a
           else
             if i < height-1 || cell.linked?(cell.south)
-              body = (i == cell_size ? content_of(cell) : '').center(i*2).send(content_color_of(cell))
+              body = (i == cell_size ? content_of(cell) : '').center(i*2).color(content_color_of(cell))
               # body = space * i
             else
               # FIXME: if cell_size == 1 the body of the cell and the bottom of the cell

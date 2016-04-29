@@ -25,7 +25,7 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
         cell_size.times do |i|
           north = " " * i
           if i == cell_size-1
-            north << content_of(cell).center(cell_size * 3).send(content_color_of(cell))
+            north << content_of(cell).center(cell_size * 3).color(content_color_of(cell))
           else
             north << space
           end

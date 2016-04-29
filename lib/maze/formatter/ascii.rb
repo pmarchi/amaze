@@ -1,4 +1,6 @@
-require 'colorize' # TODO: test rainbow as well
+
+# all rainbow colors: Rainbow::X11ColorNames::NAMES.keys
+require 'rainbow/ext/string'
 
 class Maze::Formatter::ASCII
   autoload :Delta, 'maze/formatter/ascii/delta'

@@ -6,6 +6,7 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   def render
     grid.each_cell do |cell|
       draw_cell cell
+      draw_content cell
       draw_path cell
     end
     
@@ -34,10 +35,14 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
       # right
       char[i][right] = v unless cell.linked? cell.east
     end
-    # content
+  end
+
+  def draw_content cell
+    left, right, top, bottom = coord cell
+
     my = top + cell_size / 2 + 1
     content_of(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[my][left+1+i] = c.send(content_color_of(cell))
+      char[my][left+1+i] = c.color(content_color_of(cell))
     end
   end
 
@@ -50,25 +55,25 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     
     # to north
     top.upto(my-1) do |i|
-      char[i][mx] = v.send(content_color_of cell) if path?(:north, cell)
+      char[i][mx] = v.color(content_color_of cell) if path?(:north, cell)
     end if top <= my-1
     # to east
     (mx+1).upto(right) do |i|
-      char[my][i] = h.send(content_color_of cell) if path?(:east, cell)
+      char[my][i] = h.color(content_color_of cell) if path?(:east, cell)
     end if mx+1 <= right
     # to south
     (my+1).upto(bottom) do |i|
-      char[i][mx] = v.send(content_color_of cell) if path?(:south, cell)
+      char[i][mx] = v.color(content_color_of cell) if path?(:south, cell)
     end if my+1 <= bottom
     # to west
     left.upto(mx-1) do |i|
-      char[my][i] = h.send(content_color_of cell) if path?(:west, cell)
+      char[my][i] = h.color(content_color_of cell) if path?(:west, cell)
     end if left <= mx-1
     # center
     center_char = center
     center_char = v if path?(:north, cell) && path?(:south, cell)
     center_char = h if path?(:east, cell) && path?(:west, cell)
-    char[my][mx] = center_char.send(content_color_of(cell))
+    char[my][mx] = center_char.color(content_color_of(cell))
   end
   
   def path? direction, cell

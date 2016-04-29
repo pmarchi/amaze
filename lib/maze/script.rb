@@ -58,9 +58,7 @@ class Maze::Script
       distances = distances.path_to finish_cell
       path_length = distances[finish_cell]
       highlighted_cells = distances.cells
-      content_color = Hash.new(:magenta)
-      content_color[start_cell] = :red
-      content_color[finish_cell] = :red
+      content_color = :red
     end
     
     if longest?
@@ -70,9 +68,7 @@ class Maze::Script
       distances = new_distances.path_to new_finish
       path_length = distance
       highlighted_cells = distances.cells
-      content_color = Hash.new(:magenta)
-      content_color[new_start] = :red
-      content_color[new_finish] = :red
+      content_color = :green
     end
 
     # Render the maze, set defaults for missing options

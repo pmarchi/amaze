@@ -1,48 +1,16 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
-  # TODO: render ascii output with char arrays
-
-  def render2
-    output = ansi_clear
-    output << corner << (h_line + corner) * grid.columns << "\n"
-    
-    grid.each_row do |row|
-      top = v_line.dup      # all without bottom and middle line
-      middle = v_line.dup   # exact middle
-      bottom = corner.dup
-      
-      row.each do |cell|
-        cell ||= dummy_cell # assign dummy cell for masked cells
-        
-        east_boundary = cell.linked?(cell.east) ? v_space : v_line
-        top << h_space << east_boundary
-        
-        body = content_of(cell).center(cell_size * 3).send(content_color_of(cell))
-        middle << body << east_boundary
-        
-        south_boundary = cell.linked?(cell.south) ? h_space : h_line
-        bottom << south_boundary << corner
-      end
-      
-      cell_size.times do |i|
-        output << (cell_size/2 == i ? middle : top) << "\n"
-      end
-      output << bottom << "\n"
-    end
-    
-    output
-  end
-  
   def render
     grid.each_cell do |cell|
-      draw cell
+      draw_cell cell
+      draw_path cell
     end
     
-    char.map{|l| l.join }.join("\n")
+    ansi_clear + char.map{|l| l.join }.join("\n")
   end
   
-  def draw cell
+  def draw_cell cell
     left, right, top, bottom = coord cell
     
     # corners
@@ -51,9 +19,58 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     char[bottom][left] = corner
     char[bottom][right] = corner
     # top & bottom
-    (left+1).upto(right-1) {|i| char[top][i] = h; char[bottom][i] = h }
+    (left+1).upto(right-1) do |i|
+      # top
+      char[top][i] = h unless cell.linked? cell.north
+      # bottom
+      char[bottom][i] = h unless cell.linked? cell.south
+    end
     # left & right
-    (top+1).upto(bottom-1) {|i| char[i][left] = v; char[i][right] = v }
+    (top+1).upto(bottom-1) do |i|
+      # left
+      char[i][left] = v unless cell.linked? cell.west
+      # right
+      char[i][right] = v unless cell.linked? cell.east
+    end
+    # content
+    my = top + cell_size / 2 + 1
+    content_of(cell).center(cell_size * 3).chars.each_with_index do |c,i|
+      char[my][left+1+i] = c.send(content_color_of(cell))
+    end
+  end
+
+  def draw_path cell
+    return unless highlighted_cell? cell
+    left, right, top, bottom = coord cell
+
+    mx = left + (cell_size * 3 + 1) / 2
+    my = top + cell_size / 2 + 1
+    
+    # to north
+    top.upto(my-1) do |i|
+      char[i][mx] = v.send(content_color_of cell) if path?(:north, cell)
+    end if top <= my-1
+    # to east
+    (mx+1).upto(right) do |i|
+      char[my][i] = h.send(content_color_of cell) if path?(:east, cell)
+    end if mx+1 <= right
+    # to south
+    (my+1).upto(bottom) do |i|
+      char[i][mx] = v.send(content_color_of cell) if path?(:south, cell)
+    end if my+1 <= bottom
+    # to west
+    left.upto(mx-1) do |i|
+      char[my][i] = h.send(content_color_of cell) if path?(:west, cell)
+    end if left <= mx-1
+    # center
+    center_char = center
+    center_char = v if path?(:north, cell) && path?(:south, cell)
+    center_char = h if path?(:east, cell) && path?(:west, cell)
+    char[my][mx] = center_char.send(content_color_of(cell))
+  end
+  
+  def path? direction, cell
+    cell.linked?(cell.send(direction)) && highlighted_cell?(cell.send(direction))
   end
   
   def char
@@ -85,28 +102,10 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     '|'
   end
   
-  # OLD
-  
-  def dummy_cell
-    Maze::Cell::Square.new -1, -1
+  def center
+    '∙'
   end
-
-  def v_line
-    '|'
-  end
-  
-  def v_space
-    ' '
-  end
-  
-  def h_line
-    '-' * cell_size * 3
-  end
-  
-  def h_space
-    ' ' * cell_size * 3
-  end
-  
+    
   def corner
     '+'
   end

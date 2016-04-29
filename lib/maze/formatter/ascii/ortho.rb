@@ -1,6 +1,8 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
+  # TODO: Colorize only midpoint of start and finisch cell when drawing a solution
+  
   def render
     grid.each_cell do |cell|
       draw_cell cell

@@ -73,6 +73,7 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     center_char = center
     center_char = v if path?(:north, cell) && path?(:south, cell)
     center_char = h if path?(:east, cell) && path?(:west, cell)
+    center_char = corner if [:north, :east, :south, :west].select{|d| path?(d, cell) }.size >= 3
     char[my][mx] = center_char.color(content_color_of(cell))
   end
   

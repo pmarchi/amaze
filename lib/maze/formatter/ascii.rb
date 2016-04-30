@@ -22,6 +22,10 @@ class Maze::Formatter::ASCII
     "\e[H\e[2J"
   end
   
+  def clear
+    ' '
+  end
+  
   # The size of the cell
   def cell_size
     options[:cell_size] || 1

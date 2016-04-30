@@ -3,100 +3,142 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
   
   # FIXME: render does not work for masked grids
 
+  def char
+    @char ||= Array.new(ypos(grid.rows, true) + 1) do |x|
+      Array.new(xpos(grid.columns) + cell_size) do |y|
+        clear
+      end
+    end
+  end  
+
   def render
-    output = ansi_clear
-
-    # top row
-    repeat = ((grid.columns + 0.5) / 2).round - 1
-    output << " " * cell_size << line
-    output << (" " * cell_size * 2 + space + line) * repeat << "\n"
-    
-    grid.each_row do |row|
-      upper = Array.new(cell_size) { "" }
-      lower = Array.new(cell_size) { "" }
-      
-      cell_size.times do |i|
-        upper[i] << " " * (cell_size-1-i) << upper_west
-        lower[i] << " " * i << lower_west
-      end
-
-      row.each do |cell|
-        cell ||= dummy_cell
-        cell_size.times do |i|
-          north = " " * i
-          if i == cell_size-1
-            north << content_of(cell).center(cell_size * 3).color(content_color_of(cell))
-          else
-            north << space
-          end
-          north << " " * i
-          north_east = (cell.linked? cell.northeast) ? empty_side : upper_east
-
-          if cell.column.even?
-            south = (i < (cell_size-1) || cell.linked?(cell.south)) ? space + " " * (cell_size-1-i) * 2 : line
-            south_east = (cell.linked? cell.southeast) ? empty_side : lower_east
-
-            upper[i] << north << north_east   # upper half of cell
-            lower[i] << south << south_east   # lower half of cell
-          else
-            south = (i < (cell_size-1) || cell.linked?(cell.north)) ? space + " " * (cell_size-1-i) * 2 : line
-            south_east = (cell.north || cell.northeast) ? 
-              (cell.north && cell.north.linked?(cell.northeast)) ? 
-                empty_side : 
-                lower_east :
-              ""
-
-            upper[i] << south << south_east   # lower half of cell from row above
-            lower[i] << north << north_east   # upper half of cell from current row
-          end
-        end
-      end
-      
-      cell_size.times {|i| output << upper[i] << "\n" }
-      cell_size.times {|i| output << lower[i] << "\n" }
+    grid.each_cell do |cell|
+      draw_cell cell
+      draw_content cell
+      draw_path cell
     end
     
-    # last lower half of cells
-    repeat = grid.columns / 2
-    cell_size.times do |i|
-      south = (i < (cell_size-1)) ? space : line
-      output << " " * (cell_size-i)
-      output << (" " * i * 2 + space + lower_west + " " * (cell_size-1-i) * 2 + south + lower_east) * repeat
-      output << "\n"
+    ansi_clear + char.map{|l| l.join }.join("\n")
+  end
+  
+  def draw_cell cell
+    x0, y0 = coord cell
+    x1 = x0 + cell_size
+    x2 = x0 + cell_size + cell_size * 3
+    y1 = y0 + cell_size
+
+    0.upto(cell_size*3-1) do |i|
+      # north
+      char[y0][x1+i] = n unless cell.linked? cell.north
+      # south
+      char[y0+cell_size*2][x1+i] = s unless cell.linked? cell.south
     end
 
-    output
+    0.upto(cell_size-1) do |i|
+      # north east
+      char[y0+1+i][x2+i] = ne unless cell.linked? cell.northeast
+      # north west
+      char[y0+1+i][x0+cell_size-1-i] = nw unless cell.linked? cell.northwest
+      # south east
+      char[y1+1+i][x2+cell_size-1-i] = se unless cell.linked? cell.southeast
+      # south west
+      char[y1+1+i][x0+i] = sw unless cell.linked? cell.southwest
+    end
   end
   
-  def dummy_cell
-    Maze::Cell::Hex.new -4, -4
-  end
-  
-  def line
-    "___" * cell_size
-  end
-  
-  def space
-    "   " * cell_size
+  def draw_content cell
+    x, y = coord cell
+    content_of(cell).center(cell_size * 3).chars.each_with_index do |c,i|
+      char[y+cell_size][x+cell_size+i] = c.color(content_color_of(cell))
+    end
   end
 
-  def upper_east
-    "\\"
+  # TODO: render real path on sigma grids
+  
+  def draw_path cell
+    return unless highlighted_cell? cell
+    x0, y0 = coord cell
+    char[y0+cell_size][x0+cell_size * 2] = '*'.color(content_color_of cell)
   end
 
-  def lower_east
-    "/"
+  def coord cell
+    [xpos(cell.column), ypos(cell.row, cell.column.odd?)]
   end
   
-  def upper_west
-    "/"
+  def xpos column
+    (cell_size * 4) * column
   end
   
-  def lower_west
-    "\\"
+  def ypos row, odd=false
+    offset = odd ? cell_size : 0
+    (cell_size * 2) * row + offset
   end
   
-  def empty_side
-    " "
+  def n
+    '_'
   end
+  
+  def ne
+    '\\'
+  end
+  
+  def se
+    '/'
+  end
+  
+  alias_method :s, :n
+  alias_method :sw, :ne
+  alias_method :nw, :se
 end
+
+__END__
+
+.___.....___.....___.....
+/...\___/...\___/...\___.
+\___/...\___/...\___/...\
+/...\___/...\___/...\___/
+\___/...\___/...\___/...\
+/...\___/...\___/...\___/
+\___/...\___/...\___/....
+....\___/...\___/........
+
+
+..______..........______..........______..........
+./......\......../......\......../......\.........
+/....._..\___|__/.___....\______/........\______..
+\......\_/_..|..\/......./......\......../......\.
+.\______/..\_|__/\______/........\______/........\
+./......\/...|..\/......\......../......\......../
+/........\___|__/........\______/........\______/.
+\......../......\......../......\......../......\.
+.\______/........\______/........\______/........\
+./......\......../......\......../......\......../
+/........\______/........\______/........\______/.
+\......../......\......../......\......../......\.
+.\______/........\______/........\______/........\
+........\......../......\......../......\......../
+.........\______/........\______/........\______/.
+
+
+..._________..............._________..............._________
+../.........\............./.........\............./.........\
+./...........\.........../...........\.........../...........\
+/.............\_________/.............\_________/.............\_________
+\............./.........\............./.........\............./.........\
+.\.........../...........\.........../...........\.........../...........\
+..\_________/.............\_________/.............\_________/.............\
+../.........\............./.........\............./.........\............./
+./...........\.........../...........\.........../...........\.........../
+/.............\_________/.............\_________/.............\_________/
+\............./.........\............./.........\............./.........\
+.\.........../...........\.........../...........\.........../...........\
+..\_________/.............\_________/.............\_________/.............\
+../.........\............./.........\............./.........\............./
+./...........\.........../...........\.........../...........\.........../
+/.............\_________/.............\_________/.............\_________/
+\............./.........\............./.........\............./.........\
+.\.........../...........\.........../...........\.........../...........\
+..\_________/.............\_________/.............\_________/.............\
+............\............./.........\............./.........\............./
+.............\.........../...........\.........../...........\.........../
+..............\_________/.............\_________/.............\_________/

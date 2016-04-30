@@ -1,6 +1,14 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
+  def char
+    @char ||= Array.new(y(grid.rows) + 1) do |x|
+      Array.new(x(grid.columns) + 1) do |y|
+        clear
+      end
+    end
+  end  
+
   def render
     grid.each_cell do |cell|
       draw_cell cell
@@ -79,14 +87,6 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     cell.linked?(cell.send(direction)) && highlighted_cell?(cell.send(direction))
   end
   
-  def char
-    @char ||= Array.new(y(grid.rows) + 1) do |x|
-      Array.new(x(grid.columns) + 1) do |y|
-        ' '
-      end
-    end
-  end  
-
   # left, right, top, bottom
   def coord cell
     [x(cell.column), x(cell.column+1), y(cell.row), y(cell.row+1)]

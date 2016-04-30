@@ -1,8 +1,6 @@
 
 class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
   
-  # FIXME: render does not work for masked grids
-
   def char
     @char ||= Array.new(ypos(grid.rows, true) + 1) do |x|
       Array.new(xpos(grid.columns) + cell_size) do |y|

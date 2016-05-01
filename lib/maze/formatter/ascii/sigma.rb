@@ -12,7 +12,7 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
   def render
     grid.each_cell do |cell|
       draw_cell cell
-      draw_content cell
+      draw_content cell unless highlighted_cell? cell
       draw_path cell
     end
     
@@ -51,16 +51,41 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
     end
   end
 
-  # TODO: render real path on sigma grids
-  
   def draw_path cell
     return unless highlighted_cell? cell
-    x0, y0 = coord cell
-    char[y0+cell_size][x0+cell_size * 2] = '*'.color(content_color_of cell)
+    x, y = coord cell, :center
+    # north-south
+    1.upto(cell_size*2) do |i|
+      char[y+i][x] = p.color(content_color_of(cell))
+    end if path?(:south, cell)
+    # northwest-southeast
+    0.upto(cell_size-1) do |i|
+      char[y+i][x+i*4] = p.color(content_color_of(cell))
+      char[y+i+1][x+i*4+2] = pnwse.color(content_color_of(cell))
+    end if path?(:southeast, cell)
+    # southwest-northeast
+    0.upto(cell_size-1) do |i|
+      char[y-i][x+i*4] = p.color(content_color_of(cell))
+      char[y-i][x+i*4+2] = pswne.color(content_color_of(cell))
+    end if path?(:northeast, cell)
+    # center
+    char[y][x] = p.color(content_color_of cell)
   end
+  
+  # TODO: move path? to parent class
 
-  def coord cell
-    [xpos(cell.column), ypos(cell.row, cell.column.odd?)]
+  def path? direction, cell
+    cell.linked?(cell.send(direction)) && highlighted_cell?(cell.send(direction))
+  end
+  
+  def coord cell, ref=:topleft
+    x = xpos(cell.column)
+    y = ypos(cell.row, cell.column.odd?)
+    if ref == :center
+      x = x + cell_size * 3 / 2 + cell_size
+      y = y + cell_size
+    end
+    [x, y]
   end
   
   def xpos column
@@ -84,6 +109,18 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
     '/'
   end
   
+  def p
+    '.'
+  end
+  
+  def pnwse
+    '`'
+  end
+  
+  def pswne
+    '´'
+  end
+  
   alias_method :s, :n
   alias_method :sw, :ne
   alias_method :nw, :se
@@ -103,11 +140,11 @@ __END__
 
 ..______..........______..........______..........
 ./......\......../......\......../......\.........
-/....._..\___|__/.___....\______/........\______..
-\......\_/_..|..\/......./......\......../......\.
-.\______/..\_|__/\______/........\______/........\
-./......\/...|..\/......\......../......\......../
-/........\___|__/........\______/........\______/.
+/........\______/........\______/........\______..
+\......../......\......../......\......../......\.
+.\______/........\______/........\______/........\
+./......\......../......\......../......\......../
+/........\______/........\______/........\______/.
 \......../......\......../......\......../......\.
 .\______/........\______/........\______/........\
 ./......\......../......\......../......\......../
@@ -140,3 +177,54 @@ __END__
 ............\............./.........\............./.........\............./
 .............\.........../...........\.........../...........\.........../
 ..............\_________/.............\_________/.............\_________/
+
+
+ ___     ___     ___     
+/ . \___/   \___/   \___ 
+\ . ` . \___/ . \___/   \
+/ . \___` . ´___/   \___/
+\___/   \___/   \___/   \
+/   \___/   \___/   \___/
+\___/   \___/   \___/    
+    \___/   \___/        
+
+
+  ______          ______          ______          
+ /      \        /      \        /      \         
+/    .   \______/        \______/        \______  
+\    . ` .      \        /      \        /      \ 
+ \   .     ` .   \______/    .   \______/        \
+ /   .  \      ` .       . ´     /      \        /
+/    .   \______   ` . ´  ______/        \______/ 
+\    .   /      \        /      \        /      \ 
+ \___.__/        \______/        \______/        \
+ /      \        /      \        /      \        /
+/        \______/        \______/        \______/ 
+\        /      \        /      \        /      \ 
+ \______/        \______/        \______/        \
+        \        /      \        /      \        /
+         \______/        \______/        \______/ 
+
+
+   _________               _________               _________
+  /         \             /         \             /         \
+ /           \           /           \           /           \
+/      .      \_________/             \_________/             \_________
+\      . ` .            \             /         \             /         \
+ \     .     ` .         \           /           \           /           \
+  \    .         ` .      \_________/             \_________/             \
+  /    .    \        ` .               .          /         \             /
+ /     .     \           ` .       . ´           /           \           /
+/      .      \_________     ` . ´     _________/             \_________/
+\             /         \             /         \             /         \
+ \           /           \           /           \           /           \
+  \_________/             \_________/             \_________/             \
+  /         \             /         \             /         \             /
+ /           \           /           \           /           \           /
+/             \_________/             \_________/             \_________/
+\             /         \             /         \             /         \
+ \           /           \           /           \           /           \
+  \_________/             \_________/             \_________/             \
+            \             /         \             /         \             /
+             \           /           \           /           \           /
+              \_________/             \_________/             \_________/

@@ -48,6 +48,10 @@ class Maze::Script
       algorithm.on grid
     end
     
+    # TODO: option handling for distances, solution and longest
+    # - use distance only for distances
+    # - use path for solution and longest
+    
     # Calculate the distances from a given start cell
     if distances?
       distances = start_cell.distances

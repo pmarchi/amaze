@@ -18,6 +18,28 @@ class Maze::Formatter::ASCII
     @options = options
   end
   
+  def char
+    @char ||= Array.new(char_array_height) do |x|
+      Array.new(char_array_width) do |y|
+        clear
+      end
+    end
+  end  
+
+  def render
+    grid.each_cell do |cell|
+      draw_cell cell
+      draw_content cell unless highlighted_cell? cell
+      draw_path cell if highlighted_cell? cell
+    end
+    
+    ansi_clear + char.map{|l| l.join }.join("\n")
+  end
+  
+  def path? direction, cell
+    cell.linked?(cell.send(direction)) && highlighted_cell?(cell.send(direction))
+  end
+  
   def ansi_clear
     "\e[H\e[2J"
   end
@@ -33,10 +55,6 @@ class Maze::Formatter::ASCII
   
   def highlighted_cell? cell
     Array(options[:highlighted_cells]).include? cell
-  end
-  
-  def content_highlighted
-    '*'
   end
   
   def content_color_of cell

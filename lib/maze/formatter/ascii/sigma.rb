@@ -1,24 +1,6 @@
 
 class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
   
-  def char
-    @char ||= Array.new(ypos(grid.rows, true) + 1) do |x|
-      Array.new(xpos(grid.columns) + cell_size) do |y|
-        clear
-      end
-    end
-  end  
-
-  def render
-    grid.each_cell do |cell|
-      draw_cell cell
-      draw_content cell unless highlighted_cell? cell
-      draw_path cell
-    end
-    
-    ansi_clear + char.map{|l| l.join }.join("\n")
-  end
-  
   def draw_cell cell
     x0, y0 = coord cell
     x1 = x0 + cell_size
@@ -52,7 +34,6 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
   end
 
   def draw_path cell
-    return unless highlighted_cell? cell
     x, y = coord cell, :center
     # north-south
     1.upto(cell_size*2) do |i|
@@ -70,12 +51,6 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
     end if path?(:northeast, cell)
     # center
     char[y][x] = p.color(content_color_of cell)
-  end
-  
-  # TODO: move path? to parent class
-
-  def path? direction, cell
-    cell.linked?(cell.send(direction)) && highlighted_cell?(cell.send(direction))
   end
   
   def coord cell, ref=:topleft
@@ -97,6 +72,14 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
     (cell_size * 2) * row + offset
   end
   
+  def char_array_width
+    xpos(grid.columns) + cell_size
+  end
+  
+  def char_array_height
+    ypos(grid.rows, true) + 1
+  end
+
   def n
     '_'
   end

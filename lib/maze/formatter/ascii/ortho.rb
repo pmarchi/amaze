@@ -1,24 +1,6 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
-  def char
-    @char ||= Array.new(y(grid.rows) + 1) do |x|
-      Array.new(x(grid.columns) + 1) do |y|
-        clear
-      end
-    end
-  end  
-
-  def render
-    grid.each_cell do |cell|
-      draw_cell cell
-      draw_content cell
-      draw_path cell
-    end
-    
-    ansi_clear + char.map{|l| l.join }.join("\n")
-  end
-  
   def draw_cell cell
     left, right, top, bottom = coord cell
     
@@ -53,7 +35,6 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   end
 
   def draw_path cell
-    return unless highlighted_cell? cell
     left, right, top, bottom = coord cell
 
     mx = left + (cell_size * 3 + 1) / 2
@@ -83,10 +64,6 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     char[my][mx] = center_char.color(content_color_of(cell))
   end
   
-  def path? direction, cell
-    cell.linked?(cell.send(direction)) && highlighted_cell?(cell.send(direction))
-  end
-  
   # left, right, top, bottom
   def coord cell
     [x(cell.column), x(cell.column+1), y(cell.row), y(cell.row+1)]
@@ -98,6 +75,14 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
   def y row
     (cell_size + 1) * row
+  end
+  
+  def char_array_width
+    x(grid.columns) + 1
+  end
+  
+  def char_array_height
+    y(grid.rows) + 1
   end
   
   def h

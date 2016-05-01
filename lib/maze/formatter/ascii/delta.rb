@@ -3,75 +3,157 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
 
   # FIXME render does not work for masked grids
 
-  def render
-    highlighted = content_highlighted.center(height).color(:blue)
-    
-    output = ansi_clear
-    
-    repeat = (grid.columns-1) / 2
-    output << " " << base << ("  " + base) * repeat << "\n"
-    
-    grid.each_row do |row|
-      line = Array.new(height) { "" }
-
-      # left side of first cell of row
-      height.times do |i|
-        if row.first.row.even?
-          line[i] << " " * i + side_b
-        else
-          line[i] << " " * (height-1-i) + side_a
-        end
+  def draw_cell cell
+    x0, y0 = coord cell
+    # reverse triangle
+    if (cell.column + cell.row).even?
+      1.upto(cell_size*2) do |i|
+        # base
+        char[y0][x0+i] = h
+        char[y0][x0] = h unless cell.north
+        char[y0][x0+cell_size*2+1] = h unless cell.north
       end
-      
-      # remaining cells of row
-      row.each do |cell|
-        height.times do |i|
-          if (cell.row+cell.column).even?
-            body = (i == cell_size-1 ? content_of(cell) : '').center((height-1-i)*2).color(content_color_of(cell))
-            wall = cell.linked?(cell.east) ? " " : side_a
-          else
-            if i < height-1 || cell.linked?(cell.south)
-              body = (i == cell_size ? content_of(cell) : '').center(i*2).color(content_color_of(cell))
-              # body = space * i
-            else
-              # FIXME: if cell_size == 1 the body of the cell and the bottom of the cell
-              # will be drawn by the same characters. Use underline? Underline will 
-              # cause problems with the color. Don't fix it for the moment.
-              body = base
-            end
-            wall = cell.linked?(cell.east) ? " " : side_b
-          end
-          line[i] << body << wall
-        end
+      0.upto(cell_size) do |i|
+        # east
+        char[y0+i+1][x0+cell_size*2+1-i] = re
+        # west
+        char[y0+i+1][x0+i] = rw
       end
 
-      # add all lines for a single row to output
-      height.times do |i|
-        output << line[i] << "\n"
+    # normal triangle
+    else
+      1.upto(cell_size*2) do |i|
+        # base
+        char[y0+cell_size+1][x0+i] = h
       end
-      
+      0.upto(cell_size) do |i|
+        # east
+        char[y0+i+1][x0+cell_size+1+i] = ne
+        # west
+        char[y0+i+1][x0+cell_size-i] = nw
+        
+      end
     end
-    
-    output
   end
   
-  def height
-    cell_size * 2
-  end
-
-  def side_a
-    "/"
+  def draw_content cell
   end
   
-  def side_b
-    "\\"
+  def draw_path cell
   end
   
-  def space
-    "  "
+  def coord cell
+    [xpos(cell.column), ypos(cell.row)]
   end
   
-  def base
-    "__" * (height - 1)
+  def xpos column
+    (cell_size + 1) * column
   end
+  
+  def ypos row
+    (cell_size + 1) * row
+  end
+  
+  def char_array_width
+    xpos(grid.columns + 1)
+  end
+  
+  def char_array_height
+    ypos(grid.rows) + 1
+  end
+  
+  def h
+    '_'
+  end
+  
+  def rw
+    '\\'
+  end
+  
+  def re
+    '/'
+  end
+  
+  alias_method :nw, :re
+  alias_method :ne, :rw
+  
 end
+
+__END__
+
+ __  __
+\* /\  /\
+ \/__\/__\
+ /\  /\  /
+/__\/__\/
+\  /\  /\
+ \/__\/__\
+ /\  /\  /
+/__\/__\/
+
+
+ ____  ____  ____ 
+\    /\    /\    /
+ \  /  \  /  \  /
+  \/____\/____\/
+  /\    /\    /\
+ /  \  /  \  /  \
+/____\/____\/____\
+\    /\    /\    /
+ \  /  \  /  \  /
+  \/____\/____\/
+  /\    /\    /\
+ /  \  /  \  /  \
+/____\/____\/____\
+\    /\    /\    /
+ \  /  \  /  \  /
+  \/____\/____\/
+
+ ______  ______  ______ 
+\      /\      /\      /
+ \ *  /  \    /  \    /
+  \  / *  \  /    \  /
+   \/______\/______\/
+   /\      /\      /\
+  /  \    /  \    /  \
+ /    \  /    \  /    \
+/______\/______\/______\
+\      /\      /\      /
+ \    /  \    /  \    /
+  \  /    \  /    \  /
+   \/______\/______\/
+   /\      /\      /\
+  /  \    /  \    /  \
+ /    \  /    \  /    \
+/______\/______\/______\
+\      /\      /\      /
+ \    /  \    /  \    /
+  \  /    \  /    \  /
+   \/______\/______\/
+
+
+ __________  __________  __________
+\          /\          /\          /
+ \        /  \        /  \        /
+  \  *   /    \      /    \      /
+   \    /  *   \    /      \    /
+    \  /        \  /        \  /
+     \/__________\/__________\/
+     /\          /\          /\     
+    /  \        /  \        /  \    
+   /    \      /    \      /    \   
+  /      \    /      \    /      \  
+ /        \  /        \  /        \ 
+/__________\/__________\/__________\
+\          /\          /\          /
+ \        /  \        /  \        /
+  \      /    \      /    \      /
+   \    /      \    /      \    /
+    \  /        \  /        \  /
+     \/__________\/__________\/
+     /\          /\          /\     
+    /  \        /  \        /  \    
+   /    \      /    \      /    \   
+  /      \    /      \    /      \  
+ /        \  /        \  /        \ 
+/__________\/__________\/__________\

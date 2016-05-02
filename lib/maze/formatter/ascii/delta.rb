@@ -3,48 +3,64 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
 
   def draw_cell cell
     x0, y0 = coord cell
+    
     # reverse triangle
     if (cell.column + cell.row).even?
-      unless cell.north
-        # base top row
-        char[y0][x0] = h
-        char[y0][x0+cell_size*2+1] = h
-      end
-      1.upto(cell_size*2) do |i|
-        # base
-        char[y0][x0+i] = h unless cell.linked? cell.north
-      end
-      0.upto(cell_size) do |i|
-        # east
-        char[y0+i+1][x0+cell_size*2+1-i] = re unless cell.linked? cell.east
+      # corner
+      char[y0][x0] = corner
+      char[y0][x0+(cell_size+1)*2] = corner
+      char[y0+cell_size+1][x0+cell_size+1] = corner
+      
+      0.upto(cell_size*2) do |i|
+        # north
+        char[y0][x0+1+i] = h
+      end unless cell.linked_to?(:north)
+      1.upto(cell_size) do |i|
         # west
-        char[y0+i+1][x0+i] = rw unless cell.linked? cell.west
+        char[y0+i][x0+i] = rw unless cell.linked_to?(:west)
+        # east
+        char[y0+i][x0+(cell_size+1)*2-i] = re unless cell.linked_to?(:east)
       end
-
+      
     # normal triangle
     else
-      1.upto(cell_size*2) do |i|
-        # base
-        char[y0+cell_size+1][x0+i] = h unless cell.linked? cell.south
-      end
-      0.upto(cell_size) do |i|
-        # east
-        char[y0+i+1][x0+cell_size+1+i] = ne unless cell.linked? cell.east
+      # corner
+      char[y0+cell_size+1][x0] = corner
+      char[y0+cell_size+1][x0+(cell_size+1)*2] = corner
+      char[y0][x0+cell_size+1] = corner
+      
+      0.upto(cell_size*2) do |i|
+        # south
+        char[y0+cell_size+1][x0+1+i] = h
+      end unless cell.linked_to?(:south)
+      1.upto(cell_size) do |i|
         # west
-        char[y0+i+1][x0+cell_size-i] = nw unless cell.linked? cell.west
-        
+        char[y0+i][x0+cell_size+1-i] = nw unless cell.linked_to?(:west)
+        # east
+        char[y0+i][x0+cell_size+1+i] = ne unless cell.linked_to?(:east)
       end
+      
     end
   end
-  
+
   def draw_content cell
+    # TODO: implement draw content for delta grids
   end
   
   def draw_path cell
     x0, y0 = coord cell
     
-    # FIXME: postition of center differs for odd cells
-    char[y0+cell_size][x0+cell_size] = c.color(content_color_of cell)
+    mx = x0 + cell_size + 1
+    my = y0 + (cell_size + 1) / 2
+    
+    # center
+    char[my][mx] = center.color(content_color_of cell)
+    1.upto(cell_size) do |i|
+      # east-west
+      char[my][mx+i] = h.color(content_color_of cell) if path?(:east, cell)
+      # north-south
+      char[my+i][mx] = v.color(content_color_of cell) if path?(:south, cell)
+    end
   end
   
   def coord cell
@@ -60,7 +76,7 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
   end
   
   def char_array_width
-    xpos(grid.columns + 1)
+    xpos(grid.columns + 1) + 1
   end
   
   def char_array_height
@@ -68,7 +84,11 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
   end
   
   def h
-    '_'
+    '-'
+  end
+  
+  def v
+    '|'
   end
   
   def rw
@@ -79,10 +99,11 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
     '/'
   end
   
-  def c
-    '.'
+  def corner
+    '∙'
   end
   
+  alias_method :center, :corner
   alias_method :nw, :re
   alias_method :ne, :rw
   
@@ -90,90 +111,10 @@ end
 
 __END__
 
- __  __
-\* /\  /\
- \/__\/__\
- /\  /\  /
-/__\/__\/
-\  /\  /\
- \/__\/__\
- /\  /\  /
-/__\/__\/
-
-
- ____  ____  ____ 
-\ .   \    /\    /
- \.... \  /  \  /
-  \  .  \/____\/
-  /  .  /\    /\
- /.... /. \. /  \
-/ .   /____\/____\
-\ .  /\    /\    /
- \  /  \  /  \  /
-  \/____\/____\/
-  /\    /\    /\
- /  \  /  \  /  \
-/____\/____\/____\
-\    /\    /\    /
- \  /  \  /  \  /
-  \/____\/____\/
-
- ______  ______  ______ 
-\       \      /\      /
- \ .     \    /  \    /
-  \  ` .  \  /    \  /
-   \ ______\/______\/
-   /\      /\      /\
-  /  \    /  \    /  \
- /    \  /    \  /    \
-/______\/______\/______\
-\      /\      /\      /
- \    /  \    /  \    /
-  \  /    \  /    \  /
-   \/______\/______\/
-   /\      /\      /\
-  /  \    /  \    /  \
- /    \  /    \  /    \
-/______\/______\/______\
-\      /\      /\      /
- \    /  \    /  \    /
-  \  /    \  /    \  /
-   \/______\/______\/
-
-
- __________  __________  __________
-\          /\          /\          /
- \        /  \        /  \        /
-  \  .        \      /    \      /
-   \    `  .   \    /      \    /
-    \           \  /        \  /
-     \/__________\/__________\/
-     /\          /\          /\     
-    /  \        /  \        /  \    
-   /    \      /    \      /    \   
-  /      \    /      \    /      \  
- /        \  /        \  /        \ 
-/__________\/__________\/__________\
-\          /\          /\          /
- \        /  \        /  \        /
-  \      /    \      /    \      /
-   \    /      \    /      \    /
-    \  /        \  /        \  /
-     \/__________\/__________\/
-     /\          /\          /\     
-    /  \        /  \        /  \    
-   /    \      /    \      /    \   
-  /      \    /      \    /      \  
- /        \  /        \  /        \ 
-/__________\/__________\/__________\
-
-
-
-
 ∙---∙---∙
  \...\ / \
-  ∙---∙---∙
- / \ / \ /
+  ∙ . ∙---∙
+ / \./ \ /
 ∙---∙---∙
  \ / \ / \
   ∙---∙---∙
@@ -190,11 +131,11 @@ __END__
    ∙-----∙-----∙
 
 ∙-------∙-------∙
- \     / \     / \
+ \       \     / \
   \ ..... \   /   \
-   \ /     \ /     \
-    ∙-------∙-------∙
-   / \     / \     / 
+   \    .  \ /     \
+    ∙   .   ∙-------∙
+   / \  .  / \     / 
   /   \   /   \   /
  /     \ /     \ /
 ∙-------∙-------∙

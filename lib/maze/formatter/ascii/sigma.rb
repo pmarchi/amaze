@@ -1,5 +1,7 @@
 
 class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
+
+  # TODO: use cell#linked_to? helper
   
   def draw_cell cell
     x0, y0 = coord cell

@@ -1,6 +1,8 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
+  # TODO: use cell#linked_to? helper
+  
   def draw_cell cell
     left, right, top, bottom = coord cell
     

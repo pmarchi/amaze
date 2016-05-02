@@ -26,6 +26,10 @@ class Maze::Cell
     @links.key? cell
   end
   
+  def linked_to? direction
+    @links.key? self.send(direction)
+  end
+  
   def inspect
     "cell(#{row},#{column})"
   end

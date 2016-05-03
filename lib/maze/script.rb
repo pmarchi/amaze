@@ -1,4 +1,5 @@
 
+require 'optparse'
 require 'io/console'
 
 class Maze::Script

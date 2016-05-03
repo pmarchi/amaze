@@ -1,3 +1,6 @@
 #!/usr/bin/env ruby
 
-require "maze"
+require 'bundler/setup'
+require 'maze'
+
+Maze::Script.new.run ARGV

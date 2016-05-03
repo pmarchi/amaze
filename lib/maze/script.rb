@@ -1,7 +1,7 @@
 
 require 'optparse'
 require 'io/console'
-require 'rainbow'
+require 'rainbow/ext/string'
 
 class Maze::Script
 
@@ -156,7 +156,7 @@ class Maze::Script
         options[:ascii_distances_color] = color
       end
       o.on('--all-ascii-colors', 'Print all the supported ascii colors.') do
-        puts Rainbow::X11ColorNames::NAMES.keys.map(&:to_s).join(', ')
+        puts Rainbow::X11ColorNames::NAMES.keys.map {|n| n.to_s.color(n) }.join(' ')
         exit 0
       end
 

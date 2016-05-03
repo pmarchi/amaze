@@ -7,37 +7,37 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
     # reverse triangle
     if (cell.column + cell.row).even?
       # corner
-      char[y0][x0] = corner
-      char[y0][x0+(cell_size+1)*2] = corner
-      char[y0+cell_size+1][x0+cell_size+1] = corner
+      char[y0][x0] = corner.color(grid_color)
+      char[y0][x0+(cell_size+1)*2] = corner.color(grid_color)
+      char[y0+cell_size+1][x0+cell_size+1] = corner.color(grid_color)
       
       0.upto(cell_size*2) do |i|
         # north
-        char[y0][x0+1+i] = h
+        char[y0][x0+1+i] = h.color(grid_color)
       end unless cell.linked_to?(:north)
       1.upto(cell_size) do |i|
         # west
-        char[y0+i][x0+i] = rw unless cell.linked_to?(:west)
+        char[y0+i][x0+i] = rw.color(grid_color) unless cell.linked_to?(:west)
         # east
-        char[y0+i][x0+(cell_size+1)*2-i] = re unless cell.linked_to?(:east)
+        char[y0+i][x0+(cell_size+1)*2-i] = re.color(grid_color) unless cell.linked_to?(:east)
       end
       
     # normal triangle
     else
       # corner
-      char[y0+cell_size+1][x0] = corner
-      char[y0+cell_size+1][x0+(cell_size+1)*2] = corner
-      char[y0][x0+cell_size+1] = corner
+      char[y0+cell_size+1][x0] = corner.color(grid_color)
+      char[y0+cell_size+1][x0+(cell_size+1)*2] = corner.color(grid_color)
+      char[y0][x0+cell_size+1] = corner.color(grid_color)
       
       0.upto(cell_size*2) do |i|
         # south
-        char[y0+cell_size+1][x0+1+i] = h
+        char[y0+cell_size+1][x0+1+i] = h.color(grid_color)
       end unless cell.linked_to?(:south)
       1.upto(cell_size) do |i|
         # west
-        char[y0+i][x0+cell_size+1-i] = nw unless cell.linked_to?(:west)
+        char[y0+i][x0+cell_size+1-i] = nw.color(grid_color) unless cell.linked_to?(:west)
         # east
-        char[y0+i][x0+cell_size+1+i] = ne unless cell.linked_to?(:east)
+        char[y0+i][x0+cell_size+1+i] = ne.color(grid_color) unless cell.linked_to?(:east)
       end
       
     end
@@ -54,12 +54,12 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
     my = y0 + (cell_size + 1) / 2
     
     # center
-    char[my][mx] = center.color(content_color_of cell)
+    char[my][mx] = center.color(path_color)
     1.upto(cell_size) do |i|
       # east-west
-      char[my][mx+i] = h.color(content_color_of cell) if path?(:east, cell)
+      char[my][mx+i] = h.color(path_color) if path?(:east, cell)
       # north-south
-      char[my+i][mx] = v.color(content_color_of cell) if path?(:south, cell)
+      char[my+i][mx] = v.color(path_color) if path?(:south, cell)
     end
   end
   

@@ -29,15 +29,15 @@ class Maze::Formatter::ASCII
   def render
     grid.each_cell do |cell|
       draw_cell cell
-      draw_content cell unless highlighted_cell? cell
-      draw_path cell if highlighted_cell? cell
+      draw_content cell if distances
+      draw_path cell if path_cell? cell
     end
     
     ansi_clear + char.map{|l| l.join }.join("\n")
   end
   
   def path? direction, cell
-    cell.linked?(cell.send(direction)) && highlighted_cell?(cell.send(direction))
+    cell.linked?(cell.send(direction)) && path_cell?(cell.send(direction))
   end
   
   def ansi_clear
@@ -53,36 +53,31 @@ class Maze::Formatter::ASCII
     options[:cell_size] || 1
   end
   
-  def highlighted_cell? cell
-    Array(options[:highlighted_cells]).include? cell
+  # The color of the grid
+  def grid_color
+    options[:grid_color] || :white
   end
   
-  def content_color_of cell
-    if @options[:content_color].is_a? Hash
-      @options[:content_color][cell]
-    else
-      @options[:content_color] || :blue
-    end
+  # The color used to draw the solution or the longest path
+  def path_color
+    options[:path_color] || :blue
   end
-
+  
+  def path_cell? cell
+    Array(options[:path_cells]).include? cell
+  end
+  
   # Distances
   def distances
     options[:distances]
   end
   
-  # Returns the content of a cell:
-  # a) the cell is in the list of the cells to be highlighted => '*'
-  # b) distances have been assigned, the current distance as 36 based integer, e.g. => '1F'
-  # c) empty cell => ' '
-  def content_of cell
-    if highlighted_cell? cell
-      content_highlighted
-    else
-      if distances && distances[cell]
-        distances[cell].to_s(36).upcase # 0..9a..z
-      else
-        ' '
-      end
-    end
+  def distance cell
+    # .to_s(36) => 0..9a..z
+    distances && distances[cell] ? distances[cell].to_s(36).upcase : ' '
+  end
+
+  def distances_color
+    @options[:distances_color] || :blue
   end
 end

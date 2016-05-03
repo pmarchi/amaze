@@ -11,27 +11,27 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
     0.upto(cell_size*3-1) do |i|
       # north
-      char[y0][x1+i] = n unless cell.linked? cell.north
+      char[y0][x1+i] = n.color(grid_color) unless cell.linked? cell.north
       # south
-      char[y0+cell_size*2][x1+i] = s unless cell.linked? cell.south
+      char[y0+cell_size*2][x1+i] = s.color(grid_color) unless cell.linked? cell.south
     end
 
     0.upto(cell_size-1) do |i|
       # north east
-      char[y0+1+i][x2+i] = ne unless cell.linked? cell.northeast
+      char[y0+1+i][x2+i] = ne.color(grid_color) unless cell.linked? cell.northeast
       # north west
-      char[y0+1+i][x0+cell_size-1-i] = nw unless cell.linked? cell.northwest
+      char[y0+1+i][x0+cell_size-1-i] = nw.color(grid_color) unless cell.linked? cell.northwest
       # south east
-      char[y1+1+i][x2+cell_size-1-i] = se unless cell.linked? cell.southeast
+      char[y1+1+i][x2+cell_size-1-i] = se.color(grid_color) unless cell.linked? cell.southeast
       # south west
-      char[y1+1+i][x0+i] = sw unless cell.linked? cell.southwest
+      char[y1+1+i][x0+i] = sw.color(grid_color) unless cell.linked? cell.southwest
     end
   end
   
   def draw_content cell
     x, y = coord cell
-    content_of(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[y+cell_size][x+cell_size+i] = c.color(content_color_of(cell))
+    distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
+      char[y+cell_size][x+cell_size+i] = c.color(distances_color)
     end
   end
 
@@ -39,20 +39,20 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
     x, y = coord cell, :center
     # north-south
     1.upto(cell_size*2) do |i|
-      char[y+i][x] = p.color(content_color_of(cell))
+      char[y+i][x] = p.color(path_color)
     end if path?(:south, cell)
     # northwest-southeast
     0.upto(cell_size-1) do |i|
-      char[y+i][x+i*4] = p.color(content_color_of(cell))
-      char[y+i+1][x+i*4+2] = pnwse.color(content_color_of(cell))
+      char[y+i][x+i*4] = p.color(path_color)
+      char[y+i+1][x+i*4+2] = pnwse.color(path_color)
     end if path?(:southeast, cell)
     # southwest-northeast
     0.upto(cell_size-1) do |i|
-      char[y-i][x+i*4] = p.color(content_color_of(cell))
-      char[y-i][x+i*4+2] = pswne.color(content_color_of(cell))
+      char[y-i][x+i*4] = p.color(path_color)
+      char[y-i][x+i*4+2] = pswne.color(path_color)
     end if path?(:northeast, cell)
     # center
-    char[y][x] = p.color(content_color_of cell)
+    char[y][x] = p.color(path_color)
   end
   
   def coord cell, ref=:topleft

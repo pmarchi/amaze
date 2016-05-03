@@ -1,6 +1,7 @@
 
 require 'optparse'
 require 'io/console'
+require 'rainbow'
 
 class Maze::Script
 
@@ -32,7 +33,7 @@ class Maze::Script
       algorithm.on grid do |stat|
         # print the maze
         ascii = factory.create_ascii_formatter grid,
-          ascii_options(highlighted_cells: stat.active)
+          ascii_options(path_color: :blue, path_cells: stat.active)
           
         puts ascii.render
         
@@ -49,40 +50,33 @@ class Maze::Script
       algorithm.on grid
     end
     
-    # TODO: option handling for distances, solution and longest
-    # - use distance only for distances
-    # - use path for solution and longest
+    ascii_runtime_options = {}
     
     # Calculate the distances from a given start cell
     if distances?
       distances = start_cell.distances
+      ascii_runtime_options[:distances] = distances
     end
 
     # And the solution to a given end cell
     if solution?
-      distances = distances.path_to finish_cell
+      distances = start_cell.distances.path_to finish_cell
+      ascii_runtime_options[:path_cells] = distances.cells
       path_length = distances[finish_cell]
-      highlighted_cells = distances.cells
-      content_color = :red
     end
     
     if longest?
-      new_start, distance = distances.max
+      new_start, distance = start_cell.distances.max
       new_distances = new_start.distances
       new_finish, distance = new_distances.max
       distances = new_distances.path_to new_finish
+      ascii_runtime_options[:path_cells] = distances.cells
       path_length = distance
-      highlighted_cells = distances.cells
-      content_color = :green
     end
 
     # Render the maze, set defaults for missing options
     if ascii?
-      ascii = factory.create_ascii_formatter grid,
-        ascii_options(
-        distances: distances || nil,
-        highlighted_cells: highlighted_cells || [],
-        content_color: content_color || :blue)
+      ascii = factory.create_ascii_formatter grid, ascii_options(ascii_runtime_options)
       puts ascii.render
     end
     
@@ -152,6 +146,19 @@ class Maze::Script
       o.on('-c', '--cell-size SIZE', Integer, 'The size of the cell') do |cell_size|
         options[:cell_size] = cell_size
       end
+      o.on('--grid-color NAME', Rainbow::X11ColorNames::NAMES.keys, 'The color of the grid.') do |color|
+        options[:ascii_grid_color] = color
+      end
+      o.on('--path-color NAME', Rainbow::X11ColorNames::NAMES.keys, 'The color of the path, when drawing the solution or longest path.') do |color|
+        options[:ascii_path_color] = color
+      end
+      o.on('--distances-color NAME', Rainbow::X11ColorNames::NAMES.keys, 'The color of the distances.') do |color|
+        options[:ascii_distances_color] = color
+      end
+      o.on('--all-ascii-colors', 'Print all the supported ascii colors.') do
+        puts Rainbow::X11ColorNames::NAMES.keys.map(&:to_s).join(', ')
+        exit 0
+      end
 
       o.separator "\nPNG Options:"
   
@@ -176,6 +183,10 @@ class Maze::Script
       o.on('--gradient-map NAME', Maze::Factory.gradient_maps, 'The gradient map to use for the distances color.', "One of #{Maze::Factory.gradient_maps.join(', ')}") do |map|
         options[:gradient_map] = map
       end
+      o.on('--all-png-colors', 'Print all the supported png colors.') do
+        puts Maze::Formatter::PNG.colors.join(', ')
+        exit 0
+      end
   
       o.separator ""
     end
@@ -183,7 +194,10 @@ class Maze::Script
   
   def ascii_options runtime_options={}
     { 
-      cell_size: options[:cell_size] || 1, 
+      cell_size: options[:cell_size] || 1,
+      grid_color: options[:ascii_grid_color] || :white,
+      path_color: options[:ascii_path_color] || :red,
+      distances_color: options[:ascii_distances_color] || :blue
     }.merge runtime_options
   end
   
@@ -211,7 +225,7 @@ class Maze::Script
   end
   
   def distances?
-    !!@options[:distances] || !!@options[:solution] || !!options[:longest]
+    !!@options[:distances]
   end
   
   def solution?

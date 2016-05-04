@@ -197,7 +197,7 @@ class Maze::Script
       cell_size: options[:cell_size] || 1,
       grid_color: options[:ascii_grid_color] || :white,
       path_color: options[:ascii_path_color] || :red,
-      distances_color: options[:ascii_distances_color] || :blue
+      distances_color: options[:ascii_distances_color]
     }.merge runtime_options
   end
   

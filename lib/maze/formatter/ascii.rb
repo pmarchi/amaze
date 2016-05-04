@@ -78,15 +78,12 @@ class Maze::Formatter::ASCII
   end
   
   def distance_color cell
+    return @options[:distances_color] if @options[:distances_color]
     _, max = distances.max
     high = (255-47).to_f / max * distances[cell] + 47
     low = high / 4
     p [:low, low] unless (0..255).include? low
     p [:high, high] unless (0..255).include? high
     [0,low,high]
-  end
-  
-  def distances_color
-    @options[:distances_color] || :blue
   end
 end

@@ -44,7 +44,25 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
   end
 
   def draw_content cell
-    # TODO: implement draw content for delta grids
+    x0, y0 = coord cell
+    
+    if cell_size == 1
+      my = y0 + 1
+      mx = x0 + 2
+      w = 1
+    else
+      mx = x0 + cell_size / 2 + 1
+      w = (cell_size+1) / 2 * 2 + 1
+      if (cell.column+cell.row).even?
+        my = y0 + cell_size / 2
+      else
+        my = y0 + (cell_size+3) / 2
+      end
+    end
+    
+    distance(cell).center(w).chars.each_with_index do |c,i|
+      char[my][mx+i] = c.color(*distance_color(cell))
+    end
   end
   
   def draw_path cell
@@ -110,6 +128,16 @@ class Maze::Formatter::ASCII::Delta < Maze::Formatter::ASCII
 end
 
 __END__
+
+    mx    w    yr    yn
+c1  2     1    1     1
+
+c2  2     3    1     2       cell_size / 2        cell_size + 3 / 2
+c3  2     5    1     3
+c4  3     5    2     3
+c5  3     7    2     4
+c6  4     7    3     4        cell_size / 2 + 1
+c7  4     9    3     5     cell_size+1/2 * 2 + 1
 
 ∙---∙---∙
  \...\ / \

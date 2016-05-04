@@ -31,7 +31,7 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
   def draw_content cell
     x, y = coord cell
     distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[y+cell_size][x+cell_size+i] = c.color(distances_color)
+      char[y+cell_size][x+cell_size+i] = c.color(*distance_color(cell))
     end
   end
 

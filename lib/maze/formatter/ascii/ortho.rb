@@ -32,7 +32,7 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
 
     my = top + cell_size / 2 + 1
     distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[my][left+1+i] = c.color(distances_color)
+      char[my][left+1+i] = c.color(*distance_color(cell))
     end
   end
 

@@ -76,7 +76,16 @@ class Maze::Formatter::ASCII
     # .to_s(36) => 0..9a..z
     distances && distances[cell] ? distances[cell].to_s(36).upcase : ' '
   end
-
+  
+  def distance_color cell
+    _, max = distances.max
+    high = (255-47).to_f / max * distances[cell] + 47
+    low = high / 4
+    p [:low, low] unless (0..255).include? low
+    p [:high, high] unless (0..255).include? high
+    [0,low,high]
+  end
+  
   def distances_color
     @options[:distances_color] || :blue
   end

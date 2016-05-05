@@ -129,10 +129,10 @@ class Maze::Script
       o.separator "\nSolution options:"
 
       o.on('--[no-]distances [ROW,COLUMN]', Array, 'Calculate the distances from cell(ROW/COLUMN) to all other cells of the grid.') do |distances|
-        options[:distances] = (distances || [0,0]).map(&:to_i)
+        options[:distances] = distances ? distances.map(&:to_i) : :auto
       end
       o.on('--[no-]solution [ROW,COLUMN]', Array, 'Find the shortest path to cell(ROW/COLUMN).') do |solution|
-        options[:solution] = (solution || [-1,-1]).map(&:to_i)
+        options[:solution] = solution ? solution.map(&:to_i) : :auto
       end
       o.on('--[no-]longest', 'Find the longest path of the maze.') do |longest|
         options[:longest] = longest
@@ -236,16 +236,26 @@ class Maze::Script
     !!@options[:longest]
   end
   
-  # TODO: Start and finish cell should be random, when not specified.
-  # prevent chosing masked cell.
-  # Maybe support for top left bottom right center ...
-  
   def start_cell
-    grid[*(@options[:distances] || [0,0])]
+    if !@options[:distances] || @options[:distances] == :auto
+      column = grid.columns.times.find {|i| grid[0,i] }
+      return grid[0,column] if column
+      row = grid.rows.times.find {|i| grid[i,0] }
+      return grid[row,0]
+    else
+      grid[*@options[:distances]]
+    end
   end
   
   def finish_cell
-    grid[*(@options[:solution].first == -1 ? [grid.rows - 1,0] : @options[:solution])]
+    if !@options[:solution] || @options[:solution] == :auto
+      column = grid.columns.times.find {|i| grid[grid.rows-1,grid.columns-1-i] }
+      return grid[grid.rows-1,grid.columns-1-column] if column
+      row = grid.rows.times.find {|i| grid[grid.rows-1-i,grid.columns-1] }
+      return grid[grid.rows-1-row,grid.columns-1]
+    else
+      grid[*@options[:solution]]
+    end
   end
   
   def factory

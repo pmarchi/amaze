@@ -22,81 +22,7 @@ class Maze::Script
       image: false,
     }
   end
-  
-  def run args
-    parser.parse!(args)
-    
-    initialize_random_seed
-    
-    # Run the algorithm on the grid
-    if visualize?
-      algorithm.on grid do |stat|
-        # print the maze
-        ascii = factory.create_ascii_formatter grid,
-          ascii_options(path_color: :blue, path_cells: stat.active)
-          
-        puts ascii.render
-        
-        puts stat.info if stat.info
-        sleep algorithm.speed
-        sleep 1 if options[:visualize] == :runsegment && stat.segment
-  
-        # wait for keystroke ?
-        if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)
-          break if read_char == "\e"
-        end
-      end
-    else
-      algorithm.on grid
-    end
-    
-    ascii_runtime_options = {}
-    
-    # Calculate the distances from a given start cell
-    if distances?
-      distances = start_cell.distances
-      ascii_runtime_options[:distances] = distances
-    end
 
-    # And the solution to a given end cell
-    if solution?
-      distances = start_cell.distances.path_to finish_cell
-      ascii_runtime_options[:path_cells] = distances.cells
-      path_length = distances[finish_cell]
-    end
-    
-    if longest?
-      new_start, distance = start_cell.distances.max
-      new_distances = new_start.distances
-      new_finish, distance = new_distances.max
-      distances = new_distances.path_to new_finish
-      ascii_runtime_options[:path_cells] = distances.cells
-      path_length = distance
-    end
-
-    # Render the maze, set defaults for missing options
-    if ascii?
-      ascii = factory.create_ascii_formatter grid, ascii_options(ascii_runtime_options)
-      puts ascii.render
-    end
-    
-    puts algorithm.status
-    puts "Dead ends: #{grid.deadends.size} of #{grid.size} (#{(100.to_f / grid.size * grid.deadends.size).to_i}%)"
-    puts "Path length: #{path_length}" if path_length
-    puts "Random seed: #{seed}"
-
-    if image?
-      png = factory.create_png_formatter grid,
-        png_options(distances: (distances || nil))
-
-      png.render_background
-      png.render
-      png.image.save "maze.png"
-      puts "Maze 'maze.png' saved."
-    end
-  end
-  
-  
   def parser
     OptionParser.new do |o|
       o.banner = "\nMaze generator\n\nUsage: #{File.basename $0} [options]\n"
@@ -192,6 +118,79 @@ class Maze::Script
     end
   end
   
+  def run args
+    parser.parse!(args)
+    
+    initialize_random_seed
+    
+    # Run the algorithm on the grid
+    if visualize?
+      algorithm.on grid do |stat|
+        # print the maze
+        ascii = factory.create_ascii_formatter grid,
+          ascii_options(path_color: :blue, path_cells: stat.active)
+          
+        puts ascii.render
+        
+        puts stat.info if stat.info
+        sleep algorithm.speed
+        sleep 1 if options[:visualize] == :runsegment && stat.segment
+  
+        # wait for keystroke ?
+        if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)
+          break if read_char == "\e"
+        end
+      end
+    else
+      algorithm.on grid
+    end
+    
+    ascii_runtime_options = {}
+    
+    # Calculate the distances from a given start cell
+    if distances?
+      distances = start_cell.distances
+      ascii_runtime_options[:distances] = distances
+    end
+
+    # And the solution to a given end cell
+    if solution?
+      distances = start_cell.distances.path_to finish_cell
+      ascii_runtime_options[:path_cells] = distances.cells
+      path_length = distances[finish_cell]
+    end
+    
+    if longest?
+      new_start, distance = start_cell.distances.max
+      new_distances = new_start.distances
+      new_finish, distance = new_distances.max
+      distances = new_distances.path_to new_finish
+      ascii_runtime_options[:path_cells] = distances.cells
+      path_length = distance
+    end
+
+    # Render the maze, set defaults for missing options
+    if ascii?
+      ascii = factory.create_ascii_formatter grid, ascii_options(ascii_runtime_options)
+      puts ascii.render
+    end
+    
+    puts algorithm.status
+    puts "Dead ends: #{grid.deadends.size} of #{grid.size} (#{(100.to_f / grid.size * grid.deadends.size).to_i}%)"
+    puts "Path length: #{path_length}" if path_length
+    puts "Random seed: #{seed}"
+
+    if image?
+      png = factory.create_png_formatter grid,
+        png_options(distances: (distances || nil))
+
+      png.render_background
+      png.render
+      png.image.save "maze.png"
+      puts "Maze 'maze.png' saved."
+    end
+  end
+    
   def ascii_options runtime_options={}
     { 
       cell_size: options[:cell_size] || 1,
@@ -263,6 +262,7 @@ class Maze::Script
   end
   
   def grid
+    # TODO: double x size for delta grid if not specified
     @grid ||= if options[:mask]
       factory.create_masked_grid options[:mask]
     else

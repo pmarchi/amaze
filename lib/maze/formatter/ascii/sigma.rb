@@ -1,8 +1,6 @@
 
 class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
-  # TODO: use cell#linked_to? helper
-  
   def draw_cell cell
     x0, y0 = coord cell
     x1 = x0 + cell_size
@@ -11,20 +9,20 @@ class Maze::Formatter::ASCII::Sigma < Maze::Formatter::ASCII
 
     0.upto(cell_size*3-1) do |i|
       # north
-      char[y0][x1+i] = n.color(grid_color) unless cell.linked? cell.north
+      char[y0][x1+i] = n.color(grid_color) unless cell.linked_to?(:north)
       # south
-      char[y0+cell_size*2][x1+i] = s.color(grid_color) unless cell.linked? cell.south
+      char[y0+cell_size*2][x1+i] = s.color(grid_color) unless cell.linked_to?(:south)
     end
 
     0.upto(cell_size-1) do |i|
       # north east
-      char[y0+1+i][x2+i] = ne.color(grid_color) unless cell.linked? cell.northeast
+      char[y0+1+i][x2+i] = ne.color(grid_color) unless cell.linked_to?(:northeast)
       # north west
-      char[y0+1+i][x0+cell_size-1-i] = nw.color(grid_color) unless cell.linked? cell.northwest
+      char[y0+1+i][x0+cell_size-1-i] = nw.color(grid_color) unless cell.linked_to?(:northwest)
       # south east
-      char[y1+1+i][x2+cell_size-1-i] = se.color(grid_color) unless cell.linked? cell.southeast
+      char[y1+1+i][x2+cell_size-1-i] = se.color(grid_color) unless cell.linked_to?(:southeast)
       # south west
-      char[y1+1+i][x0+i] = sw.color(grid_color) unless cell.linked? cell.southwest
+      char[y1+1+i][x0+i] = sw.color(grid_color) unless cell.linked_to?(:southwest)
     end
   end
   

@@ -1,8 +1,6 @@
 
 class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
   
-  # TODO: use cell#linked_to? helper
-  
   def draw_cell cell
     left, right, top, bottom = coord cell
     
@@ -14,16 +12,16 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     # top & bottom
     (left+1).upto(right-1) do |i|
       # top
-      char[top][i] = h.color(grid_color) unless cell.linked? cell.north
+      char[top][i] = h.color(grid_color) unless cell.linked_to?(:north)
       # bottom
-      char[bottom][i] = h.color(grid_color) unless cell.linked? cell.south
+      char[bottom][i] = h.color(grid_color) unless cell.linked_to?(:south)
     end
     # left & right
     (top+1).upto(bottom-1) do |i|
       # left
-      char[i][left] = v.color(grid_color) unless cell.linked? cell.west
+      char[i][left] = v.color(grid_color) unless cell.linked_to?(:west)
       # right
-      char[i][right] = v.color(grid_color) unless cell.linked? cell.east
+      char[i][right] = v.color(grid_color) unless cell.linked_to?(:east)
     end
   end
 

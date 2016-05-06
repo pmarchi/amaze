@@ -9,9 +9,10 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Patrick Marchi"]
   spec.email         = ["patrick.marchi@geo.uzh.ch"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Maze generator.}
+  spec.description   = %q{A maze generator inspired by Mazes for Programmers: Code Your Own Twisty Little Passages
+Book by Jamis Buck.}
+  spec.homepage      = ""
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.

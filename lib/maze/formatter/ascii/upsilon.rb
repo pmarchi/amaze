@@ -7,52 +7,52 @@ class Maze::Formatter::ASCII::Upsilon < Maze::Formatter::ASCII
     if (cell.row+cell.column).even?
       # draw octo cell
       # corners
-      char[y0][x1] = corner
-      char[y0][x2] = corner
-      char[y1][x0] = corner
-      char[y1][x3] = corner
-      char[y2][x0] = corner
-      char[y2][x3] = corner
-      char[y3][x1] = corner
-      char[y3][x2] = corner
+      char[y0][x1] = corner.color(grid_color)
+      char[y0][x2] = corner.color(grid_color)
+      char[y1][x0] = corner.color(grid_color)
+      char[y1][x3] = corner.color(grid_color)
+      char[y2][x0] = corner.color(grid_color)
+      char[y2][x3] = corner.color(grid_color)
+      char[y3][x1] = corner.color(grid_color)
+      char[y3][x2] = corner.color(grid_color)
       1.upto(cell_size) do |i|
         # northeast
-        char[y0+i][x2+i] = ne unless cell.linked_to?(:northeast)
+        char[y0+i][x2+i] = ne.color(grid_color) unless cell.linked_to?(:northeast)
         # southeast
-        char[y2+i][x3-i] = se unless cell.linked_to?(:southeast)
+        char[y2+i][x3-i] = se.color(grid_color) unless cell.linked_to?(:southeast)
         # southwest
-        char[y2+i][x0+i] = sw unless cell.linked_to?(:southwest)
+        char[y2+i][x0+i] = sw.color(grid_color) unless cell.linked_to?(:southwest)
         # northwest
-        char[y0+i][x1-i] = nw unless cell.linked_to?(:northwest)
+        char[y0+i][x1-i] = nw.color(grid_color) unless cell.linked_to?(:northwest)
         # east
-        char[y1+i][x3] = v unless cell.linked_to?(:east)
+        char[y1+i][x3] = v.color(grid_color) unless cell.linked_to?(:east)
         # west
-        char[y1+i][x0] = v unless cell.linked_to?(:west)
+        char[y1+i][x0] = v.color(grid_color) unless cell.linked_to?(:west)
       end
       1.upto(cell_size*3) do |i|
         # north
-        char[y0][x1+i] = h unless cell.linked_to?(:north)
+        char[y0][x1+i] = h.color(grid_color) unless cell.linked_to?(:north)
         # south
-        char[y3][x1+i] = h unless cell.linked_to?(:south)
+        char[y3][x1+i] = h.color(grid_color) unless cell.linked_to?(:south)
       end
     else
       # draw square cell
       # corners
-      char[y1][x1] = corner
-      char[y1][x2] = corner
-      char[y2][x1] = corner
-      char[y2][x2] = corner
+      char[y1][x1] = corner.color(grid_color)
+      char[y1][x2] = corner.color(grid_color)
+      char[y2][x1] = corner.color(grid_color)
+      char[y2][x2] = corner.color(grid_color)
       1.upto(cell_size) do |i|
         # east
-        char[y1+i][x2] = v unless cell.linked_to?(:east)
+        char[y1+i][x2] = v.color(grid_color) unless cell.linked_to?(:east)
         # west
-        char[y1+i][x1] = v unless cell.linked_to?(:west)
+        char[y1+i][x1] = v.color(grid_color) unless cell.linked_to?(:west)
       end
       1.upto(cell_size*3) do |i|
         # north
-        char[y1][x1+i] = h unless cell.linked_to?(:north)
+        char[y1][x1+i] = h.color(grid_color) unless cell.linked_to?(:north)
         # south
-        char[y2][x1+i] = h unless cell.linked_to?(:south)
+        char[y2][x1+i] = h.color(grid_color) unless cell.linked_to?(:south)
       end
     end
   end

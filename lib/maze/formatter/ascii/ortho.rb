@@ -40,6 +40,8 @@ class Maze::Formatter::ASCII::Ortho < Maze::Formatter::ASCII
     mx = left + (cell_size * 3 + 1) / 2
     my = top + cell_size / 2 + 1
     
+    # TODO: simplify paths, draw only north-south and east-west
+    
     # to north
     top.upto(my-1) do |i|
       char[i][mx] = v.color(path_color) if path?(:north, cell)

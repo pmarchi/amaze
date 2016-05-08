@@ -67,9 +67,56 @@ class Maze::Formatter::ASCII::Upsilon < Maze::Formatter::ASCII
   end
 
   def draw_path cell
+    x0, x1, x2, x3, y0, y1, y2, y3 = coord cell
     
-    # TODO: render path for upsilon mazes
+    # middle of cell
+    mx0 = (x1 + x2) / 2
+    my0 = (y1 + y2) / 2
     
+    # delta to middle of neighbor cell
+    dx = cell_size * 4 + 2
+    dy = cell_size * 2 + 2
+    
+    # north-south
+    1.upto(dy-1) do |i|
+      char[my0+i][mx0] = v.color(path_color)
+    end if path?(:south, cell)
+    # west-east
+    1.upto(dx-1) do |i|
+      char[my0][mx0+i] = h.color(path_color)
+    end if path?(:east, cell)
+    
+    if (cell.column+cell.row).even?
+      # northwest-southeast
+      if path?(:southeast, cell)
+        mx1 = mx0 + dx / 2
+        my1 = my0 + dy / 2
+
+        char[my1][mx1] = center.color(path_color)
+        1.upto(cell_size) do |i|
+          char[my0+i][mx0+i*2-1] = pnwse1.color(path_color)
+          char[my0+i][mx0+i*2] = pnwse2.color(path_color)
+          char[my1+i][mx1+i*2-1] = pnwse1.color(path_color)
+          char[my1+i][mx1+i*2] = pnwse2.color(path_color)
+        end
+      end
+      # northeast-southwest
+      if path?(:southwest, cell)
+        mx1 = mx0 - dx / 2
+        my1 = my0 + dy / 2
+
+        char[my1][mx1] = center.color(path_color)
+        1.upto(cell_size) do |i|
+          char[my0+i][mx0-i*2+1] = pswne1.color(path_color)
+          char[my0+i][mx0-i*2] = pswne2.color(path_color)
+          char[my1+i][mx1-i*2+1] = pswne1.color(path_color)
+          char[my1+i][mx1-i*2] = pswne2.color(path_color)
+        end
+      end
+    end
+
+    # center
+    char[my0][mx0] = center.color(path_color)
   end
   
   # left, right, top, bottom
@@ -118,10 +165,24 @@ class Maze::Formatter::ASCII::Upsilon < Maze::Formatter::ASCII
   def se
     '/'
   end
-
+  
   alias_method :sw, :ne
   alias_method :nw, :se
   
+  def pnwse1
+    '`'
+  end
+  
+  def pnwse2
+    '.'
+  end
+  
+  def pswne1
+    '´'
+  end
+  
+  alias_method :pswne2, :pnwse2
+
   def center
     '∙'
   end
@@ -134,18 +195,18 @@ end
 __END__
 
      x           y
-c1   0  6  12    4   8  12      cell_size * 2 + 2
-c2   0 10  20    6  12  18
-c3   0 14  28    8  16  24
+c1   0  6  12    4   8  12      4  4  2  
+c2   0 10  20    6  12  18      8  6  4
+c3   0 14  28    8  16  24      12 8  6
 
   +---+       +---+       +---+      
  /     \     /     \     /     \     
 +       +---+       +---+       +---+
-|       |   |       |   |       |   |
-+       +---+       +---+       +---+
- \     /     \     /     \     /     \
-  +---+       +---+       +---+       +
-  |   |       |   |       |   |       |
+|   ∙-----∙ |   ∙   |   |       |   |
++    `. +---+ .´|   +---+       +---+
+ \     ∙     ∙  |  /     \     /     \
+  +---+ `. .´ + | +       +---+       +
+  |   |   ∙   | ∙ |       |   |       |
   +---+       +---+       +---+       +
  /     \     /     \     /     \     /
 +       +---+       +---+       +---+
@@ -166,13 +227,13 @@ c3   0 14  28    8  16  24
   /        \          /        \          /        \     
  /          \        /          \        /          \     
 +            +------+            +------+            +------+
-|            |      |            |      |            |      |
-|            |      |            |      |            |      |
-+            +------+            +------+            +------+
- \          /        \          /        \          /        \ 
-  \        /          \        /          \        /          \
-   +------+            +------+            +------+            +
-   |      |            |      |            |      |            |
+|     ∙---------∙   |     ∙      |      |            |      |
+|      `.           |   .´|      |      |            |      |
++        `.  +------+ .´  |      +------+            +------+
+ \         ∙         ∙    |     /        \          /        \ 
+  \         `.     .´     |    /          \        /          \
+   +------+   `. .´    +  |   +            +------+            +
+   |      |     ∙      |  ∙   |            |      |            |
    |      |            |      |            |      |            |
    +------+            +------+            +------+            +
   /        \          /        \          /        \          /
@@ -202,16 +263,16 @@ c3   0 14  28    8  16  24
   /             \             /             \             /             \     
  /               \           /               \           /               \    
 +                 +---------+                 +---------+                 +---------+
-|                 |         |                 |         |                 |         |
-|                 |         |                 |         |                 |         |
-|                 |         |                 |         |                 |         |
-+                 +---------+                 +---------+                 +---------+
- \               /           \               /           \               /           \ 
-  \             /             \             /             \             /             \ 
-   \           /               \           /               \           /               \
-    +---------+                 +---------+                 +---------+                 +
-    |         |                 |         |                 |         |
-    |         |                 |         |                 |         |
+|                           |                 |         |                 |         |
+|        ∙-------------∙    |        ∙        |         |                 |         |
+|         `.                |      .´|        |         |                 |         |
++           `.    +---------+    .´  |        +---------+                 +---------+
+ \            `.               .´    |       /           \               /           \ 
+  \             ∙             ∙      |      /             \             /             \ 
+   \             `.         .´       |     /               \           /               \
+    +---------+    `.     .´    +    |    +                 +---------+                 +
+    |         |      `. .´      |    |    |                 |         |
+    |         |        ∙        |    ∙    |                 |         |
     |         |                 |         |                 |         |
     +---------+                 +---------+                 +---------+      
    /           \               /           \               /           \     

@@ -30,4 +30,5 @@ class Maze::Algorithm
   autoload :BinaryTree, 'maze/algorithm/binary_tree'
   autoload :Sidewinder, 'maze/algorithm/sidewinder'
   autoload :GrowingTree, 'maze/algorithm/growing_tree'
+  autoload :Wilson, 'maze/algorithm/wilson'
 end

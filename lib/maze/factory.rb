@@ -47,7 +47,7 @@ class Maze::Factory
 
   # All known algorithms
   def self.algorithms
-    %i( bt sw ab gt1 gt2 gt3 gt4 w )
+    %i( bt sw ab gt1 gt2 gt3 gt4 w hk )
   end
   
   def create_algorithm algorithm
@@ -61,6 +61,7 @@ class Maze::Factory
       gt3: Maze::Algorithm::GrowingTree,
       gt4: Maze::Algorithm::GrowingTree,
       w:   Maze::Algorithm::Wilson,
+      hk:  Maze::Algorithm::HuntAndKill,
     }
     
     # Algorithms only for ortho mazes

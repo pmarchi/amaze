@@ -31,4 +31,5 @@ class Maze::Algorithm
   autoload :Sidewinder, 'maze/algorithm/sidewinder'
   autoload :GrowingTree, 'maze/algorithm/growing_tree'
   autoload :Wilson, 'maze/algorithm/wilson'
+  autoload :HuntAndKill, 'maze/algorithm/hunt_and_kill'
 end

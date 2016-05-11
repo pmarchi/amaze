@@ -8,7 +8,8 @@ class Maze::Algorithm::Wilson < Maze::Algorithm
     grid.each_cell {|cell| unvisited << cell }
     
     # pick randon cell and remove from unvisited
-    unvisited.delete unvisited.sample
+    start = unvisited.sample
+    unvisited.delete start
     
     while unvisited.any?
       cell = unvisited.sample
@@ -18,30 +19,31 @@ class Maze::Algorithm::Wilson < Maze::Algorithm
       while unvisited.include? cell
         cell = cell.neighbors.sample
 
-        stat.active = path                          # visualize
-        stat.info = "Cells in path: #{path.size}"   #
-        stat.segment = ! unvisited.include?(cell)   #
-        yield stat if block_given?                  #
-
         if path.include? cell
           path = path[0..path.index(cell)]
         else
           path << cell
         end
+
+        stat.active = [start, *path].compact        # visualize
+        stat.info = "Path: #{path.size}"            #
+        stat.segment = ! unvisited.include?(cell)   #
+        yield stat if block_given?                  #
       end
       
       # carve path
-      carved = [path.first]                          # visualize
+      carved = 0                                    # visualize
       path.each_cons(2) do |cell1, cell2|
         cell1.link cell2
         unvisited.delete cell1
         
-        carved << cell2                              # visualize
-        stat.active = carved                         #
-        stat.info = "Carved cells: #{carved.size}"   #
-        stat.segment = carved.last == path.last      #
-        yield stat if block_given?                   #
+        carved += 1                                 # visualize
+        stat.active = path                          #
+        stat.info = "Carved: #{carved}"             #
+        stat.segment = cell2 == path.last           #
+        yield stat if block_given?                  #
       end
+      start = nil                                   # visualize
     end
   end
   

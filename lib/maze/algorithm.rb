@@ -32,4 +32,5 @@ class Maze::Algorithm
   autoload :GrowingTree, 'maze/algorithm/growing_tree'
   autoload :Wilson, 'maze/algorithm/wilson'
   autoload :HuntAndKill, 'maze/algorithm/hunt_and_kill'
+  autoload :RecursiveBacktracker, 'maze/algorithm/recursive_backtracker'
 end

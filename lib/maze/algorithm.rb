@@ -13,6 +13,18 @@ class Maze::Algorithm
     @stat ||= Stat.new([], true, false)
   end
   
+  # TODO: Replace Stat with this
+  #
+  # class KeywordStruct < Struct
+  #   def initialize(**kwargs)
+  #     super(kwargs.keys)
+  #     kwargs.each { |k, v| self[k] = v }
+  #   end
+  # end
+  #
+  # This will allow to consturct the stat object within the algorithm like this
+  # Stat.new(active: [], pause: false, info: "This is an info.")
+  
   def on grid
     @duration = Benchmark.realtime do
       work grid do |stat|

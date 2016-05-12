@@ -13,7 +13,6 @@ class Maze::Script
     # default options
     @options = {
       type: :ortho, 
-      grid_size: [4, 4],
       distances: false,
       ascii: true,
       algorithm: :gt1,
@@ -32,8 +31,7 @@ class Maze::Script
         options[:type] = type
       end
       o.on('-g', '--grid-size ROWS[,COLUMNS]', Array, 'The number of rows and columns of the grid') do |v|
-        options[:grid_size] = v.first(2).map(&:to_i)
-        options[:grid_size][1] ||= options[:grid_size][0]
+        options[:grid_size] = Array(v).map(&:to_i)
       end
       o.on('-m', '--mask MASKFILE', String, 'MASKFILE is either a ASCII file or a PNG file.') do |mask|
         options[:mask] = mask
@@ -267,12 +265,22 @@ class Maze::Script
   end
   
   def grid
-    # TODO: double x size for delta grid if not specified
     @grid ||= if options[:mask]
       factory.create_masked_grid options[:mask]
     else
-      factory.create_grid *options[:grid_size]
+      factory.create_grid *grid_size
     end
+  end
+  
+  def grid_size
+    # double the columns for delta grids if not specified
+    if options[:grid_size]
+      size = options[:grid_size].first(2).map(&:to_i)
+      size[1] ||= (options[:type] == :delta ? options[:grid_size][0] * 2 : options[:grid_size][0])
+    else
+      size = [4, options[:type] == :delta ? 8 : 4]
+    end
+    size
   end
   
   def algorithm

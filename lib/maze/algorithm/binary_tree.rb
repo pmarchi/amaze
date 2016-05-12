@@ -2,14 +2,14 @@
 class Maze::Algorithm::BinaryTree < Maze::Algorithm
 
   def work grid
-    stat.segment = false
-    
+    count = 0 # visualize
     grid.each_cell do |cell|
       links = [cell.north, cell.east].compact
       cell.link links[rand(links.size)] unless links.empty?
 
-      stat.active = [cell]
-      yield stat if block_given?
+      yield Stat.new(                                # visualize
+        current: [cell],                             #
+        info: "Cell: #{count += 1}") if block_given? #
     end
     grid
   end

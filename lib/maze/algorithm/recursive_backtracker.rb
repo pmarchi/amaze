@@ -11,10 +11,10 @@ class Maze::Algorithm::RecursiveBacktracker < Maze::Algorithm
     while current
       unvisited_neighbors = current.neighbors.select {|c| c.links.empty? }
 
-      stat.active = path                                # visualize
-      stat.info = "Path: #{path.size}"                  #
-      stat.segment = segmentend?(unvisited_neighbors)   #
-      yield stat if block_given?                        #
+      yield Stat.new(                               # visualize
+        current: path,                              #
+        pause: segmentend?(unvisited_neighbors),    #
+        info: "Path: #{path.size}") if block_given? #
 
       if unvisited_neighbors.any?
         neighbor = unvisited_neighbors.sample

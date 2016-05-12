@@ -19,7 +19,7 @@ class Maze::Algorithm::GrowingTree < Maze::Algorithm
   def work grid
     # true when active gets cells added
     # false when active gets cells deleted
-    prev_mode = true
+    mode = true
 
     active = [grid.random_cell]
     
@@ -28,12 +28,11 @@ class Maze::Algorithm::GrowingTree < Maze::Algorithm
       
       neighbor = cell.neighbors.select {|neighbor| neighbor.links.empty? }.sample
       
-      mode = !!neighbor
-      stat.active = active
-      stat.segment = prev_mode ^ mode
-      stat.info = "Current active cells: #{active.size}"
-      yield stat if block_given?
-      prev_mode = mode
+      yield Stat.new(                                  # visualize
+        current: active,                               #
+        pause: mode ^ !!neighbor,                      #
+        info: "Active #{active.size}") if block_given? #
+      mode = !!neighbor                                #
       
       if neighbor
         cell.link neighbor

@@ -4,16 +4,16 @@ class Maze::Algorithm::HuntAndKill < Maze::Algorithm
   def work grid
     
     current = grid.random_cell
-    path = []                                     # visualize
+    path = [] # visualize
     
     while current
       unvisited_neighbors = current.neighbors.select {|c| c.links.empty? }
-      
-      path << current                             # visualize
-      stat.active = path                          #
-      stat.info = "Path: #{path.size}"            #
-      stat.segment = unvisited_neighbors.empty?   #
-      yield stat if block_given?                  #
+
+      path << current                               # visualize
+      yield Stat.new(                               #
+        current: path,                              #
+        pause: unvisited_neighbors.empty?,          #
+        info: "Path: #{path.size}") if block_given? #
 
       # carve path
       if unvisited_neighbors.any?
@@ -25,18 +25,17 @@ class Maze::Algorithm::HuntAndKill < Maze::Algorithm
       else
         current = nil
 
-        path = []                                 # visualize
-        hunt = 0                                  # visualize
+        path = [] # visualize
+        hunt = 0  #
 
         grid.each_cell do |cell|
-
-          hunt += 1                               # visualize
-          stat.active = [cell]                    #
-          stat.info = "Hunt: #{hunt}"             #
-          stat.segment = false                    #
-          yield stat if block_given?              #
-
           visited_neighbors = cell.neighbors.select {|c| c.links.any? }
+
+          yield Stat.new(                                       # visualize
+            current: [cell],                                    #
+            pause: cell.links.empty? && visited_neighbors.any?, #
+            info: "Hunt: #{hunt += 1}") if block_given?         #
+
           if cell.links.empty? && visited_neighbors.any?
             current = cell
             neighbor = visited_neighbors.sample

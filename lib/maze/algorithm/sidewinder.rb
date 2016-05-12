@@ -8,9 +8,10 @@ class Maze::Algorithm::Sidewinder < Maze::Algorithm
       
       dig_north = cell.north && (!cell.east || rand(2) == 0)
       
-      stat.segment = dig_north
-      stat.active = run
-      yield stat if block_given?
+      yield Stat.new(                                 # visualize
+        current: run,                                 #
+        pause: dig_north,                             #
+        info: "Run set: #{run.size}") if block_given? #
       
       # dig north if there is a cell north AND
       #   you can't dig east OR

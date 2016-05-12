@@ -128,17 +128,22 @@ class Maze::Script
       algorithm.on grid do |stat|
         # print the maze
         ascii = factory.create_ascii_formatter grid,
-          ascii_options(path_color: :blue, path_cells: stat.active)
+          ascii_options(path_color: :blue, path_cells: stat.current)
           
         puts ascii.render
         
         puts stat.info if stat.info
         sleep algorithm.speed
-        sleep 1 if options[:visualize] == :runsegment && stat.segment
+        sleep 1 if options[:visualize] == :runsegment && stat.pause?
   
         # wait for keystroke ?
-        if (options[:visualize] == :segment && stat.segment || options[:visualize] == :step)
-          break if read_char == "\e"
+        if (options[:visualize] == :segment && stat.pause? || options[:visualize] == :step)
+          case read_char
+          when "\e"
+            break
+          when "r"
+            options[:visualize] = :run
+          end
         end
       end
     else

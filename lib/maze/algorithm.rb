@@ -3,27 +3,23 @@ require 'benchmark'
 
 class Maze::Algorithm
   
-  class Stat < Struct.new(:active, :segment, :info); end
+  # Helper class to report the status of the algorithm
+  class Stat
+    def initialize opts
+      @current = opts[:current]
+      @pause = opts[:pause]
+      @info = opts[:info]
+    end
+
+    attr_reader :current, :info
   
+    def pause?
+      @pause
+    end
+  end
+    
   # The time the algorithm takes to generate the maze
   attr_reader :duration
-  
-  # The current stat of the algorithm
-  def stat
-    @stat ||= Stat.new([], true, false)
-  end
-  
-  # TODO: Replace Stat with this
-  #
-  # class KeywordStruct < Struct
-  #   def initialize(**kwargs)
-  #     super(kwargs.keys)
-  #     kwargs.each { |k, v| self[k] = v }
-  #   end
-  # end
-  #
-  # This will allow to consturct the stat object within the algorithm like this
-  # Stat.new(active: [], pause: false, info: "This is an info.")
   
   def on grid
     @duration = Benchmark.realtime do

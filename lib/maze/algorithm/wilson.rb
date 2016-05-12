@@ -25,25 +25,26 @@ class Maze::Algorithm::Wilson < Maze::Algorithm
           path << cell
         end
 
-        stat.active = [start, *path].compact        # visualize
-        stat.info = "Path: #{path.size}"            #
-        stat.segment = ! unvisited.include?(cell)   #
-        yield stat if block_given?                  #
+        yield Stat.new(                                   # visualize
+          current: [start, *path].compact,                #
+          pause: ! unvisited.include?(cell),              #
+          info: "Path: #{path.size}") if block_given?     #
+
       end
       
       # carve path
-      carved = 0                                    # visualize
+      carved = 0                                          # visualize
       path.each_cons(2) do |cell1, cell2|
         cell1.link cell2
         unvisited.delete cell1
         
-        carved += 1                                 # visualize
-        stat.active = path                          #
-        stat.info = "Carved: #{carved}"             #
-        stat.segment = cell2 == path.last           #
-        yield stat if block_given?                  #
+        yield Stat.new(                                   # visualize
+          current: path,                                  #
+          pause: cell2 == path.last,                      #
+          info: "Carved: #{carved += 1}") if block_given? #
+
       end
-      start = nil                                   # visualize
+      start = nil                                         # visualize
     end
   end
   

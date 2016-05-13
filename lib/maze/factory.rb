@@ -47,7 +47,7 @@ class Maze::Factory
 
   # All known algorithms
   def self.algorithms
-    %i( bt sw ab gt1 gt2 gt3 gt4 w hk rb )
+    %i( bt sw ab gt1 gt2 gt3 gt4 w hk rb1 rb2 )
   end
   
   def create_algorithm algorithm
@@ -62,7 +62,8 @@ class Maze::Factory
       gt4: Maze::Algorithm::GrowingTree,
       w:   Maze::Algorithm::Wilson,
       hk:  Maze::Algorithm::HuntAndKill,
-      rb:  Maze::Algorithm::RecursiveBacktracker,
+      rb1: Maze::Algorithm::RecursiveBacktracker,
+      rb2: Maze::Algorithm::RecursiveBacktracker,
     }
     
     # Algorithms only for ortho mazes
@@ -83,6 +84,10 @@ class Maze::Factory
       instance.configure "last/random 1/1 from list", proc {|active| (rand(2) > 0) ? active.last : active.sample }
     when :gt4
       instance.configure "last/random 2/1 from list", proc {|active| (rand(3) > 0) ? active.last : active.sample }
+    when :rb1
+      instance.configure :stack
+    when :rb2
+      instance.configure :recursion
     end
     
     instance 

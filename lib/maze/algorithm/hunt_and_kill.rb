@@ -15,7 +15,7 @@ class Maze::Algorithm::HuntAndKill < Maze::Algorithm
         pause: unvisited_neighbors.empty?,          #
         info: "Path: #{path.size}") if block_given? #
 
-      # carve path
+      # kill
       if unvisited_neighbors.any?
         neighbor = unvisited_neighbors.sample
         current.link neighbor

@@ -280,6 +280,7 @@ class Maze::Script
     else
       size = [4, options[:type] == :delta ? 8 : 4]
     end
+    size = size.first if options[:type] == :polar
     size
   end
   

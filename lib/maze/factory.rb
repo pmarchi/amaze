@@ -5,7 +5,7 @@ class Maze::Factory
 
   # All known maze types
   def self.types
-    %i( delta ortho sigma upsilon )
+    %i( delta ortho sigma upsilon polar )
   end
   
   # The type of the grid

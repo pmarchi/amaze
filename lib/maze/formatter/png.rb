@@ -4,6 +4,7 @@ require 'oily_png'
 
 class Maze::Formatter::PNG
   autoload :Ortho, 'maze/formatter/png/ortho'
+  autoload :Polar, 'maze/formatter/png/polar'
   
   # The grid
   attr_reader :grid

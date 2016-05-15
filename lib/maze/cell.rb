@@ -3,6 +3,7 @@ class Maze::Cell
   autoload :Square, 'maze/cell/square'
   autoload :Hex, 'maze/cell/hex'
   autoload :Octo, 'maze/cell/octo'
+  autoload :Polar, 'maze/cell/polar'
   
   # The position of the cell in the grid
   attr_reader :row, :column

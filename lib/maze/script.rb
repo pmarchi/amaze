@@ -14,6 +14,7 @@ class Maze::Script
     @options = {
       type: :ortho, 
       distances: false,
+      formats: [:ascii],
       ascii: true,
       algorithm: :gt1,
       visualize: false,
@@ -62,11 +63,14 @@ class Maze::Script
         options[:longest] = longest
       end
   
+      o.separator "\nRender Options:"
+  
+      o.on('-f', '--format [FORMAT,...]', Array, 'Render the maze on the given formats.', 'Not all formats can render all maze types.') do |formats|
+        options[:formats] = formats.map(&:to_sym)
+      end
+
       o.separator "\nASCII Options:"
   
-      o.on('--[no-]ascii', 'Render the maze with ASCII on the terminal.') do |ascii|
-        options[:ascii] = ascii
-      end
       o.on('-c', '--cell-size SIZE', Integer, 'The size of the cell') do |cell_size|
         options[:cell_size] = cell_size
       end
@@ -86,9 +90,6 @@ class Maze::Script
 
       o.separator "\nPNG Options:"
   
-      o.on('--[no-]image', 'Render the maze as PNG image.') do |image|
-        options[:image] = image
-      end
       o.on('--cell-width PIXEL', Integer, 'The width of a cell.') do |px|
         options[:png_cell] = px
       end
@@ -183,7 +184,7 @@ class Maze::Script
     puts "Path length: #{path_length}" if path_length
     puts "Random seed: #{seed}"
 
-    if image?
+    if png?
       png = factory.create_png_formatter grid,
         png_options(distances: (distances || nil))
 
@@ -215,15 +216,15 @@ class Maze::Script
   end
   
   def ascii?
-    @options[:ascii]
+    @options[:formats].include? :ascii
   end
   
-  def image?
-    @options[:image]
+  def png?
+    @options[:formats].include? :png
   end
   
   def visualize?
-    @options[:ascii] && !!@options[:visualize]
+    ascii? && !!@options[:visualize]
   end
   
   def distances?

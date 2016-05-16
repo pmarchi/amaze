@@ -303,6 +303,8 @@ class Maze::Script
     !!@options[:longest]
   end
   
+  # TODO: specify a start cell should also work for polar grids
+  
   def start_cell
     if @options[:type] == :polar
       grid[grid.rows-1, 0]
@@ -317,6 +319,8 @@ class Maze::Script
       end
     end
   end
+  
+  # TODO: specify a finish cell should also work for polar grids
   
   def finish_cell
     if @options[:type] == :polar

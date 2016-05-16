@@ -44,8 +44,25 @@ class Maze::Formatter::Image::Polar < Maze::Formatter::Image
     canvas.stroke_width path_width
 
     grid.each_cell do |cell|
-      next if cell.row == 0
       next unless path_cell? cell
+
+      unless path?(:cw, cell) || path?(:ccw, cell)
+        # draw arc to close the gap if outward ring is subdivided
+        # and cell is linked outwards but not cw and ccw
+        # this can be the case even for cell(0,0)
+        outward_cells = path_outward(cell)
+        if outward_subdivided?(cell) && outward_cells.any?
+          _, _, _, _, radius, angle = center_coord cell
+          angles_outward_cells = outward_cells.map {|o| _, _, _, _, _, a = center_coord(o); a }
+          # don't use cell(0,0) own angel, override with one of the outward cells
+          angle = angles_outward_cells.first if cell.row == 0
+          angle1 = [angle, *angles_outward_cells].min
+          angle2 = [angle, *angles_outward_cells].max
+          canvas.ellipse image_center, image_center, radius, radius, angle1, angle2 unless angle1 == angle2
+        end
+      end
+
+      next if cell.row == 0
       
       if path?(:inward, cell)
         x1, y1, x2, y2, _, _ = center_coord cell
@@ -63,19 +80,6 @@ class Maze::Formatter::Image::Polar < Maze::Formatter::Image
           _, _, _, _, _, angle2 = center_coord(outward_cells_cw.first) if outward_cells_cw.any?
         end
         canvas.ellipse image_center, image_center, radius1, radius1, angle1, angle2
-      end
-      
-      unless path?(:cw, cell) || path?(:ccw, cell)
-        # draw arc to close the gap if outward ring is subdivided
-        # and cell is linked outwards but not cw and ccw
-        outward_cells = path_outward(cell)
-        if outward_subdivided?(cell) && outward_cells.any?
-          _, _, _, _, radius, angle = center_coord cell
-          angles_outward_cells = outward_cells.map {|o| _, _, _, _, _, a = center_coord(o); a }
-          angle1 = [angle, *angles_outward_cells].min
-          angle2 = [angle, *angles_outward_cells].max
-          canvas.ellipse image_center, image_center, radius, radius, angle1, angle2 unless angle1 == angle2
-        end
       end
     end
     

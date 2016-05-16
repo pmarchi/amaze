@@ -2,6 +2,7 @@
 require 'optparse'
 require 'io/console'
 require 'rainbow/ext/string'
+require 'rmagick'
 
 class Maze::Script
 
@@ -113,6 +114,37 @@ class Maze::Script
         exit 0
       end
   
+      o.separator "\nImage Options:"
+  
+      o.on('--cell-width PIXEL', Integer, 'The width of a cell.') do |px|
+        options[:image_cell_width] = px
+      end
+      o.on('--wall-width PIXEL', Integer, 'The width of the walls.') do |px|
+        options[:image_wall_width] = px
+      end
+      o.on('--wall-color NAME', Magick.colors.map(&:name), 'The color of the walls.') do |color|
+        options[:image_wall_color] = color
+      end
+      o.on('--path-width PIXEL', Integer, 'The width of the walls.') do |px|
+        options[:image_path_width] = px
+      end
+      o.on('--path-color NAME', Magick.colors.map(&:name), 'The color of the walls.') do |color|
+        options[:image_path_color] = color
+      end
+      o.on('--border-width PIXEL', Integer, 'The width of the border around the maze.') do |px|
+        options[:image_border_width] = px
+      end
+      o.on('--background-color NAME', Magick.colors.map(&:name), 'The background color.') do |color|
+        options[:image_background_color] = color
+      end
+      o.on('--show-grid', 'The background color.') do
+        options[:image_show_grid] = true
+      end
+      o.on('--all-image-colors', 'Print all the supported image colors.') do
+        puts Magick.colors.map(&:name).join(', ')
+        exit 0
+      end
+
       o.separator ""
     end
   end
@@ -150,6 +182,7 @@ class Maze::Script
     end
     
     ascii_runtime_options = {}
+    image_runtime_options = {}
     
     # Calculate the distances from a given start cell
     if distances?
@@ -161,6 +194,9 @@ class Maze::Script
     if solution?
       distances = start_cell.distances.path_to finish_cell
       ascii_runtime_options[:path_cells] = distances.cells
+      image_runtime_options[:path_cells] = distances.cells
+      image_runtime_options[:path_start] = start_cell
+      image_runtime_options[:path_finish] = finish_cell
       path_length = distances[finish_cell]
     end
     
@@ -170,6 +206,9 @@ class Maze::Script
       new_finish, distance = new_distances.max
       distances = new_distances.path_to new_finish
       ascii_runtime_options[:path_cells] = distances.cells
+      image_runtime_options[:path_cells] = distances.cells
+      image_runtime_options[:path_start] = new_start
+      image_runtime_options[:path_finish] = new_finish
       path_length = distance
     end
 
@@ -191,6 +230,14 @@ class Maze::Script
       png.render_background
       png.render
       png.image.save "maze.png"
+      puts "Maze 'maze.png' saved."
+    end
+    
+    if image?
+      image = factory.create_image_formatter grid,
+        image_options(image_runtime_options)
+      image.render
+      image.write "maze.png"
       puts "Maze 'maze.png' saved."
     end
   end
@@ -215,12 +262,29 @@ class Maze::Script
     }.merge runtime_options
   end
   
+  def image_options runtime_options={}
+    {
+      cell_width: options[:image_cell_width] || 100,
+      wall_width: options[:image_wall_width] || 5,
+      wall_color: options[:image_wall_color] || 'black',
+      path_width: options[:image_path_width] || 3,
+      path_color: options[:image_path_color] || 'red',
+      border_width: options[:image_border_width] || 0,
+      background_color: options[:image_background_color] || 'white',
+      show_grid: options[:image_show_grid] || false
+    }.merge runtime_options
+  end
+  
   def ascii?
     @options[:formats].include? :ascii
   end
   
   def png?
     @options[:formats].include? :png
+  end
+  
+  def image?
+    @options[:formats].include? :image
   end
   
   def visualize?
@@ -240,24 +304,34 @@ class Maze::Script
   end
   
   def start_cell
-    if !@options[:distances] || @options[:distances] == :auto
-      column = grid.columns.times.find {|i| grid[0,i] }
-      return grid[0,column] if column
-      row = grid.rows.times.find {|i| grid[i,0] }
-      return grid[row,0]
+    if @options[:type] == :polar
+      grid[grid.rows-1, 0]
     else
-      grid[*@options[:distances]]
+      if !@options[:distances] || @options[:distances] == :auto
+        column = grid.columns.times.find {|i| grid[0,i] }
+        return grid[0,column] if column
+        row = grid.rows.times.find {|i| grid[i,0] }
+        return grid[row,0]
+      else
+        grid[*@options[:distances]]
+      end
     end
   end
   
   def finish_cell
-    if !@options[:solution] || @options[:solution] == :auto
-      column = grid.columns.times.find {|i| grid[grid.rows-1,grid.columns-1-i] }
-      return grid[grid.rows-1,grid.columns-1-column] if column
-      row = grid.rows.times.find {|i| grid[grid.rows-1-i,grid.columns-1] }
-      return grid[grid.rows-1-row,grid.columns-1]
+    if @options[:type] == :polar
+      row = grid.rows-1
+      columns = grid.columns row
+      grid[row, columns.size / 2]
     else
-      grid[*@options[:solution]]
+      if !@options[:solution] || @options[:solution] == :auto
+        column = grid.columns.times.find {|i| grid[grid.rows-1,grid.columns-1-i] }
+        return grid[grid.rows-1,grid.columns-1-column] if column
+        row = grid.rows.times.find {|i| grid[grid.rows-1-i,grid.columns-1] }
+        return grid[grid.rows-1-row,grid.columns-1]
+      else
+        grid[*@options[:solution]]
+      end
     end
   end
   

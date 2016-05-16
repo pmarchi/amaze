@@ -45,6 +45,10 @@ class Maze::Factory
     Maze::Formatter::PNG.const_get(type.to_s.capitalize).new *args
   end
 
+  def create_image_formatter *args
+    Maze::Formatter::Image.const_get(type.to_s.capitalize).new *args
+  end
+
   # All known algorithms
   def self.algorithms
     %i( bt sw ab gt1 gt2 gt3 gt4 w hk rb1 rb2 )

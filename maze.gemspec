@@ -35,4 +35,5 @@ Book by Jamis Buck.}
   spec.add_dependency "oily_png"
   spec.add_dependency "rainbow"
   spec.add_dependency "gradient"
+  spec.add_dependency "rmagick"
 end

@@ -88,7 +88,7 @@ class Maze::Formatter::Image::Polar < Maze::Formatter::Image
     canvas.stroke_linecap 'square'
     canvas.fill path_color
     canvas.stroke 'none'
-    [path_start, path_finish].each do |cell|
+    [path_start, path_finish].compact.each do |cell|
       x, y, _, _, _, _ = center_coord cell
       canvas.ellipse x, y, path_width*2, path_width*2, 0, 360
     end

@@ -2,6 +2,7 @@
 require 'rmagick'
 
 class Maze::Formatter::Image
+  autoload :Ortho, 'maze/formatter/image/ortho'
   autoload :Polar, 'maze/formatter/image/polar'
   
   # The grid

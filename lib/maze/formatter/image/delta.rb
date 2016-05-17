@@ -3,7 +3,8 @@ class Maze::Formatter::Image::Delta < Maze::Formatter::Image
   
   def render_background
     canvas.stroke_antialias true
-    canvas.stroke_linecap 'square'
+    canvas.stroke_linecap 'round'
+    canvas.stroke_linejoin 'round'
     canvas.stroke 'none'
     grid.each_cell do |cell|
       color = distance_color cell

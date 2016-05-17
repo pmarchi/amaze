@@ -271,9 +271,9 @@ class Maze::Script
   def image_options runtime_options={}
     {
       cell_width: options[:image_cell_width] || 100,
-      wall_width: options[:image_wall_width] || 5,
+      wall_width: options[:image_wall_width] || 6,
       wall_color: options[:image_wall_color] || 'black',
-      path_width: options[:image_path_width] || 3,
+      path_width: options[:image_path_width] || 4,
       path_color: options[:image_path_color] || 'red',
       border_width: options[:image_border_width] || 0,
       background_color: options[:image_background_color] || 'white',

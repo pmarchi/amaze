@@ -18,6 +18,7 @@ class Maze::Formatter::Image::Polar < Maze::Formatter::Image
       canvas.ellipse image_center, image_center, radius, radius, ccw, cw
       canvas.line cx, cy, dx, dy
     end
+    canvas.ellipse(image_center, image_center, grid.rows * cell_width, grid.rows * cell_width, 0, 360)
   end
   
   def render_wall

@@ -134,8 +134,11 @@ class Maze::Script
       o.on('--background-color NAME', Magick.colors.map(&:name), 'The background color.') do |color|
         options[:image_background_color] = color
       end
-      o.on('--show-grid', 'The background color.') do
+      o.on('--show-grid', 'Render the underlying grid.') do
         options[:image_show_grid] = true
+      end
+      o.on('--hide-walls', "Don't render the walls.") do
+        options[:image_hide_walls] = true
       end
       o.on('--gradient-map NAME', Maze::Factory.gradient_maps, 'The gradient map to use for the distances color.', "One of #{Maze::Factory.gradient_maps.join(', ')}") do |map|
         options[:gradient_map] = map
@@ -278,6 +281,7 @@ class Maze::Script
       border_width: options[:image_border_width] || 0,
       background_color: options[:image_background_color] || 'white',
       show_grid: options[:image_show_grid] || false,
+      hide_walls: options[:image_hide_walls] || false,
       gradient_map: factory.gradient_map(options[:gradient_map] || :warm),
     }.merge runtime_options
   end

@@ -40,7 +40,7 @@ class Maze::Formatter::Image
   def render
     render_background if distances
     render_grid if show_grid?
-    render_wall
+    render_wall unless hide_walls?
     render_path if path_cells.any?
   end
   
@@ -87,6 +87,10 @@ class Maze::Formatter::Image
   
   def show_grid?
     @options[:show_grid]
+  end
+  
+  def hide_walls?
+    @options[:hide_walls]
   end
   
   def distances

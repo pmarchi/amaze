@@ -41,10 +41,6 @@ class Maze::Factory
     Maze::Formatter::ASCII.const_get(type.to_s.capitalize).new *args
   end
 
-  def create_png_formatter *args
-    Maze::Formatter::PNG.const_get(type.to_s.capitalize).new *args
-  end
-
   def create_image_formatter *args
     Maze::Formatter::Image.const_get(type.to_s.capitalize).new *args
   end

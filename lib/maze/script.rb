@@ -86,28 +86,6 @@ class Maze::Script
         exit 0
       end
 
-      o.separator "\nPNG Options:"
-  
-      o.on('--cell-width PIXEL', Integer, 'The width of a cell.') do |px|
-        options[:png_cell] = px
-      end
-      o.on('--border PIXEL', Integer, 'The width of the border around the maze.') do |px|
-        options[:png_border] = px
-      end
-      o.on('--wall PIXEL', Integer, 'The width of the walls.') do |px|
-        options[:png_wall] = px
-      end
-      o.on('--wall-color NAME', Maze::Formatter::PNG.colors, 'The color of the walls. Provide a HTML color name.') do |color|
-        options[:png_wall_color] = color
-      end
-      o.on('--background-color NAME', Maze::Formatter::PNG.colors, 'The background color. Provide a HTML color name.') do |color|
-        options[:png_background_color] = color
-      end
-      o.on('--all-png-colors', 'Print all the supported png colors.') do
-        puts Maze::Formatter::PNG.colors.join(', ')
-        exit 0
-      end
-  
       o.separator "\nImage Options:"
   
       o.on('--cell-width PIXEL', Integer, 'The width of a cell.') do |px|
@@ -119,10 +97,10 @@ class Maze::Script
       o.on('--wall-color NAME', Magick.colors.map(&:name), 'The color of the walls.') do |color|
         options[:image_wall_color] = color
       end
-      o.on('--path-width PIXEL', Integer, 'The width of the walls.') do |px|
+      o.on('--path-width PIXEL', Integer, 'The width of the path.') do |px|
         options[:image_path_width] = px
       end
-      o.on('--path-color NAME', Magick.colors.map(&:name), 'The color of the walls.') do |color|
+      o.on('--path-color NAME', Magick.colors.map(&:name), 'The color of the path.') do |color|
         options[:image_path_color] = color
       end
       o.on('--border-width PIXEL', Integer, 'The width of the border around the maze.') do |px|
@@ -225,16 +203,6 @@ class Maze::Script
     puts "Path length: #{path_length}" if path_length
     puts "Random seed: #{seed}"
 
-    if png?
-      png = factory.create_png_formatter grid,
-        png_options(distances: (distances || nil))
-
-      png.render_background
-      png.render
-      png.image.save "maze.png"
-      puts "Maze 'maze.png' saved."
-    end
-    
     if image?
       image = factory.create_image_formatter grid,
         image_options(image_runtime_options)
@@ -257,17 +225,6 @@ class Maze::Script
     }.merge runtime_options
   end
   
-  def png_options runtime_options={}
-    { 
-      cell_size: options[:png_cell] || 10,
-      background_color: options[:png_background_color] || :white,
-      border: options[:png_border] || 0,
-      line_width: options[:png_wall] || 1,
-      line_color: options[:png_wall_color] || :black,
-      gradient_map: factory.gradient_map(options[:gradient_map] || :warm),
-    }.merge runtime_options
-  end
-  
   def image_options runtime_options={}
     {
       cell_width: options[:image_cell_width] || 100,
@@ -285,10 +242,6 @@ class Maze::Script
   
   def ascii?
     @options[:formats].include? :ascii
-  end
-  
-  def png?
-    @options[:formats].include? :png
   end
   
   def image?

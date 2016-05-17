@@ -32,7 +32,6 @@ Book by Jamis Buck.}
   spec.add_development_dependency "rspec", "~> 3.0"
 
   spec.add_dependency "chunky_png"
-  spec.add_dependency "oily_png"
   spec.add_dependency "rainbow"
   spec.add_dependency "gradient"
   spec.add_dependency "rmagick"

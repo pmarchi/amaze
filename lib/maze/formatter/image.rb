@@ -3,6 +3,7 @@ require 'rmagick'
 
 class Maze::Formatter::Image
   autoload :Ortho, 'maze/formatter/image/ortho'
+  autoload :Sigma, 'maze/formatter/image/sigma'
   autoload :Polar, 'maze/formatter/image/polar'
   
   # The grid
@@ -37,9 +38,10 @@ class Maze::Formatter::Image
   end
   
   def render
-    render_background
+    render_background if distances
+    render_grid if show_grid?
     render_wall
-    render_path
+    render_path if path_cells.any?
   end
   
   def image
@@ -85,6 +87,28 @@ class Maze::Formatter::Image
   
   def show_grid?
     @options[:show_grid]
+  end
+  
+  def distances
+    options[:distances]
+  end
+
+  def distances_max
+    @distances_max ||= distances.max[1]
+  end
+  
+  # Returns the background color of a cell, depending on its distance from the origin
+  def distance_color cell
+    if distances && distances[cell]
+      intensity = (distances_max - distances[cell].to_f) / distances_max
+      '#' + gradient.at(intensity).color.hex
+    else
+      nil
+    end
+  end
+  
+  def gradient
+    options[:gradient_map]
   end
   
   def self.colors

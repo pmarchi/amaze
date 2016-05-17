@@ -106,9 +106,6 @@ class Maze::Script
       o.on('--background-color NAME', Maze::Formatter::PNG.colors, 'The background color. Provide a HTML color name.') do |color|
         options[:png_background_color] = color
       end
-      o.on('--gradient-map NAME', Maze::Factory.gradient_maps, 'The gradient map to use for the distances color.', "One of #{Maze::Factory.gradient_maps.join(', ')}") do |map|
-        options[:gradient_map] = map
-      end
       o.on('--all-png-colors', 'Print all the supported png colors.') do
         puts Maze::Formatter::PNG.colors.join(', ')
         exit 0
@@ -139,6 +136,9 @@ class Maze::Script
       end
       o.on('--show-grid', 'The background color.') do
         options[:image_show_grid] = true
+      end
+      o.on('--gradient-map NAME', Maze::Factory.gradient_maps, 'The gradient map to use for the distances color.', "One of #{Maze::Factory.gradient_maps.join(', ')}") do |map|
+        options[:gradient_map] = map
       end
       o.on('--all-image-colors', 'Print all the supported image colors.') do
         puts Magick.colors.map(&:name).join(', ')
@@ -188,6 +188,7 @@ class Maze::Script
     if distances?
       distances = start_cell.distances
       ascii_runtime_options[:distances] = distances
+      image_runtime_options[:distances] = distances
     end
 
     # And the solution to a given end cell
@@ -205,6 +206,7 @@ class Maze::Script
       new_distances = new_start.distances
       new_finish, distance = new_distances.max
       distances = new_distances.path_to new_finish
+      image_runtime_options[:distances] = new_distances if distances?
       ascii_runtime_options[:path_cells] = distances.cells
       image_runtime_options[:path_cells] = distances.cells
       image_runtime_options[:path_start] = new_start
@@ -237,6 +239,10 @@ class Maze::Script
       image = factory.create_image_formatter grid,
         image_options(image_runtime_options)
       image.render
+      
+      # TODO: write multiple images with solution and distances
+      #       or a psd file with layers
+      
       image.write "maze.png"
       puts "Maze 'maze.png' saved."
     end
@@ -271,7 +277,8 @@ class Maze::Script
       path_color: options[:image_path_color] || 'red',
       border_width: options[:image_border_width] || 0,
       background_color: options[:image_background_color] || 'white',
-      show_grid: options[:image_show_grid] || false
+      show_grid: options[:image_show_grid] || false,
+      gradient_map: factory.gradient_map(options[:gradient_map] || :warm),
     }.merge runtime_options
   end
   

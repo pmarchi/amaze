@@ -16,11 +16,8 @@ class Maze::Script
       type: :ortho, 
       distances: false,
       formats: [:ascii],
-      ascii: true,
       algorithm: :gt1,
       visualize: false,
-      highlight: true,
-      image: false,
     }
   end
 

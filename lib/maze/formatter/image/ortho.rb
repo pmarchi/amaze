@@ -2,30 +2,38 @@
 class Maze::Formatter::Image::Ortho < Maze::Formatter::Image
   
   def render_background
+    canvas.stroke_antialias true
+    canvas.stroke_linecap 'square'
+    canvas.stroke 'none'
+    grid.each_cell do |cell|
+      color = distance_color cell
+      next unless color
+      canvas.fill color
+      x1, x2, y1, y2 = coord cell
+      canvas.polygon x1, y1, x2, y1, x2, y2, x1, y2
+    end
   end
   
+  def render_grid
+    canvas.stroke_antialias true
+    canvas.stroke_linecap 'square'
+    canvas.stroke 'gray90'
+    canvas.stroke_width 1
+    canvas.fill 'none'
+
+    grid.each_cell do |cell|
+      x1, x2, y1, y2 = coord cell
+      canvas.polygon x1, y1, x2, y1, x2, y2, x1, y2
+    end
+  end  
+
   def render_wall
     canvas.stroke_antialias true
     canvas.stroke_linecap 'square'
-    canvas.fill 'none'
-
-    # raster
-    if show_grid?
-      canvas.stroke 'gray90'
-      canvas.stroke_width 1
-      grid.each_cell do |cell|
-        x1, x2, y1, y2 = coord cell
-      
-        canvas.line x1, y1, x2, y1
-        canvas.line x2, y1, x2, y2
-        canvas.line x1, y2, x2, y2
-        canvas.line x1, y1, x1, y2
-      end
-    end
-
-    # maze
     canvas.stroke wall_color
     canvas.stroke_width wall_width
+    canvas.fill 'none'
+
     grid.each_cell do |cell|
       x1, x2, y1, y2 = coord cell
       

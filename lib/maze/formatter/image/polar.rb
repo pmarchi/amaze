@@ -4,27 +4,29 @@ class Maze::Formatter::Image::Polar < Maze::Formatter::Image
   def render_background
   end
   
+  def render_grid
+    canvas.stroke_antialias true
+    canvas.stroke_linecap 'square'
+    canvas.stroke 'gray90'
+    canvas.stroke_width 1
+    canvas.fill 'none'
+
+    grid.each_cell do |cell|
+      next if cell.row == 0
+      ax, ay, bx, by, cx, cy, dx, dy, radius, ccw, cw = coord cell
+  
+      canvas.ellipse image_center, image_center, radius, radius, ccw, cw
+      canvas.line cx, cy, dx, dy
+    end
+  end
+  
   def render_wall
     canvas.stroke_antialias true
     canvas.stroke_linecap 'square'
-    canvas.fill 'none'
-
-    # raster
-    if show_grid?
-      canvas.stroke 'gray90'
-      canvas.stroke_width 1
-      grid.each_cell do |cell|
-        next if cell.row == 0
-        ax, ay, bx, by, cx, cy, dx, dy, radius, ccw, cw = coord cell
-    
-        canvas.ellipse image_center, image_center, radius, radius, ccw, cw
-        canvas.line cx, cy, dx, dy
-      end
-    end
-
-    # maze
     canvas.stroke wall_color
     canvas.stroke_width wall_width
+    canvas.fill 'none'
+
     grid.each_cell do |cell|
       next if cell.row == 0
       ax, ay, bx, by, cx, cy, dx, dy, radius, ccw, cw = coord cell

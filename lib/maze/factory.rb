@@ -5,7 +5,7 @@ class Maze::Factory
 
   # All known maze types
   def self.types
-    %i( delta ortho sigma upsilon polar )
+    %i( delta ortho sigma upsilon polar triangle )
   end
   
   # The type of the grid
@@ -16,14 +16,40 @@ class Maze::Factory
     @type = type
   end
   
+  # TODO: refactor shapes
+  
   def create_grid *args
-    Maze::Grid.const_get(type.to_s.capitalize).new *args
+    if type == :triangle
+      @type = :delta
+      Maze::Grid::Delta.prepend Maze::MaskedGrid
+      Maze::Grid::Delta.new generate_mask(args.first)
+    else
+      Maze::Grid.const_get(type.to_s.capitalize).new *args
+    end
   end
   
   def create_masked_grid file
     klass = Maze::Grid.const_get(type.to_s.capitalize)
     klass.prepend Maze::MaskedGrid
     klass.new create_mask(file)
+  end
+  
+  # TODO: refactor into own shape class
+  
+  def generate_mask rows
+    columns = (rows+1)/2 * 4 - 1
+    mask = Maze::Mask.new rows, columns
+    (0...rows).each do |row|
+      on = (row+1) * 2 - 1
+      off = (columns - on) / 2
+      (0...off).each do |column|
+        mask[row, column] = false
+      end
+      ((off+on)...columns).each do |column|
+        mask[row, column] = false
+      end
+    end
+    mask
   end
   
   def create_mask file

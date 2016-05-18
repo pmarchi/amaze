@@ -55,14 +55,9 @@ class Maze::Formatter::Image::Ortho < Maze::Formatter::Image
       next unless path_cell? cell
 
       x1, y1 = center_coord cell
-      # east-west
-      if path?(:east, cell)
-        x2, y2 = center_coord cell.east
-        canvas.line x1, y1, x2, y2
-      end
-      # north-south
-      if path?(:south, cell)
-        x2, y2 = center_coord cell.south
+      %i( north east ).each do |direction|
+        next unless path?(direction, cell)
+        x2, y2 = center_coord cell.send(direction)
         canvas.line x1, y1, x2, y2
       end
     end
@@ -96,10 +91,6 @@ class Maze::Formatter::Image::Ortho < Maze::Formatter::Image
     y = (row+0.5) * cell_width + cell_offset
     
     [x, y]
-  end
-  
-  def cell_offset
-    wall_width / 2.0 + border_width
   end
   
   def image_width

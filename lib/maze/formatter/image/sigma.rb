@@ -112,10 +112,6 @@ class Maze::Formatter::Image::Sigma < Maze::Formatter::Image
     @pattern_height ||= cell_width * Math.sqrt(3)
   end
   
-  def cell_offset
-    wall_width / 2.0 + border_width
-  end
-  
   def image_width
     pattern_width * grid.columns + cell_width / 2.0 + wall_width + border_width * 2 + 1
   end

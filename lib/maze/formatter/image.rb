@@ -95,7 +95,6 @@ class Maze::Formatter::Image
     @options[:hide_walls]
   end
   
-  # TODO: remove from subclasses
   def cell_offset
     wall_width / 2.0 + border_width
   end

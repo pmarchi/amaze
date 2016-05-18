@@ -127,8 +127,6 @@ class Maze::Formatter::Image::Upsilon < Maze::Formatter::Image
     @pattern_width ||= cell_width + partial_cell
   end
   
-  alias_method :pattern_height, :pattern_width
-  
   def image_width
     pattern_width * (grid.columns) + partial_cell + wall_width + border_width * 2 + 1
   end

@@ -5,6 +5,7 @@ class Maze::Formatter::Image
   autoload :Ortho, 'maze/formatter/image/ortho'
   autoload :Sigma, 'maze/formatter/image/sigma'
   autoload :Delta, 'maze/formatter/image/delta'
+  autoload :Upsilon, 'maze/formatter/image/upsilon'
   autoload :Polar, 'maze/formatter/image/polar'
   
   # The grid
@@ -52,7 +53,7 @@ class Maze::Formatter::Image
   def canvas
     @canvas ||= Magick::Draw.new
   end
-  
+
   def write filename
     canvas.draw image
     image.write(filename)
@@ -92,6 +93,11 @@ class Maze::Formatter::Image
   
   def hide_walls?
     @options[:hide_walls]
+  end
+  
+  # TODO: remove from subclasses
+  def cell_offset
+    wall_width / 2.0 + border_width
   end
   
   def distances

@@ -7,6 +7,8 @@ class Maze::Formatter::ASCII
   autoload :Ortho, 'maze/formatter/ascii/ortho'
   autoload :Sigma, 'maze/formatter/ascii/sigma'
   autoload :Upsilon, 'maze/formatter/ascii/upsilon'
+  
+  # TODO: implement an ascii representation of polar grid
 
   # The grid
   attr_reader :grid

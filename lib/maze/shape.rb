@@ -1,6 +1,7 @@
 
 class Maze::Shape
   autoload :Triangle, 'maze/shape/triangle'
+  autoload :Diamond, 'maze/shape/diamond'
   
   # The size of the shape, usually the rows
   attr_reader :size

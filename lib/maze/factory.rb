@@ -39,7 +39,7 @@ class Maze::Factory
   
   # All known shapes
   def self.shapes
-    %i( triangle )
+    %i( triangle diamond )
   end
 
   def create_shaped_grid shape, *args

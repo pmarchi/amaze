@@ -35,6 +35,9 @@ class Maze::Script
       o.on('-m', '--mask MASKFILE', String, 'MASKFILE is either a ASCII file or a PNG file.') do |mask|
         options[:mask] = mask
       end
+      o.on('-s', '--shape SHAPE', Maze::Factory.shapes, "One of #{Maze::Factory.shapes.join(', ')}.") do |shape|
+        options[:shape] = shape
+      end
   
       o.separator "\nAlgorithm options:"
 
@@ -307,6 +310,8 @@ class Maze::Script
   def grid
     @grid ||= if options[:mask]
       factory.create_masked_grid options[:mask]
+    elsif options[:shape]
+      factory.create_shaped_grid options[:shape], *grid_size
     else
       factory.create_grid *grid_size
     end

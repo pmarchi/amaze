@@ -5,7 +5,7 @@ class Maze::Factory
 
   # All known maze types
   def self.types
-    %i( delta ortho sigma upsilon polar triangle )
+    %i( delta ortho sigma upsilon polar )
   end
   
   # The type of the grid
@@ -16,40 +16,14 @@ class Maze::Factory
     @type = type
   end
   
-  # TODO: refactor shapes
-  
   def create_grid *args
-    if type == :triangle
-      @type = :delta
-      Maze::Grid::Delta.prepend Maze::MaskedGrid
-      Maze::Grid::Delta.new generate_mask(args.first)
-    else
-      Maze::Grid.const_get(type.to_s.capitalize).new *args
-    end
+    Maze::Grid.const_get(type.to_s.capitalize).new *args
   end
-  
+
   def create_masked_grid file
     klass = Maze::Grid.const_get(type.to_s.capitalize)
     klass.prepend Maze::MaskedGrid
     klass.new create_mask(file)
-  end
-  
-  # TODO: refactor into own shape class
-  
-  def generate_mask rows
-    columns = (rows+1)/2 * 4 - 1
-    mask = Maze::Mask.new rows, columns
-    (0...rows).each do |row|
-      on = (row+1) * 2 - 1
-      off = (columns - on) / 2
-      (0...off).each do |column|
-        mask[row, column] = false
-      end
-      ((off+on)...columns).each do |column|
-        mask[row, column] = false
-      end
-    end
-    mask
   end
   
   def create_mask file
@@ -61,6 +35,17 @@ class Maze::Factory
     else
       raise "Mask file of type #{File.extname(file)} is not supported."
     end
+  end
+  
+  # All known shapes
+  def self.shapes
+    %i( triangle )
+  end
+
+  def create_shaped_grid shape, *args
+    klass = Maze::Grid.const_get(type.to_s.capitalize)
+    klass.prepend Maze::MaskedGrid
+    klass.new Maze::Shape.const_get(shape.to_s.capitalize).new(args.first).create_mask
   end
   
   def create_ascii_formatter *args

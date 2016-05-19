@@ -13,4 +13,5 @@ module Maze
   autoload :Distances, 'maze/distances'
   autoload :Mask, 'maze/mask'
   autoload :MaskedGrid, 'maze/masked_grid'
+  autoload :Shape, 'maze/shape'
 end

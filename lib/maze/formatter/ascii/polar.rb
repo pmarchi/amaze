@@ -1,6 +1,11 @@
 
 class Maze::Formatter::ASCII::Polar < Maze::Formatter::ASCII
   
+  # TODO: revers x in order to match coord of image renderer
+  # x = char_array_width -1 - x
+  # cw => left
+  # ccw => right
+  
   def draw_cell cell
     x1, x2, y1, y2 = coord cell
     

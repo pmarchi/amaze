@@ -1,8 +1,4 @@
-XXXXXXX.XXXXXXX
-XXXXXX...XXXXXX
-XX...........XX
-XXX.........XXX
-XXX.........XXX
-XX...........XX
-XXXXXX...XXXXXX
-XXXXXXX.XXXXXXX
+XXX.XXX
+X.....X
+X.....X
+XXX.XXX

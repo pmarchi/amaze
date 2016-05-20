@@ -1,11 +1,6 @@
 
 class Maze::Formatter::ASCII::Polar < Maze::Formatter::ASCII
   
-  # TODO: revers x in order to match coord of image renderer
-  # x = char_array_width -1 - x
-  # cw => left
-  # ccw => right
-  
   def draw_cell cell
     x1, x2, y1, y2 = coord cell
     
@@ -23,10 +18,10 @@ class Maze::Formatter::ASCII::Polar < Maze::Formatter::ASCII
     end
     # left & right
     (y1+1).upto(y2-1) do |i|
-      # left (ccw)
-      char[i][x1] = v.color(grid_color) unless cell.linked_to?(:ccw)
-      # right (cw)
-      char[i][x2] = v.color(grid_color) unless cell.linked_to?(:cw)
+      # left (cw)
+      char[i][x1] = v.color(grid_color) unless cell.linked_to?(:cw)
+      # right (ccw)
+      char[i][x2] = v.color(grid_color) unless cell.linked_to?(:ccw)
     end
   end
 
@@ -58,13 +53,13 @@ class Maze::Formatter::ASCII::Polar < Maze::Formatter::ASCII
       end
     end
     
-    # to ccw
-    if path?(:ccw, cell)
-      mx1, my1 = center_coord cell.ccw
+    # to cw
+    if path?(:cw, cell)
+      mx1, my1 = center_coord cell.cw
       mx2, my2 = center_coord cell
       if outward_subdivided? cell
-        outward_cells_ccw = path_outward cell.ccw
-        mx1, _ = center_coord(outward_cells_ccw.first) if outward_cells_ccw.any?
+        outward_cells_cw = path_outward cell.cw
+        mx1, _ = center_coord(outward_cells_cw.first) if outward_cells_cw.any?
         outward_cells = path_outward cell
         mx2, _ = center_coord(outward_cells.first) if outward_cells.any?
       end
@@ -75,15 +70,15 @@ class Maze::Formatter::ASCII::Polar < Maze::Formatter::ASCII
       char[my1][mx2] = center.color(path_color)
     end
     
-    # to cw
-    if path?(:cw, cell)
+    # to ccw
+    if path?(:ccw, cell)
       mx1, my1 = center_coord cell
-      mx2, my2 = center_coord cell.cw
+      mx2, my2 = center_coord cell.ccw
       if outward_subdivided? cell
         outward_cells = path_outward cell
         mx1, _ = center_coord(outward_cells.first) if outward_cells.any?
-        outward_cells_cw = path_outward cell.cw
-        mx2, _ = center_coord(outward_cells_cw.first) if outward_cells_cw.any?
+        outward_cells_ccw = path_outward cell.ccw
+        mx2, _ = center_coord(outward_cells_ccw.first) if outward_cells_ccw.any?
       end
       mx2 = char_array_width if mx1 > mx2
       (mx1+1).upto(mx2-1) do |i|
@@ -126,8 +121,8 @@ class Maze::Formatter::ASCII::Polar < Maze::Formatter::ASCII
   
   def coord cell
     columns = grid.columns(cell.row).size
-    x1 = x(cell.column, columns)
-    x2 = x(cell.column+1, columns)
+    x2 = char_array_width - 1 - x(cell.column, columns)
+    x1 = char_array_width - 1 - x(cell.column+1, columns)
     y1 = y(cell.row)
     y2 = y(cell.row+1)
     

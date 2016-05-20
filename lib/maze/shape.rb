@@ -2,6 +2,7 @@
 class Maze::Shape
   autoload :Triangle, 'maze/shape/triangle'
   autoload :Diamond, 'maze/shape/diamond'
+  autoload :Hexagon, 'maze/shape/hexagon'
   autoload :Star, 'maze/shape/star'
   
   # The size of the shape, usually the rows

@@ -7,20 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "amaze"
   spec.version       = Amaze::VERSION
   spec.authors       = ["Patrick Marchi"]
-  spec.email         = ["patrick.marchi@geo.uzh.ch"]
+  spec.email         = ["mail@patrickmarchi.ch"]
 
-  spec.summary       = %q{Maze generator.}
-  spec.description   = %q{A maze generator inspired by Mazes for Programmers: Code Your Own Twisty Little Passages
-Book by Jamis Buck.}
-  spec.homepage      = ""
-
-  # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
-  # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-  end
+  spec.summary       = %q{Maze generator}
+  spec.description   = %q{A maze generator inspired by the book of Jamis Buck, Mazes for Programmers: Code Your Own Twisty Little Passages.}
+  spec.homepage      = "https://github.com/pmarchi/amaze"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"

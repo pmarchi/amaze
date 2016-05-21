@@ -97,6 +97,14 @@ Finally you can render your maze as PNG
     Random seed: 72618483828743227022428199116847991100
     Maze 'maze.png' saved.
 
+... and a last example
+
+    $ amaze --type ortho -g 12 --format image --distances --longest --cell-width=20 --wall-width=2 --path-width=1 --border-width=20
+
+will render something like this:
+
+![Image of an ortho maze with color coded distances and longest path](/support/images/maze.png?raw=true "Beautiful Maze")
+
 Amaze has a lot more options to play with. Have fun and create beautiful piece of [algorithmic art](https://en.wikipedia.org/wiki/Algorithmic_art).
 
 

@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Maze generator}
   spec.description   = %q{A maze generator inspired by the book of Jamis Buck, Mazes for Programmers: Code Your Own Twisty Little Passages.}
   spec.homepage      = "https://github.com/pmarchi/amaze"
+  spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"

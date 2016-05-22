@@ -85,7 +85,8 @@ class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
         # center of cell
         x1, y1 = polar2cartesian(radius, theta)
         # center of inward cell, but adjusted to the same angle of the current cell
-        x2, y2 = polar2cartesian(radius - cell_width, theta)
+        radius_inward, _ = center_coord cell.inward, :radian
+        x2, y2 = polar2cartesian(radius_inward, theta)
         canvas.line x1, y1, x2, y2
       end
       
@@ -109,7 +110,10 @@ class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
     canvas.fill path_color
     canvas.stroke 'none'
     [path_start, path_finish].compact.each do |cell|
-      x, y = polar2cartesian(*center_coord(cell, :radian))
+      radius, theta = center_coord cell, :radian
+      # adjust the angle for cell(0,0)
+      _, theta = center_coord path_outward(cell).first, :radian if cell.row.zero?
+      x, y = polar2cartesian(radius, theta)
       canvas.ellipse x, y, path_width*2, path_width*2, 0, 360
     end
   end

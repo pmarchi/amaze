@@ -17,9 +17,16 @@ On **OS X** install imagemagick with brew
 
     $ brew install imagemagick
 
+On **Ubuntu**
+
+    $ sudo apt-get install libmagickwand-dev
+
 Then run
 
     $ gem install amaze
+
+
+Amaze has been tested on OS X 10.11.x and Ubuntu 16.04 with ruby 2.3.x.
 
 
 ## Usage

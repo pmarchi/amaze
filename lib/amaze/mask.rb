@@ -43,11 +43,15 @@ class Amaze::Mask
   end
   
   def self.from_txt file
-    lines = File.readlines(file).map(&:strip)
+    from_string File.read(file)
+  end
+  
+  def self.from_string string
+    lines = string.lines.map(&:strip)
     lines.pop while lines.last.length < 1
     
-    rows = lines.length
-    columns = lines.first.length
+    rows = lines.count
+    columns = lines.first.chomp.length
     mask = new rows, columns
     
     mask.rows.times do |row|

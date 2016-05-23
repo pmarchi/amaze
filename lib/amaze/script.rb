@@ -47,7 +47,7 @@ class Amaze::Script
       o.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
         options[:seed] = seed
       end
-      visualization_modes = [:run, :runsegment, :segment, :step]
+      visualization_modes = %i( run autopause pause step )
       o.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
         options[:visualize] = mode || :run
       end
@@ -146,10 +146,10 @@ class Amaze::Script
         
         puts stat.info if stat.info
         sleep algorithm.speed
-        sleep 1 if options[:visualize] == :runsegment && stat.pause?
+        sleep 1 if options[:visualize] == :autopause && stat.pause?
   
         # wait for keystroke ?
-        if (options[:visualize] == :segment && stat.pause? || options[:visualize] == :step)
+        if (options[:visualize] == :pause && stat.pause? || options[:visualize] == :step)
           case read_char
           when "\e"
             break

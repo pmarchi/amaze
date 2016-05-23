@@ -4,6 +4,7 @@
 ## v 0.2.1 / not released yet
 - Fix bullet position when path ends in the center of a circular image maze
 - Add required ruby version in gemspec
+- Rename visualization modes, option `--visualize [run|autopause|pause|step]`
 
 
 ## v 0.2.0 / 2016-05-21

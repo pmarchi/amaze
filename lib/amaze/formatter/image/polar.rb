@@ -92,7 +92,7 @@ class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
       
       if path?(:cw, cell)
         radius1, angle1 = center_coord cell
-        radius2, angle2 = center_coord cell.cw
+        _, angle2 = center_coord cell.cw
         # adjust angle if outward ring is subdivided
         if outward_subdivided?(cell)
           outward_cells = path_outward(cell)

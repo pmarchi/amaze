@@ -26,7 +26,7 @@ class Amaze::Formatter::ASCII::Polar < Amaze::Formatter::ASCII
   end
 
   def draw_content cell
-    x1, x2, y1, y2 = coord cell
+    x1, x2, _, _ = coord cell
     _, my = center_coord cell
     dx = x2 - x1 - 1 
 
@@ -56,7 +56,7 @@ class Amaze::Formatter::ASCII::Polar < Amaze::Formatter::ASCII
     # to cw
     if path?(:cw, cell)
       mx1, my1 = center_coord cell.cw
-      mx2, my2 = center_coord cell
+      mx2, _ = center_coord cell
       if outward_subdivided? cell
         outward_cells_cw = path_outward cell.cw
         mx1, _ = center_coord(outward_cells_cw.first) if outward_cells_cw.any?
@@ -73,7 +73,7 @@ class Amaze::Formatter::ASCII::Polar < Amaze::Formatter::ASCII
     # to ccw
     if path?(:ccw, cell)
       mx1, my1 = center_coord cell
-      mx2, my2 = center_coord cell.ccw
+      mx2, _ = center_coord cell.ccw
       if outward_subdivided? cell
         outward_cells = path_outward cell
         mx1, _ = center_coord(outward_cells.first) if outward_cells.any?
@@ -90,7 +90,7 @@ class Amaze::Formatter::ASCII::Polar < Amaze::Formatter::ASCII
     # to inward
     if path?(:inward, cell)
       mx, my = center_coord cell
-      v1, v2, w1, w2 = coord cell.inward
+      _, _, w1, w2 = coord cell.inward
       mw = (w1 + w2) / 2
       (mw+1).upto(my-1) do |i|
         char[i][mx] = v.color(path_color)

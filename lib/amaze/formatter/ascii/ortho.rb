@@ -26,7 +26,7 @@ class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
   end
 
   def draw_content cell
-    left, right, top, bottom = coord cell
+    left, _, top, _ = coord cell
 
     my = top + cell_size / 2 + 1
     distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
@@ -62,7 +62,7 @@ class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
     center_char = center
     center_char = v if path?(:north, cell) && path?(:south, cell)
     center_char = h if path?(:east, cell) && path?(:west, cell)
-    center_char = corner if [:north, :east, :south, :west].select{|d| path?(d, cell) }.size >= 3
+    center_char = corner if [:north, :east, :south, :west].count{|d| path?(d, cell) } >= 3
     char[my][mx] = center_char.color(path_color)
   end
   

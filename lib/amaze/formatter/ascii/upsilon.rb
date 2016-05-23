@@ -58,7 +58,7 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   end
 
   def draw_content cell
-    x0, x1, x2, x3, y0, y1, y2, y3 = coord cell
+    _, x1, _, _, _, y1, y2, _ = coord cell
     
     y = y1 + (y2 - y1) / 2
     distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
@@ -67,7 +67,7 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   end
 
   def draw_path cell
-    x0, x1, x2, x3, y0, y1, y2, y3 = coord cell
+    _, x1, x2, _, _, y1, y2, _ = coord cell
     
     # middle of cell
     mx0 = (x1 + x2) / 2

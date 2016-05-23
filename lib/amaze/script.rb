@@ -183,7 +183,7 @@ class Amaze::Script
     end
     
     if longest?
-      new_start, distance = start_cell.distances.max
+      new_start, _ = start_cell.distances.max
       new_distances = new_start.distances
       new_finish, distance = new_distances.max
       distances = new_distances.path_to new_finish
@@ -308,12 +308,13 @@ class Amaze::Script
   end
   
   def grid
-    @grid ||= if options[:mask]
-      factory.create_masked_grid options[:mask]
+    @grid ||=
+    if options[:mask]
+      factory.create_masked_grid(options[:mask])
     elsif options[:shape]
-      factory.create_shaped_grid options[:shape], *grid_size
+      factory.create_shaped_grid(options[:shape], *grid_size)
     else
-      factory.create_grid *grid_size
+      factory.create_grid(*grid_size)
     end
   end
   
@@ -356,6 +357,6 @@ class Amaze::Script
   ensure
     STDIN.echo = true
     STDIN.cooked!
-    return input
+    input
   end
 end

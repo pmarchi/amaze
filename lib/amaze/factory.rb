@@ -17,7 +17,7 @@ class Amaze::Factory
   end
   
   def create_grid *args
-    Amaze::Grid.const_get(type.to_s.capitalize).new *args
+    Amaze::Grid.const_get(type.to_s.capitalize).new(*args)
   end
 
   def create_masked_grid file
@@ -49,11 +49,11 @@ class Amaze::Factory
   end
   
   def create_ascii_formatter *args
-    Amaze::Formatter::ASCII.const_get(type.to_s.capitalize).new *args
+    Amaze::Formatter::ASCII.const_get(type.to_s.capitalize).new(*args)
   end
 
   def create_image_formatter *args
-    Amaze::Formatter::Image.const_get(type.to_s.capitalize).new *args
+    Amaze::Formatter::Image.const_get(type.to_s.capitalize).new(*args)
   end
 
   # All known algorithms

@@ -10,7 +10,7 @@ class Amaze::Formatter::Image::Upsilon < Amaze::Formatter::Image
       color = distance_color cell
       next unless color
       canvas.fill color
-      canvas.polygon *coord(cell)
+      canvas.polygon(*coord(cell))
     end
   end
   
@@ -23,7 +23,7 @@ class Amaze::Formatter::Image::Upsilon < Amaze::Formatter::Image
     canvas.fill 'none'
 
     grid.each_cell do |cell|
-      canvas.polygon *coord(cell)
+      canvas.polygon(*coord(cell))
     end
   end
   

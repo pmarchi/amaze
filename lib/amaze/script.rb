@@ -118,7 +118,7 @@ class Amaze::Script
       o.on('--hide-walls', "Don't render the walls.") do
         options[:image_hide_walls] = true
       end
-      o.on('--gradient-map NAME', Amaze::Factory.gradient_maps, 'The gradient map to use for the distances color.', "One of #{Amaze::Factory.gradient_maps.join(', ')}") do |map|
+      o.on('--gradient-map NAME', Amaze::GradientMap.all, 'The gradient map to use for the distances color.', "One of #{Amaze::GradientMap.all.join(', ')}") do |map|
         options[:gradient_map] = map
       end
       o.on('--all-image-colors', 'Print all the supported image colors.') do
@@ -239,7 +239,7 @@ class Amaze::Script
       background_color: options[:image_background_color] || 'white',
       show_grid: options[:image_show_grid] || false,
       hide_walls: options[:image_hide_walls] || false,
-      gradient_map: factory.gradient_map(options[:gradient_map] || :warm),
+      gradient_map: Amaze::GradientMap.create(options[:gradient_map] || :warm),
     }.merge runtime_options
   end
   

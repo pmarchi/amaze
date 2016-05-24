@@ -35,7 +35,7 @@ class Amaze::Script
       o.on('-m', '--mask MASKFILE', String, 'MASKFILE is either a ASCII file or a PNG file.') do |mask|
         options[:mask] = mask
       end
-      o.on('-s', '--shape SHAPE', Amaze::Factory.shapes, "One of #{Amaze::Factory.shapes.join(', ')}.", "Shapes won't work on polar mazes.") do |shape|
+      o.on('-s', '--shape SHAPE', Amaze::Shape.all, "One of #{Amaze::Shape.all.join(', ')}.", "Shapes won't work on polar mazes.") do |shape|
         options[:shape] = shape
       end
   

@@ -1,17 +1,16 @@
 
 class Amaze::Shape::Triangle < Amaze::Shape
 
-  def build_mask
-    (0...rows).each do |row|
+  label :triangle
+
+  def chars
+    Array.new(rows) do |row|
       # How many cells are on
-      on = (row+1) * 2 - 1
+      n_on = row * 2 + 1
       # How many cells are off
-      off = (columns - on) / 2
-      # Build a line: #off cells, #on cells, #off cells
-      line_map = Array.new(off, false) + Array.new(on, true) + Array.new(off, false)
-      line_map.each_with_index do |switch, i|
-        mask[row, i] = switch
-      end
+      n_off = (columns - n_on) / 2
+      # Build the line of cells
+      off(n_off) + on(n_on) + off(n_off)
     end
   end
   
@@ -20,6 +19,10 @@ class Amaze::Shape::Triangle < Amaze::Shape
   end
   
   def columns
-    (rows+1)/2 * 4 - 1
+    size * 2 - 1 + offset
+  end
+  
+  def offset
+    size.even? ? 0 : 2
   end
 end

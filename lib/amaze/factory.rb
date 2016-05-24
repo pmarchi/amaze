@@ -37,15 +37,10 @@ class Amaze::Factory
     end
   end
   
-  # All known shapes
-  def self.shapes
-    %i( triangle diamond hexagon star )
-  end
-
   def create_shaped_grid shape, *args
     klass = Amaze::Grid.const_get(type.to_s.capitalize)
     klass.prepend Amaze::MaskedGrid
-    klass.new Amaze::Shape.const_get(shape.to_s.capitalize).new(args.first).create_mask
+    klass.new Amaze::Mask.from_string(Amaze::Shape.create(shape, args.first).to_s)
   end
   
   def create_ascii_formatter *args

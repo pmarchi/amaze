@@ -3,16 +3,11 @@ require 'gradient'
 
 class Amaze::Factory
 
-  # All known maze types
-  def self.types
-    %i( delta ortho sigma upsilon polar )
-  end
-  
   # The type of the grid
   attr_reader :type
   
   def initialize type
-    raise "#{type} maze is not supported" unless self.class.types.include? type
+    raise "#{type} maze is not supported" unless Amaze::Grid.all.include? type
     @type = type
   end
   

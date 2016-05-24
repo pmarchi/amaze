@@ -26,7 +26,7 @@ class Amaze::Script
       o.banner = "\nMaze generator\n\nUsage: #{File.basename $0} [options]\n"
       o.separator "\nGrid options:"
 
-      o.on('-t', '--type TYPE', Amaze::Factory.types, 'The type of the maze.', "One of #{Amaze::Factory.types.join(', ')}") do |type|
+      o.on('-t', '--type TYPE', Amaze::Grid.all, 'The type of the maze.', "One of #{Amaze::Grid.all.join(', ')}") do |type|
         options[:type] = type
       end
       o.on('-g', '--grid-size ROWS[,COLUMNS]', Array, 'The size of the grid.') do |v|

@@ -1,11 +1,5 @@
 
-class Amaze::Grid
-  autoload :Ortho, 'amaze/grid/ortho'
-  autoload :Delta, 'amaze/grid/delta'
-  autoload :Sigma, 'amaze/grid/sigma'
-  autoload :Upsilon, 'amaze/grid/upsilon'
-  autoload :Polar, 'amaze/grid/polar'
-  
+class Amaze::Grid  
   # The dimension of the amaze
   attr_reader :rows, :columns
   
@@ -63,4 +57,19 @@ class Amaze::Grid
   def size
     rows * columns
   end
+  
+  def self.inherited child_class
+    name = child_class.to_s.split('::').last.split(/(?=[[:upper:]])/).map(&:downcase).join
+    (@@names ||= []) << name.to_sym
+  end
+  
+  def self.all
+    @@names
+  end
 end
+
+require 'amaze/grid/ortho'
+require 'amaze/grid/delta'
+require 'amaze/grid/sigma'
+require 'amaze/grid/upsilon'
+require 'amaze/grid/polar'

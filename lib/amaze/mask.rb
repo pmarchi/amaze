@@ -42,6 +42,13 @@ class Amaze::Mask
     end
   end
   
+  def self.from_file file
+    ext = File.extname(file)[1..-1]
+    send "from_#{ext}", file
+  rescue
+    raise "Mask file of type #{File.extname(file)} is not supported."
+  end
+  
   def self.from_txt file
     from_string File.read(file)
   end
@@ -62,7 +69,7 @@ class Amaze::Mask
     
     mask
   end
-  
+
   def self.from_png file
     image = ChunkyPNG::Image.from_file file
     mask = new image.height, image.width

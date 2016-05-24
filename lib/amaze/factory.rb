@@ -16,31 +16,22 @@ class Amaze::Factory
     @type = type
   end
   
+  def grid_class
+    @grid_class ||= Amaze::Grid.const_get(type.to_s.capitalize)
+  end
+  
   def create_grid *args
-    Amaze::Grid.const_get(type.to_s.capitalize).new(*args)
+    grid_class.new(*args)
   end
 
   def create_masked_grid file
-    klass = Amaze::Grid.const_get(type.to_s.capitalize)
-    klass.prepend Amaze::MaskedGrid
-    klass.new create_mask(file)
-  end
-  
-  def create_mask file
-    case File.extname file
-    when '.txt'
-      Amaze::Mask.from_txt file
-    when '.png'
-      Amaze::Mask.from_png file
-    else
-      raise "Mask file of type #{File.extname(file)} is not supported."
-    end
+    grid_class.prepend Amaze::MaskedGrid
+    grid_class.new Amaze::Mask.from_file(file)
   end
   
   def create_shaped_grid shape, *args
-    klass = Amaze::Grid.const_get(type.to_s.capitalize)
-    klass.prepend Amaze::MaskedGrid
-    klass.new Amaze::Mask.from_string(Amaze::Shape.create(shape, args.first).to_s)
+    grid_class.prepend Amaze::MaskedGrid
+    grid_class.new Amaze::Mask.from_string(Amaze::Shape.create(shape, args.first).to_s)
   end
   
   def create_ascii_formatter *args

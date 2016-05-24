@@ -43,10 +43,13 @@ class Amaze::Mask
   end
   
   def self.from_file file
-    ext = File.extname(file)[1..-1]
-    send "from_#{ext}", file
-  rescue
-    raise "Mask file of type #{File.extname(file)} is not supported."
+    ext = File.extname(file)[1..-1].downcase
+    method_name = "from_#{ext}"
+    if self.respond_to? method_name
+      send method_name, file
+    else
+      raise "Mask file of type #{ext} is not supported."
+    end
   end
   
   def self.from_txt file

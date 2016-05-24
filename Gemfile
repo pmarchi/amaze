@@ -3,4 +3,10 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in amaze.gemspec
 gemspec
 
-gem "codeclimate-test-reporter", group: :test, require: nil
+group :test do
+  gem "codeclimate-test-reporter", require: false
+end
+
+group :development do
+  gem "guard-rspec", require: false
+end

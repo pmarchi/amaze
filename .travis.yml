@@ -6,3 +6,5 @@ addons:
   apt:
     packages:
     - libmagickwand-dev
+  code_climate:
+    repo_token: a9ac57eb2f2678084f82945059ba6efe302db1dc6f2ddc48db447a4edc34f513

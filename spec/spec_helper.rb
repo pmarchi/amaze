@@ -5,7 +5,10 @@ CodeClimate::TestReporter.start
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'amaze'
 
-def read_fixture(*part)
-  file = File.join(File.dirname(__FILE__), 'fixture',  *part)
-  File.read file
+def fixture *part
+  File.join(File.dirname(__FILE__), 'fixture',  *part)
+end
+
+def read_fixture *part
+  File.read(fixture *part)
 end

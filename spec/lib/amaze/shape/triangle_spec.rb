@@ -14,19 +14,23 @@ describe Amaze::Shape::Triangle do
     expect(triangle.size).to eq 3
   end
   
-  [[1,3], [2,3], [3,7], [4,7], [5,11]].each do |size, columns|
+  (1..5).each do |size|
     context "with size = #{size}" do
       let(:triangle) { Amaze::Shape::Triangle.new size }
-      it "#rows are equal #{size}" do
-        expect(triangle.rows).to eq size
+      let(:mask) { read_fixture "shape/triangle#{size}.txt" }
+      let(:rows) { mask.lines.size }
+      let(:columns) { mask.lines.first.chomp.size }
+
+      it "#rows match the rows of the fixture" do
+        expect(triangle.rows).to eq rows
       end
   
-      it "#columns are equal #{columns}" do
-        expect(triangle.columns).to eq(columns)
+      it "#columns match the rows of the fixture" do
+        expect(triangle.columns).to eq columns
       end
       
-      it "#to_s returns a #{size}x#{columns} mask of a triangle" do
-        expect(triangle.to_s).to eq(read_fixture "shape/triangle#{size}.txt")
+      it "#to_s returns the same mask as the fixture" do
+        expect(triangle.to_s).to eq mask
       end
     end
   end

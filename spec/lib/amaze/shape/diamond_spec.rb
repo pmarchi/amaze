@@ -14,19 +14,23 @@ describe Amaze::Shape::Diamond do
     expect(diamond.size).to eq 3
   end
   
-  [[1,3], [2,3], [3,7], [4,7], [5,11]].each do |size, columns|
+  (1..5).each do |size|
     context "with size = #{size}" do
-      let(:diamond) { Amaze::Shape::Diamond.new size }
-      it "#rows are equal #{size}" do
-        expect(diamond.rows).to eq size*2
+      let(:star) { Amaze::Shape::Diamond.new size }
+      let(:mask) { read_fixture "shape/diamond#{size}.txt" }
+      let(:rows) { mask.lines.size }
+      let(:columns) { mask.lines.first.chomp.size }
+
+      it "#rows match the rows of the fixture" do
+        expect(star.rows).to eq rows
       end
   
-      it "#columns are equal #{columns}" do
-        expect(diamond.columns).to eq(columns)
+      it "#columns match the rows of the fixture" do
+        expect(star.columns).to eq columns
       end
       
-      it "#to_s returns a #{size}x#{columns} mask of a diamond" do
-        expect(diamond.to_s).to eq(read_fixture "shape/diamond#{size}.txt")
+      it "#to_s returns the same mask as the fixture" do
+        expect(star.to_s).to eq mask
       end
     end
   end

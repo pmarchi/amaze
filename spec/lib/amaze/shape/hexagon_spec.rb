@@ -14,20 +14,23 @@ describe Amaze::Shape::Hexagon do
     expect(hexagon.size).to eq 3
   end
   
-  [[1,5], [2,7], [3,13], [4,15], [5,21]].each do |size, columns|
+  (1..5).each do |size|
     context "with size = #{size}" do
-      let(:hexagon) { Amaze::Shape::Hexagon.new size }
+      let(:star) { Amaze::Shape::Hexagon.new size }
+      let(:mask) { read_fixture "shape/hexagon#{size}.txt" }
+      let(:rows) { mask.lines.size }
+      let(:columns) { mask.lines.first.chomp.size }
 
-      it "#rows are equal #{size*2}" do
-        expect(hexagon.rows).to eq size*2
+      it "#rows match the rows of the fixture" do
+        expect(star.rows).to eq rows
       end
-
-      it "#columns are equal #{columns}" do
-        expect(hexagon.columns).to eq columns
+  
+      it "#columns match the rows of the fixture" do
+        expect(star.columns).to eq columns
       end
-
-      it "#to_s returns a #{size*2}x#{columns} mask of a hexagon" do
-        expect(hexagon.to_s).to eq(read_fixture "shape/hexagon#{size}.txt")
+      
+      it "#to_s returns the same mask as the fixture" do
+        expect(star.to_s).to eq mask
       end
     end
   end

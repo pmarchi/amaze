@@ -16,18 +16,21 @@ describe Amaze::Shape::Cross do
   
   (1..4).each do |size|
     context "with size = #{size}" do
-      let(:cross) { Amaze::Shape::Cross.new size }
+      let(:star) { Amaze::Shape::Cross.new size }
+      let(:mask) { read_fixture "shape/cross#{size}.txt" }
+      let(:rows) { mask.lines.size }
+      let(:columns) { mask.lines.first.chomp.size }
 
-      it "#rows are equal #{size*3}" do
-        expect(cross.rows).to eq size*3
+      it "#rows match the rows of the fixture" do
+        expect(star.rows).to eq rows
       end
-
-      it "#columns are equal #{size*3}" do
-        expect(cross.columns).to eq size*3
+  
+      it "#columns match the rows of the fixture" do
+        expect(star.columns).to eq columns
       end
-
-      it "#to_s returns a #{size*3}x#{size*3} mask of a cross" do
-        expect(cross.to_s).to eq(read_fixture "shape/cross#{size}.txt")
+      
+      it "#to_s returns the same mask as the fixture" do
+        expect(star.to_s).to eq mask
       end
     end
   end

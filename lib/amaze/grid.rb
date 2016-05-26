@@ -1,5 +1,7 @@
 
-class Amaze::Grid  
+class Amaze::Grid
+  extend Amaze::Module::AutoRegisterSubclass
+  
   # The dimension of the amaze
   attr_reader :rows, :columns
   
@@ -56,15 +58,6 @@ class Amaze::Grid
 
   def size
     rows * columns
-  end
-  
-  def self.inherited child_class
-    name = child_class.to_s.split('::').last.split(/(?=[[:upper:]])/).map(&:downcase).join
-    (@@names ||= []) << name.to_sym
-  end
-  
-  def self.all
-    @@names
   end
 end
 

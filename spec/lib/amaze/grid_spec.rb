@@ -8,4 +8,10 @@ describe Amaze::Grid do
       expect(described_class.all).to include :test
     end
   end
+  
+  context "initialize" do
+    it "should raise a NotImplementedError" do
+      expect{ described_class.new 3, 4 }.to raise_error(NotImplementedError)
+    end
+  end
 end

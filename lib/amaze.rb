@@ -15,4 +15,5 @@ module Amaze
   autoload :MaskedGrid, 'amaze/masked_grid'
   autoload :Shape, 'amaze/shape'
   autoload :GradientMap, 'amaze/gradient_map'
+  autoload :Module, 'amaze/module'
 end

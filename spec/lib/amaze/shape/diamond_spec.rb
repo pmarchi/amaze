@@ -2,12 +2,6 @@
 require 'spec_helper'
 
 describe Amaze::Shape::Diamond do
-  context "class" do
-    it "has a label" do
-      expect(Amaze::Shape.all).to include :diamond
-    end
-  end
-  
   let(:diamond) { Amaze::Shape::Diamond.new 3 }
   
   it "#initialize accepts a size" do

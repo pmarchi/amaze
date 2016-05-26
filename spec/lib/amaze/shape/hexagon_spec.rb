@@ -2,12 +2,6 @@
 require 'spec_helper'
 
 describe Amaze::Shape::Hexagon do
-  context "class" do
-    it "has a label" do
-      expect(Amaze::Shape.all).to include :hexagon
-    end
-  end
-  
   let(:hexagon) { Amaze::Shape::Hexagon.new 3 }
 
   it "#initialize accepts a size" do

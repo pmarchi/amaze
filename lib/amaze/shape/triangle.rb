@@ -1,8 +1,6 @@
 
 class Amaze::Shape::Triangle < Amaze::Shape
 
-  label :triangle
-
   def chars
     Array.new(rows) do |row|
       # How many cells are on

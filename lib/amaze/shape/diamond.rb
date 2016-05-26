@@ -1,8 +1,6 @@
 
 class Amaze::Shape::Diamond < Amaze::Shape
   
-  label :diamond
-
   def chars
     lines = Array.new(rows)
     

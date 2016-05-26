@@ -2,12 +2,6 @@
 require 'spec_helper'
 
 describe Amaze::Shape::Star do
-  context "class" do
-    it "has a label" do
-      expect(Amaze::Shape.all).to include :star
-    end
-  end
-  
   let(:star) { Amaze::Shape::Star.new 3 }
 
   it "#initialize accepts a size" do

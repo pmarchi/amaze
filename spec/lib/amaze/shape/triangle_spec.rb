@@ -2,12 +2,6 @@
 require 'spec_helper'
 
 describe Amaze::Shape::Triangle do
-  context "class" do
-    it "has a label" do
-      expect(Amaze::Shape.all).to include :triangle
-    end
-  end
-  
   let(:triangle) { Amaze::Shape::Triangle.new 3 }
   
   it "#initialize accepts a size" do

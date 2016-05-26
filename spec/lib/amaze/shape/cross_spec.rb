@@ -2,12 +2,6 @@
 require 'spec_helper'
 
 describe Amaze::Shape::Cross do
-  context "class" do
-    it "has a label" do
-      expect(Amaze::Shape.all).to include :cross
-    end
-  end
-  
   let(:cross) { Amaze::Shape::Cross.new 3 }
 
   it "#initialize accepts a size" do

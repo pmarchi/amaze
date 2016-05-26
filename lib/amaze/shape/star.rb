@@ -1,8 +1,6 @@
 
 class Amaze::Shape::Star < Amaze::Shape
   
-  label :star
-
   def chars
     lines = Array.new(rows)
     

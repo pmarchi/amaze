@@ -1,8 +1,6 @@
 
 class Amaze::Shape::Cross < Amaze::Shape
   
-  label :cross
-  
   def chars
     lines = Array.new(rows)
     

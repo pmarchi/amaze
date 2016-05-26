@@ -1,8 +1,6 @@
 
 class Amaze::Shape::Hexagon < Amaze::Shape
   
-  label :hexagon
-
   def chars
     lines = Array.new(rows)
 

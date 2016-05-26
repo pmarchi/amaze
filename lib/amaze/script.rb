@@ -239,7 +239,7 @@ class Amaze::Script
       background_color: options[:image_background_color] || 'white',
       show_grid: options[:image_show_grid] || false,
       hide_walls: options[:image_hide_walls] || false,
-      gradient_map: Amaze::GradientMap.create(options[:gradient_map] || :warm),
+      gradient_map: Amaze::GradientMap.create(options[:gradient_map] || :warm).map,
     }.merge runtime_options
   end
   

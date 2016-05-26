@@ -2,18 +2,7 @@
 require 'gradient'
 
 class Amaze::GradientMap
-  def self.inherited child_class
-    name = child_class.to_s.split('::').last.split(/(?=[[:upper:]])/).map(&:downcase).join
-    (@@names ||= {})[name.to_sym] = child_class
-  end
-  
-  def self.all
-    @@names.keys
-  end
-  
-  def self.create name
-    @@names[name.to_sym].new.map
-  end
+  extend Amaze::Module::AutoRegisterSubclass
 end
 
 require 'amaze/gradient_map/blue'

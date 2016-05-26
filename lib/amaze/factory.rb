@@ -1,6 +1,4 @@
 
-require 'gradient'
-
 class Amaze::Factory
 
   # The type of the grid
@@ -9,24 +7,6 @@ class Amaze::Factory
   def initialize type
     raise "#{type} maze is not supported" unless Amaze::Grid.all.include? type
     @type = type
-  end
-  
-  def grid_class
-    @grid_class ||= Amaze::Grid.const_get(type.to_s.capitalize)
-  end
-  
-  def create_grid *args
-    grid_class.new(*args)
-  end
-
-  def create_masked_grid file
-    grid_class.prepend Amaze::MaskedGrid
-    grid_class.new Amaze::Mask.from_file(file)
-  end
-  
-  def create_shaped_grid shape, *args
-    grid_class.prepend Amaze::MaskedGrid
-    grid_class.new Amaze::Mask.from_string(Amaze::Shape.create(shape, args.first).to_s)
   end
   
   def create_ascii_formatter *args

@@ -13,7 +13,8 @@ class Amaze::Script
   def initialize
     # default options
     @options = {
-      type: :ortho, 
+      type: :ortho,
+      grid_size: [4],
       distances: false,
       formats: [:ascii],
       algorithm: :gt1,
@@ -308,24 +309,26 @@ class Amaze::Script
   end
   
   def grid
-    @grid ||=
-    if options[:mask]
-      factory.create_masked_grid(options[:mask])
-    elsif options[:shape]
-      factory.create_shaped_grid(options[:shape], *grid_size)
+    @grid ||= Amaze::Grid.create options[:type], *grid_args
+  end
+  
+  def grid_args
+    if options[:mask] || options[:shape]
+      Amaze::Grid.registred[options[:type]].prepend Amaze::MaskedGrid
+      if options[:mask]
+        Amaze::Mask.from_file options[:mask]
+      else
+        Amaze::Mask.from_string(Amaze::Shape.create(options[:shape], grid_size.first).to_s)
+      end
     else
-      factory.create_grid(*grid_size)
+      grid_size
     end
   end
   
   def grid_size
     # double the columns for delta grids if not specified
-    if options[:grid_size]
-      size = options[:grid_size].first(2).map(&:to_i)
-      size[1] ||= (options[:type] == :delta ? options[:grid_size][0] * 2 : options[:grid_size][0])
-    else
-      size = [4, options[:type] == :delta ? 8 : 4]
-    end
+    size = options[:grid_size].first(2).map(&:to_i)
+    size[1] ||= (options[:grid_size][0] * (options[:type] == :delta ? 2 : 1))
     size = size.first if options[:type] == :polar
     size
   end

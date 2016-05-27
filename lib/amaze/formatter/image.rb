@@ -2,11 +2,7 @@
 require 'rmagick'
 
 class Amaze::Formatter::Image
-  autoload :Ortho, 'amaze/formatter/image/ortho'
-  autoload :Sigma, 'amaze/formatter/image/sigma'
-  autoload :Delta, 'amaze/formatter/image/delta'
-  autoload :Upsilon, 'amaze/formatter/image/upsilon'
-  autoload :Polar, 'amaze/formatter/image/polar'
+  extend Amaze::Module::AutoRegisterSubclass
   
   # The grid
   attr_reader :grid
@@ -125,3 +121,9 @@ class Amaze::Formatter::Image
     Magick.colors.map(&:name)
   end
 end
+
+require 'amaze/formatter/image/ortho'
+require 'amaze/formatter/image/sigma'
+require 'amaze/formatter/image/delta'
+require 'amaze/formatter/image/upsilon'
+require 'amaze/formatter/image/polar'

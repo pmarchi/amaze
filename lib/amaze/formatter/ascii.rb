@@ -3,12 +3,8 @@
 require 'rainbow/ext/string'
 
 class Amaze::Formatter::ASCII
-  autoload :Delta, 'amaze/formatter/ascii/delta'
-  autoload :Ortho, 'amaze/formatter/ascii/ortho'
-  autoload :Sigma, 'amaze/formatter/ascii/sigma'
-  autoload :Upsilon, 'amaze/formatter/ascii/upsilon'
-  autoload :Polar, 'amaze/formatter/ascii/polar'
-  
+  extend Amaze::Module::AutoRegisterSubclass
+
   # The grid
   attr_reader :grid
   
@@ -89,3 +85,9 @@ class Amaze::Formatter::ASCII
     [0,low,high]
   end
 end
+
+require 'amaze/formatter/ascii/delta'
+require 'amaze/formatter/ascii/ortho'
+require 'amaze/formatter/ascii/sigma'
+require 'amaze/formatter/ascii/upsilon'
+require 'amaze/formatter/ascii/polar'

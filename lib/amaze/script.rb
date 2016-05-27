@@ -140,7 +140,7 @@ class Amaze::Script
     if visualize?
       algorithm.on grid do |stat|
         # print the maze
-        ascii = factory.create_ascii_formatter grid,
+        ascii = Amaze::Formatter::ASCII.create options[:type], grid,
           ascii_options(path_color: :blue, path_cells: stat.current)
           
         puts ascii.render
@@ -198,7 +198,7 @@ class Amaze::Script
 
     # Render the maze, set defaults for missing options
     if ascii?
-      ascii = factory.create_ascii_formatter grid, ascii_options(ascii_runtime_options)
+      ascii = Amaze::Formatter::ASCII.create options[:type], grid, ascii_options(ascii_runtime_options)
       puts ascii.render
     end
     
@@ -208,7 +208,7 @@ class Amaze::Script
     puts "Random seed: #{seed}"
 
     if image?
-      image = factory.create_image_formatter grid,
+      image = Amaze::Formatter::Image.create options[:type], grid,
         image_options(image_runtime_options)
       image.render
       

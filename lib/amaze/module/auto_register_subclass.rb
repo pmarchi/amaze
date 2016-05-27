@@ -7,11 +7,11 @@ module Amaze::Module::AutoRegisterSubclass
       map(&:downcase).
       join
 
-    (@@registred ||= {})[name.to_sym] = child_class
+    (@registred ||= {})[name.to_sym] = child_class
   end
   
   def registred
-    @@registred
+    @registred
   end
   
   def all

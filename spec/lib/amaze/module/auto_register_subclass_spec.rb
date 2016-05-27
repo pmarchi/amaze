@@ -1,24 +1,35 @@
 
 require 'spec_helper'
 
-class Parent
+class ParentFoo
   extend Amaze::Module::AutoRegisterSubclass
 end
-class Child1 < Parent; end
-class Child2 < Parent; end
+class ChildFoo1 < ParentFoo; end
+class ChildFoo2 < ParentFoo; end
+
+class ParentBar
+  extend Amaze::Module::AutoRegisterSubclass
+end
+class ChildBar1 < ParentBar; end
+class ChildBar2 < ParentBar; end
+
 
 describe Amaze::Module::AutoRegisterSubclass do
   it "registers the class in a hash by name" do
-    expect(Parent.registred.keys).to include :child1
-    expect(Parent.registred[:child1]).to eq Child1
+    expect(ParentFoo.registred.keys).to include :childfoo1
+    expect(ParentFoo.registred[:childfoo1]).to eq ChildFoo1
   end
   
   it ".all includes the names of all subclasses" do
-    expect(Parent.all).to include :child1
-    expect(Parent.all).to include :child2
+    expect(ParentFoo.all).to include :childfoo1
+    expect(ParentFoo.all).to include :childfoo2
   end
   
   it "creates an new instance of a subclass by name" do
-    expect(Parent.create(:child1)).to be_an_instance_of Child1
+    expect(ParentFoo.create(:childfoo1)).to be_an_instance_of ChildFoo1
+  end
+  
+  it "does not register names of children of other parents" do
+    expect(ParentFoo.all).not_to include :childbar1
   end
 end

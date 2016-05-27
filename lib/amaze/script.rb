@@ -1,136 +1,32 @@
 
-require 'optparse'
 require 'io/console'
-require 'rainbow/ext/string'
-require 'rmagick'
 
 class Amaze::Script
+  autoload :Options, 'amaze/script/options'
+  autoload :AsciiOptions, 'amaze/script/ascii_options'
+  autoload :ImageOptions, 'amaze/script/image_options'
 
   attr_reader :seed
-
-  attr_reader :options
-
-  def initialize
-    # default options
-    @options = {
-      type: :ortho,
-      grid_size: [4],
-      distances: false,
-      formats: [:ascii],
-      algorithm: :gt1,
-      visualize: false,
-    }
-  end
-
+  
   def parser
-    OptionParser.new do |o|
-      o.banner = "\nMaze generator\n\nUsage: #{File.basename $0} [options]\n"
-      o.separator "\nGrid options:"
-
-      o.on('-t', '--type TYPE', Amaze::Grid.all, 'The type of the maze.', "One of #{Amaze::Grid.all.join(', ')}") do |type|
-        options[:type] = type
-      end
-      o.on('-g', '--grid-size ROWS[,COLUMNS]', Array, 'The size of the grid.') do |v|
-        options[:grid_size] = Array(v).map(&:to_i)
-      end
-      o.on('-m', '--mask MASKFILE', String, 'MASKFILE is either a ASCII file or a PNG file.') do |mask|
-        options[:mask] = mask
-      end
-      o.on('-s', '--shape SHAPE', Amaze::Shape.all, "One of #{Amaze::Shape.all.join(', ')}.", "Shapes won't work on polar mazes.") do |shape|
-        options[:shape] = shape
-      end
-  
-      o.separator "\nAlgorithm options:"
-
-      o.on('-a', '--algorithm ALGORITHM', Amaze::Factory.algorithms, 'The algorithm to generate the maze.', "One of #{Amaze::Factory.algorithms.join(', ')}") do |algorithm|
-        options[:algorithm] = algorithm
-      end
-      o.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
-        options[:seed] = seed
-      end
-      visualization_modes = %i( run autopause pause step )
-      o.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
-        options[:visualize] = mode || :run
-      end
-
-      o.separator "\nSolution options:"
-
-      o.on('--[no-]distances [ROW,COLUMN]', Array, 'Calculate the distances from cell(ROW/COLUMN) to all other cells of the grid.') do |distances|
-        options[:distances] = distances ? distances.map(&:to_i) : :auto
-      end
-      o.on('--[no-]solution [ROW,COLUMN]', Array, 'Find the shortest path to cell(ROW/COLUMN).') do |solution|
-        options[:solution] = solution ? solution.map(&:to_i) : :auto
-      end
-      o.on('--[no-]longest', 'Find the longest path of the maze.') do |longest|
-        options[:longest] = longest
-      end
-  
-      o.separator "\nRender Options:"
-  
-      o.on('-f', '--format [FORMAT,...]', Array, 'Render the maze on the given formats.') do |formats|
-        options[:formats] = formats.map(&:to_sym)
-      end
-
-      o.separator "\nASCII Options:"
-  
-      o.on('-c', '--cell-size SIZE', Integer, 'The size of the cell') do |cell_size|
-        options[:cell_size] = cell_size
-      end
-      o.on('--grid-color NAME', Rainbow::X11ColorNames::NAMES.keys, 'The color of the grid.') do |color|
-        options[:ascii_grid_color] = color
-      end
-      o.on('--path-color NAME', Rainbow::X11ColorNames::NAMES.keys, 'The color of the path, when drawing the solution or longest path.') do |color|
-        options[:ascii_path_color] = color
-      end
-      o.on('--distances-color NAME', Rainbow::X11ColorNames::NAMES.keys, 'The color of the distances.') do |color|
-        options[:ascii_distances_color] = color
-      end
-      o.on('--all-ascii-colors', 'Print all the supported ascii colors.') do
-        puts Rainbow::X11ColorNames::NAMES.keys.map {|n| n.to_s.color(n) }.join(' ')
-        exit 0
-      end
-
-      o.separator "\nImage Options:"
-  
-      o.on('--cell-width PIXEL', Integer, 'The width of a cell.') do |px|
-        options[:image_cell_width] = px
-      end
-      o.on('--wall-width PIXEL', Integer, 'The width of the walls.') do |px|
-        options[:image_wall_width] = px
-      end
-      o.on('--wall-color NAME', Magick.colors.map(&:name), 'The color of the walls.') do |color|
-        options[:image_wall_color] = color
-      end
-      o.on('--path-width PIXEL', Integer, 'The width of the path.') do |px|
-        options[:image_path_width] = px
-      end
-      o.on('--path-color NAME', Magick.colors.map(&:name), 'The color of the path.') do |color|
-        options[:image_path_color] = color
-      end
-      o.on('--border-width PIXEL', Integer, 'The width of the border around the maze.') do |px|
-        options[:image_border_width] = px
-      end
-      o.on('--background-color NAME', Magick.colors.map(&:name), 'The background color.') do |color|
-        options[:image_background_color] = color
-      end
-      o.on('--show-grid', 'Render the underlying grid.') do
-        options[:image_show_grid] = true
-      end
-      o.on('--hide-walls', "Don't render the walls.") do
-        options[:image_hide_walls] = true
-      end
-      o.on('--gradient-map NAME', Amaze::GradientMap.all, 'The gradient map to use for the distances color.', "One of #{Amaze::GradientMap.all.join(', ')}") do |map|
-        options[:gradient_map] = map
-      end
-      o.on('--all-image-colors', 'Print all the supported image colors.') do
-        puts Magick.colors.map(&:name).join(', ')
-        exit 0
-      end
-
-      o.separator ""
+    @parser ||= Amaze::Script::Options.new.tap do |p|
+      p.extend Amaze::Script::AsciiOptions
+      p.extend Amaze::Script::ImageOptions
     end
   end
   
+  def options
+    parser.options
+  end
+  
+  def ascii_options runtime_options={}
+    parser.ascii_options.merge runtime_options
+  end
+    
+  def image_options runtime_options={}
+    parser.image_options.merge runtime_options
+  end
+
   def run args
     parser.parse!(args)
     
@@ -220,67 +116,43 @@ class Amaze::Script
     end
   end
     
-  def ascii_options runtime_options={}
-    { 
-      cell_size: options[:cell_size] || 1,
-      grid_color: options[:ascii_grid_color] || :white,
-      path_color: options[:ascii_path_color] || :red,
-      distances_color: options[:ascii_distances_color]
-    }.merge runtime_options
-  end
-  
-  def image_options runtime_options={}
-    {
-      cell_width: options[:image_cell_width] || 100,
-      wall_width: options[:image_wall_width] || 6,
-      wall_color: options[:image_wall_color] || 'black',
-      path_width: options[:image_path_width] || 4,
-      path_color: options[:image_path_color] || 'red',
-      border_width: options[:image_border_width] || 0,
-      background_color: options[:image_background_color] || 'white',
-      show_grid: options[:image_show_grid] || false,
-      hide_walls: options[:image_hide_walls] || false,
-      gradient_map: Amaze::GradientMap.create(options[:gradient_map] || :warm).map,
-    }.merge runtime_options
-  end
-  
   def ascii?
-    @options[:formats].include? :ascii
+    options[:formats].include? :ascii
   end
   
   def image?
-    @options[:formats].include? :image
+    options[:formats].include? :image
   end
   
   def visualize?
-    ascii? && !!@options[:visualize]
+    ascii? && !!options[:visualize]
   end
   
   def distances?
-    !!@options[:distances]
+    !!options[:distances]
   end
   
   def solution?
-    !!@options[:solution]
+    !!options[:solution]
   end
   
   def longest?
-    !!@options[:longest]
+    !!options[:longest]
   end
   
   # TODO: specify a start cell should also work for polar grids
   
   def start_cell
-    if @options[:type] == :polar
+    if options[:type] == :polar
       grid[grid.rows-1, 0]
     else
-      if !@options[:distances] || @options[:distances] == :auto
+      if !options[:distances] || options[:distances] == :auto
         column = grid.columns.times.find {|i| grid[0,i] }
         return grid[0,column] if column
         row = grid.rows.times.find {|i| grid[i,0] }
         return grid[row,0]
       else
-        grid[*@options[:distances]]
+        grid[*options[:distances]]
       end
     end
   end
@@ -288,18 +160,18 @@ class Amaze::Script
   # TODO: specify a finish cell should also work for polar grids
   
   def finish_cell
-    if @options[:type] == :polar
+    if options[:type] == :polar
       row = grid.rows-1
       columns = grid.columns row
       grid[row, columns.size / 2]
     else
-      if !@options[:solution] || @options[:solution] == :auto
+      if !options[:solution] || options[:solution] == :auto
         column = grid.columns.times.find {|i| grid[grid.rows-1,grid.columns-1-i] }
         return grid[grid.rows-1,grid.columns-1-column] if column
         row = grid.rows.times.find {|i| grid[grid.rows-1-i,grid.columns-1] }
         return grid[grid.rows-1-row,grid.columns-1]
       else
-        grid[*@options[:solution]]
+        grid[*options[:solution]]
       end
     end
   end

@@ -23,6 +23,27 @@ class Amaze::Algorithm
     def all
       @@registred.keys
     end
+    
+    def random_seed
+      if defined? @@random_seed
+        @@random_seed
+      else
+        srand
+        @@random_seed = srand
+      end
+    end
+    
+    def random_seed= seed
+      @@random_seed = seed
+    end
+  end
+  
+  def initialize
+    initialize_random_seed
+  end
+  
+  def initialize_random_seed
+    srand self.class.random_seed
   end
   
   # Options can be defined on registration and will be set by create

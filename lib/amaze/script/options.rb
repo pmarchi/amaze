@@ -46,7 +46,7 @@ class Amaze::Script::Options
       options[:algorithm] = algorithm
     end
     opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
-      options[:seed] = seed
+      Amaze::Algorithm.random_seed = seed
     end
     visualization_modes = %i( run autopause pause step )
     opts.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|

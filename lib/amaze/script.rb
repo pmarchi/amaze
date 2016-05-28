@@ -30,8 +30,6 @@ class Amaze::Script
   def run args
     parser.parse!(args)
     
-    initialize_random_seed
-    
     # Run the algorithm on the grid
     if visualize?
       algorithm.on grid do |stat|
@@ -101,7 +99,7 @@ class Amaze::Script
     puts algorithm.status
     puts "Dead ends: #{grid.deadends.size} of #{grid.size} (#{(100.to_f / grid.size * grid.deadends.size).to_i}%)"
     puts "Path length: #{path_length}" if path_length
-    puts "Random seed: #{seed}"
+    puts "Random seed: #{Amaze::Algorithm.random_seed}"
 
     if image?
       image = Amaze::Formatter::Image.create options[:type], grid,
@@ -203,16 +201,6 @@ class Amaze::Script
   
   def algorithm
     @algorithm ||= Amaze::Algorithm.create options[:algorithm]
-  end
-  
-  def initialize_random_seed
-    if options[:seed]
-      @seed = options[:seed]
-    else
-      srand
-      @seed = srand
-    end
-    srand @seed
   end
   
   # Reads keypresses from the user including 2 and 3 escape character sequences.

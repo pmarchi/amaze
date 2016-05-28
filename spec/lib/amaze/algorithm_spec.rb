@@ -52,4 +52,34 @@ describe Amaze::Algorithm do
       expect(Amaze::Algorithm.all).to include(:a1, :a2, :b)
     end
   end
+  
+  context ".random_seed" do
+    context "not set to a specific value" do
+      before(:example) do
+        Amaze::Algorithm.new
+      end
+    
+      it "returns a random value" do
+        expect(Amaze::Algorithm.random_seed).to be_a(Bignum)
+      end
+    end
+    
+    context "set to a specific value" do
+      let(:seed) { 8 }
+      let(:random_sequence) { srand seed; [rand, rand, rand] }
+
+      before(:example) do
+        Amaze::Algorithm.random_seed = seed
+        Amaze::Algorithm.new
+      end
+   
+      it "returns the given value" do
+        expect(Amaze::Algorithm.random_seed).to eq seed
+      end
+
+      it "produces the same sequence of random values" do
+        expect([rand, rand, rand]).to eq random_sequence
+      end
+    end
+  end
 end

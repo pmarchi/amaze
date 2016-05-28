@@ -1,5 +1,4 @@
 
-# all rainbow colors: Rainbow::X11ColorNames::NAMES.keys
 require 'rainbow/ext/string'
 
 class Amaze::Formatter::ASCII
@@ -83,6 +82,10 @@ class Amaze::Formatter::ASCII
     p [:low, low] unless (0..255).include? low
     p [:high, high] unless (0..255).include? high
     [0,low,high]
+  end
+
+  def self.colors
+    Rainbow::X11ColorNames::NAMES.keys
   end
 end
 

@@ -2,7 +2,6 @@ require "amaze/version"
 
 module Amaze
   autoload :Script, 'amaze/script'
-  autoload :Factory, 'amaze/factory'
   autoload :Cell, 'amaze/cell'
   autoload :Grid, 'amaze/grid'
   autoload :SigmaCell, 'amaze/sigma_cell'

@@ -2,22 +2,32 @@
 require 'benchmark'
 
 class Amaze::Algorithm
-  
-  # Helper class to report the status of the algorithm
-  class Stat
-    def initialize opts
-      @current = opts[:current]
-      @pause = opts[:pause]
-      @info = opts[:info]
-    end
+  class << self
+    @@registred = {}
 
-    attr_reader :current, :info
+    def register name, options={}
+      @@registred[name.to_sym] = {class: self, options: options}
+    end
   
-    def pause?
-      @pause
+    def registred
+      @@registred
+    end
+  
+    def create name
+      stored = @@registred[name]
+      algorithm = stored[:class].new
+      algorithm.options = stored[:options] unless stored[:options].empty?
+      algorithm
+    end
+    
+    def all
+      @@registred.keys
     end
   end
-    
+  
+  # Options can be defined on registration and will be set by create
+  attr_accessor :options
+  
   # The time the algorithm takes to generate the maze
   attr_reader :duration
   
@@ -34,11 +44,26 @@ class Amaze::Algorithm
     0.06
   end
     
-  autoload :AldousBorder, 'amaze/algorithm/aldous_border'
-  autoload :BinaryTree, 'amaze/algorithm/binary_tree'
-  autoload :Sidewinder, 'amaze/algorithm/sidewinder'
-  autoload :GrowingTree, 'amaze/algorithm/growing_tree'
-  autoload :Wilson, 'amaze/algorithm/wilson'
-  autoload :HuntAndKill, 'amaze/algorithm/hunt_and_kill'
-  autoload :RecursiveBacktracker, 'amaze/algorithm/recursive_backtracker'
+  # Helper class to report the status of the algorithm
+  class Stat
+    def initialize opts
+      @current = opts[:current]
+      @pause = opts[:pause]
+      @info = opts[:info]
+    end
+
+    attr_reader :current, :info
+  
+    def pause?
+      @pause
+    end
+  end
 end
+
+require 'amaze/algorithm/aldous_border'
+require 'amaze/algorithm/binary_tree'
+require 'amaze/algorithm/sidewinder'
+require 'amaze/algorithm/growing_tree'
+require 'amaze/algorithm/wilson'
+require 'amaze/algorithm/hunt_and_kill'
+require 'amaze/algorithm/recursive_backtracker'

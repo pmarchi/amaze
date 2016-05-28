@@ -1,6 +1,8 @@
 
 class Amaze::Algorithm::AldousBorder < Amaze::Algorithm
   
+  register :ab
+  
   def work grid
     cell = grid.random_cell
     unvisited = grid.size - 1

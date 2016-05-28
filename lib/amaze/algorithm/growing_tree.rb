@@ -1,21 +1,31 @@
 
 class Amaze::Algorithm::GrowingTree < Amaze::Algorithm
   
-  # The configuration of the algorithm
-  # In this instance the way the next cell gets picked
-  # from the list of active cells.
-  attr_reader :config
-  
-  def initialize
-    @description = "last from list"
-    @config = Proc.new {|active| active.last }
+  register :gt1, 
+    strategy: ->(active) { active.last }, 
+    description: "last from list"
+
+  register :gt2,
+    strategy: ->(active) { active.sample },
+    description: "random from list"
+    
+  register :gt3,
+    strategy: ->(active) { (rand(2) > 0) ? active.last : active.sample },
+    description: "last/1 : random/1 from list"
+
+  register :gt4,
+    strategy: ->(active) { (rand(3) > 0) ? active.last : active.sample },
+    description: "last/2 : random/1 from list"
+    
+    
+  def strategy
+    options[:strategy]
   end
   
-  def configure description, block
-    @description = description
-    @config = block
+  def description
+    options[:description]
   end
-  
+    
   def work grid
     # true when active gets cells added
     # false when active gets cells deleted
@@ -24,7 +34,7 @@ class Amaze::Algorithm::GrowingTree < Amaze::Algorithm
     active = [grid.random_cell]
     
     while active.any?
-      cell = config.call active
+      cell = strategy.call active
       
       neighbor = cell.neighbors.select {|neighbor| neighbor.links.empty? }.sample
       
@@ -47,6 +57,6 @@ class Amaze::Algorithm::GrowingTree < Amaze::Algorithm
   end
   
   def status
-    "Growing tree (#{@description}) algorithm: #{duration}s"
+    "Growing tree (#{description}) algorithm: #{duration}s"
   end
 end

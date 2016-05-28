@@ -1,6 +1,8 @@
 
 class Amaze::Algorithm::HuntAndKill < Amaze::Algorithm
   
+  register :hk
+  
   def work grid
     
     current = grid.random_cell

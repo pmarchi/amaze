@@ -42,7 +42,7 @@ class Amaze::Script::Options
 
     opts.separator "\nAlgorithm options:"
 
-    opts.on('-a', '--algorithm ALGORITHM', Amaze::Factory.algorithms, 'The algorithm to generate the maze.', "One of #{Amaze::Factory.algorithms.join(', ')}") do |algorithm|
+    opts.on('-a', '--algorithm ALGORITHM', Amaze::Algorithm.all, 'The algorithm to generate the maze.', "One of #{Amaze::Algorithm.all.join(', ')}") do |algorithm|
       options[:algorithm] = algorithm
     end
     opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|

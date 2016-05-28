@@ -1,6 +1,8 @@
 
 class Amaze::Algorithm::Wilson < Amaze::Algorithm
   
+  register :w
+  
   def work grid
     
     # initialize

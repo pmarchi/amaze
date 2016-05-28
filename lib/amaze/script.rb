@@ -176,10 +176,6 @@ class Amaze::Script
     end
   end
   
-  def factory
-    @factory ||= Amaze::Factory.new options[:type]
-  end
-  
   def grid
     @grid ||= Amaze::Grid.create options[:type], *grid_args
   end
@@ -206,7 +202,7 @@ class Amaze::Script
   end
   
   def algorithm
-    @algorithm ||= factory.create_algorithm options[:algorithm]
+    @algorithm ||= Amaze::Algorithm.create options[:algorithm]
   end
   
   def initialize_random_seed

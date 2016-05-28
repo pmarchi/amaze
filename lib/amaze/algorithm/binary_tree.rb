@@ -1,5 +1,7 @@
 
 class Amaze::Algorithm::BinaryTree < Amaze::Algorithm
+  
+  register :bt
 
   def work grid
     count = 0 # visualize

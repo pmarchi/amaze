@@ -1,5 +1,7 @@
 
 class Amaze::Algorithm::Sidewinder < Amaze::Algorithm
+  
+  register :sw
 
   def work grid
     run = []

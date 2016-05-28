@@ -1,16 +1,11 @@
 
 class Amaze::Algorithm::RecursiveBacktracker < Amaze::Algorithm
   
-  def initialize
-    @implementation = :stack
-  end
-  
-  def configure implementation
-    @implementation = implementation
-  end
+  register :rb1, implementation: :stack
+  register :rb2, implementation: :recursion
   
   def work grid, &block
-    case @implementation
+    case options[:implementation]
     when :recursion
       carve [grid.random_cell], &block
     when :stack
@@ -72,6 +67,6 @@ class Amaze::Algorithm::RecursiveBacktracker < Amaze::Algorithm
   end
 
   def status
-    "Recursive Backtracker (#{@implementation}) algorithm: #{duration}s"
+    "Recursive Backtracker (#{options[:implementation]}) algorithm: #{duration}s"
   end
 end

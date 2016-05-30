@@ -2,12 +2,24 @@
 class Amaze::Grid
   extend Amaze::Module::AutoRegisterSubclass
   
-  # The dimension of the amaze
-  attr_reader :rows, :columns
+  # The number of rows
+  attr_reader :rows
+
+  # The number of columns
+  attr_reader :columns
   
   # The grid
   attr_reader :grid
-    
+  
+  # Initializes the grid and configures adjacent cells.
+  #
+  # Call from one of the subclasses.
+  # (see {Amaze::Grid::Ortho}, {Amaze::Grid::Delta}, {Amaze::Grid::Sigma}, {Amaze::Grid::Upsilon}, {Amaze::Grid::Polar})
+  #
+  # @example Amaze::Grid::Ortho.new(10, 16)
+  # @note Amaze::Grid does not implement a concrete tessellation of the grid.
+  # @param rows [Integer] the number of rows
+  # @param columns [Integer] the number of columns  
   def initialize rows, columns
     @rows = rows
     @columns = columns

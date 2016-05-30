@@ -30,32 +30,7 @@ class Amaze::Script
   def run args
     parser.parse!(args)
     
-    # Run the algorithm on the grid
-    if visualize?
-      algorithm.on grid do |stat|
-        # print the maze
-        ascii = Amaze::Formatter::ASCII.create options[:type], grid,
-          ascii_options(path_color: :blue, path_cells: stat.current)
-          
-        puts ascii.render
-        
-        puts stat.info if stat.info
-        sleep algorithm.speed
-        sleep 1 if options[:visualize] == :autopause && stat.pause?
-  
-        # wait for keystroke ?
-        if (options[:visualize] == :pause && stat.pause? || options[:visualize] == :step)
-          case read_char
-          when "\e"
-            break
-          when "r"
-            options[:visualize] = :run
-          end
-        end
-      end
-    else
-      algorithm.on grid
-    end
+    generate_maze
     
     ascii_runtime_options = {}
     image_runtime_options = {}
@@ -90,28 +65,56 @@ class Amaze::Script
       path_length = distance
     end
 
-    # Render the maze, set defaults for missing options
-    if ascii?
-      ascii = Amaze::Formatter::ASCII.create options[:type], grid, ascii_options(ascii_runtime_options)
-      puts ascii.render
-    end
-    
+    render_ascii ascii_runtime_options if ascii?
+
     puts algorithm.status
     puts "Dead ends: #{grid.deadends.size} of #{grid.size} (#{(100.to_f / grid.size * grid.deadends.size).to_i}%)"
     puts "Path length: #{path_length}" if path_length
     puts "Random seed: #{Amaze::Algorithm.random_seed}"
 
-    if image?
-      image = Amaze::Formatter::Image.create options[:type], grid,
-        image_options(image_runtime_options)
-      image.render
-      
-      # TODO: write multiple images with solution and distances
-      #       or a psd file with layers
-      
-      image.write "maze.png"
-      puts "Maze 'maze.png' saved."
+    render_image image_runtime_options if image?
+  end
+  
+  def generate_maze
+    if visualize?
+      algorithm.on grid do |stat|
+        # print the maze
+        ascii = Amaze::Formatter::ASCII.create options[:type], grid,
+          ascii_options(path_color: :blue, path_cells: stat.current)
+          
+        puts ascii.render
+        
+        puts stat.info if stat.info
+        sleep algorithm.speed
+        sleep 1 if options[:visualize] == :autopause && stat.pause?
+  
+        # wait for keystroke ?
+        if (options[:visualize] == :pause && stat.pause? || options[:visualize] == :step)
+          case read_char
+          when "\e"
+            break
+          when "r"
+            options[:visualize] = :run
+          end
+        end
+      end
+    else
+      algorithm.on grid
     end
+  end
+  
+  def render_ascii ascii_runtime_options
+    ascii = Amaze::Formatter::ASCII.create(
+      options[:type], grid, ascii_options(ascii_runtime_options))
+    puts ascii.render
+  end
+  
+  def render_image image_runtime_options
+    image = Amaze::Formatter::Image.create(
+      options[:type], grid, image_options(image_runtime_options))
+    image.render
+    image.write "maze.png"
+    puts "Maze 'maze.png' saved."
   end
     
   def ascii?

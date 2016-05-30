@@ -19,60 +19,38 @@ class Amaze::Script
     parser.options
   end
   
-  def ascii_options runtime_options={}
-    parser.ascii_options.merge runtime_options
+  def ascii_options
+    parser.ascii_options.merge ascii_runtime_options
   end
     
-  def image_options runtime_options={}
-    parser.image_options.merge runtime_options
+  def image_options
+    parser.image_options.merge image_runtime_options
+  end
+  
+  def ascii_runtime_options
+    @ascii_runtime_options ||= {}
+  end
+  
+  def image_runtime_options
+    @image_runtime_options ||= {}
   end
 
   def run args
     parser.parse!(args)
     
     generate_maze
-    
-    ascii_runtime_options = {}
-    image_runtime_options = {}
-    
-    # Calculate the distances from a given start cell
-    if distances?
-      distances = start_cell.distances
-      ascii_runtime_options[:distances] = distances
-      image_runtime_options[:distances] = distances
-    end
 
-    # And the solution to a given end cell
-    if solution?
-      distances = start_cell.distances.path_to finish_cell
-      ascii_runtime_options[:path_cells] = distances.cells
-      image_runtime_options[:path_cells] = distances.cells
-      image_runtime_options[:path_start] = start_cell
-      image_runtime_options[:path_finish] = finish_cell
-      path_length = distances[finish_cell]
-    end
-    
-    if longest?
-      new_start, _ = start_cell.distances.max
-      new_distances = new_start.distances
-      new_finish, distance = new_distances.max
-      distances = new_distances.path_to new_finish
-      image_runtime_options[:distances] = new_distances if distances?
-      ascii_runtime_options[:path_cells] = distances.cells
-      image_runtime_options[:path_cells] = distances.cells
-      image_runtime_options[:path_start] = new_start
-      image_runtime_options[:path_finish] = new_finish
-      path_length = distance
-    end
+    compute_distances
+    path_length = compute_solution || compute_longest_path
 
-    render_ascii ascii_runtime_options if ascii?
+    render_ascii if ascii?
 
     puts algorithm.status
     puts "Dead ends: #{grid.deadends.size} of #{grid.size} (#{(100.to_f / grid.size * grid.deadends.size).to_i}%)"
     puts "Path length: #{path_length}" if path_length
     puts "Random seed: #{Amaze::Algorithm.random_seed}"
 
-    render_image image_runtime_options if image?
+    render_image if image?
   end
   
   def generate_maze
@@ -103,15 +81,63 @@ class Amaze::Script
     end
   end
   
-  def render_ascii ascii_runtime_options
-    ascii = Amaze::Formatter::ASCII.create(
-      options[:type], grid, ascii_options(ascii_runtime_options))
+  def compute_distances
+    return unless options[:distances]
+
+    # Calculate the distances from a given start cell
+    distances = start_cell.distances
+
+    # Set render options
+    ascii_runtime_options[:distances] = distances
+    image_runtime_options[:distances] = distances
+  end
+  
+  def compute_solution
+    return nil unless options[:solution]
+
+    # Calculate the distances from a given start cell
+    # and the solution to a given finish cell
+    distances = start_cell.distances.path_to finish_cell
+
+    # Set render options
+    ascii_runtime_options[:path_cells] = distances.cells
+    image_runtime_options[:path_cells] = distances.cells
+    image_runtime_options[:path_start] = start_cell
+    image_runtime_options[:path_finish] = finish_cell
+    
+    # The length of the path
+    distances[finish_cell]
+  end
+  
+  def compute_longest_path
+    return nil unless options[:longest]
+    
+    # Find the max distance from a given start cell
+    new_start, _ = start_cell.distances.max
+    # Calculate the distances from the previous finish cell
+    new_distances = new_start.distances
+    # Find the new max distance
+    new_finish, distance = new_distances.max
+    distances = new_distances.path_to new_finish
+    
+    # Set render options
+    image_runtime_options[:distances] = new_distances if options[:distances]
+    ascii_runtime_options[:path_cells] = distances.cells
+    image_runtime_options[:path_cells] = distances.cells
+    image_runtime_options[:path_start] = new_start
+    image_runtime_options[:path_finish] = new_finish
+    
+    # The length fo the path
+    distance
+  end
+  
+  def render_ascii
+    ascii = Amaze::Formatter::ASCII.create(options[:type], grid, ascii_options)
     puts ascii.render
   end
   
-  def render_image image_runtime_options
-    image = Amaze::Formatter::Image.create(
-      options[:type], grid, image_options(image_runtime_options))
+  def render_image
+    image = Amaze::Formatter::Image.create(options[:type], grid, image_options)
     image.render
     image.write "maze.png"
     puts "Maze 'maze.png' saved."
@@ -127,18 +153,6 @@ class Amaze::Script
   
   def visualize?
     ascii? && !!options[:visualize]
-  end
-  
-  def distances?
-    !!options[:distances]
-  end
-  
-  def solution?
-    !!options[:solution]
-  end
-  
-  def longest?
-    !!options[:longest]
   end
   
   # TODO: specify a start cell should also work for polar grids

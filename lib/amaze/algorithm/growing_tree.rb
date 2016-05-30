@@ -36,7 +36,7 @@ class Amaze::Algorithm::GrowingTree < Amaze::Algorithm
     while active.any?
       cell = strategy.call active
       
-      neighbor = cell.neighbors.select {|neighbor| neighbor.links.empty? }.sample
+      neighbor = cell.neighbors.select {|n| n.links.empty? }.sample
       
       yield Stat.new(                                  # visualize
         current: active,                               #

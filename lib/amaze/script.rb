@@ -3,6 +3,7 @@ require 'io/console'
 
 class Amaze::Script
   autoload :Options, 'amaze/script/options'
+  autoload :AlgorithmOptions, 'amaze/script/algorithm_options'
   autoload :AsciiOptions, 'amaze/script/ascii_options'
   autoload :ImageOptions, 'amaze/script/image_options'
 
@@ -10,6 +11,7 @@ class Amaze::Script
   
   def parser
     @parser ||= Amaze::Script::Options.new.tap do |p|
+      p.extend Amaze::Script::AlgorithmOptions
       p.extend Amaze::Script::AsciiOptions
       p.extend Amaze::Script::ImageOptions
     end
@@ -17,6 +19,10 @@ class Amaze::Script
   
   def options
     @options ||= parser.options
+  end
+  
+  def algorithm_options
+    @algorithm_options ||= parser.algorithm_options
   end
   
   def ascii_options
@@ -46,31 +52,35 @@ class Amaze::Script
   end
   
   def generate_maze
-    if visualize?
-      algorithm.on grid do |stat|
-        # print the maze
-        ascii = Amaze::Formatter::ASCII.create options[:type], grid,
-          ascii_options.merge(path_color: :blue, path_cells: stat.current)
-          
-        puts ascii.render
-        
-        puts stat.info if stat.info
-        sleep algorithm.speed
-        sleep 1 if options[:visualize] == :autopause && stat.pause?
+    algorithm.on grid do |stat|
+      next unless visualize?
+
+      # render grid
+      ascii_options[:path_cells] = stat.current
+      render_ascii
+
+      # optional wait
+      algorithm_wait stat
+      break if algorithm_options[:break]
+    end
+
+    ascii_options[:path_cells] = nil
+  end
   
-        # wait for keystroke ?
-        if (options[:visualize] == :pause && stat.pause? || options[:visualize] == :step)
-          puts "[SPACE] next | [R] run algorithm | [ESC] stop algorithm"
-          case read_char
-          when "\e"
-            break
-          when "r"
-            options[:visualize] = :run
-          end
-        end
+  def algorithm_wait stat
+    puts stat.info if stat.info
+    sleep algorithm.speed
+    sleep 1 if algorithm_options[:visualize] == :autopause && stat.pause?
+
+    # wait for keystroke ?
+    if (algorithm_options[:visualize] == :pause && stat.pause? || algorithm_options[:visualize] == :step)
+      puts "[SPACE] next | [R] run algorithm | [ESC] stop algorithm"
+      case read_char
+      when "\e"
+        algorithm_options[:break] = true
+      when "r"
+        algorithm_options[:visualize] = :run
       end
-    else
-      algorithm.on grid
     end
   end
   
@@ -136,7 +146,7 @@ class Amaze::Script
   end
   
   def visualize?
-    ascii? && !!options[:visualize]
+    ascii? && !!algorithm_options[:visualize]
   end
   
   # TODO: specify a start cell should also work for polar grids
@@ -201,7 +211,7 @@ class Amaze::Script
   end
   
   def algorithm
-    @algorithm ||= Amaze::Algorithm.create options[:algorithm]
+    @algorithm ||= Amaze::Algorithm.create algorithm_options[:algorithm]
   end
   
   # Reads keypresses from the user including 2 and 3 escape character sequences.

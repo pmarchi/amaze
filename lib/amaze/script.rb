@@ -20,28 +20,20 @@ class Amaze::Script
   end
   
   def ascii_options
-    parser.ascii_options.merge ascii_runtime_options
+    @ascii_options ||= parser.ascii_options
   end
     
   def image_options
-    parser.image_options.merge image_runtime_options
+    @image_options ||= parser.image_options
   end
   
-  def ascii_runtime_options
-    @ascii_runtime_options ||= {}
-  end
-  
-  def image_runtime_options
-    @image_runtime_options ||= {}
-  end
-
   def run args
     parser.parse!(args)
     
     generate_maze
 
     compute_distances
-    path_length = compute_solution || compute_longest_path
+    path_length = compute_path
 
     render_ascii if ascii?
 
@@ -88,47 +80,38 @@ class Amaze::Script
     distances = start_cell.distances
 
     # Set render options
-    ascii_runtime_options[:distances] = distances
-    image_runtime_options[:distances] = distances
+    ascii_options[:distances] = distances
+    image_options[:distances] = distances
   end
   
-  def compute_solution
-    return nil unless options[:solution]
+  def compute_path
+    return nil unless options[:solution] || options[:longest]
+    
+    start = start_cell
+    finish = finish_cell
 
-    # Calculate the distances from a given start cell
-    # and the solution to a given finish cell
-    distances = start_cell.distances.path_to finish_cell
+    distances = start.distances
+
+    if options[:longest]
+      # Find the cell with the max distance from the start cell
+      start, _ = distances.max
+      # Calculate the distances from this new cell ...
+      distances = start.distances
+      # ... and  find the new max distance
+      finish, _ = distances.max
+    end
+    
+    path = distances.path_to(finish).cells
 
     # Set render options
-    ascii_runtime_options[:path_cells] = distances.cells
-    image_runtime_options[:path_cells] = distances.cells
-    image_runtime_options[:path_start] = start_cell
-    image_runtime_options[:path_finish] = finish_cell
-    
+    image_runtime_options[:distances] = distances if options[:distances]
+    ascii_options[:path_cells] = path
+    image_options[:path_cells] = path
+    image_options[:path_start] = start
+    image_options[:path_finish] = finish
+
     # The length of the path
-    distances[finish_cell]
-  end
-  
-  def compute_longest_path
-    return nil unless options[:longest]
-    
-    # Find the max distance from a given start cell
-    new_start, _ = start_cell.distances.max
-    # Calculate the distances from the previous finish cell
-    new_distances = new_start.distances
-    # Find the new max distance
-    new_finish, distance = new_distances.max
-    distances = new_distances.path_to new_finish
-    
-    # Set render options
-    image_runtime_options[:distances] = new_distances if options[:distances]
-    ascii_runtime_options[:path_cells] = distances.cells
-    image_runtime_options[:path_cells] = distances.cells
-    image_runtime_options[:path_start] = new_start
-    image_runtime_options[:path_finish] = new_finish
-    
-    # The length fo the path
-    distance
+    distances[finish]
   end
   
   def render_ascii

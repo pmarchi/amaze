@@ -18,8 +18,6 @@ class Amaze::Script::Options
       grid_size: [4],
       distances: false,
       formats: [:ascii],
-      algorithm: :gt1,
-      visualize: false,
     }
   end
   
@@ -38,19 +36,6 @@ class Amaze::Script::Options
     end
     opts.on('-s', '--shape SHAPE', Amaze::Shape.all, "One of #{Amaze::Shape.all.join(', ')}.", "Shapes won't work on polar mazes.") do |shape|
       options[:shape] = shape
-    end
-
-    opts.separator "\nAlgorithm options:"
-
-    opts.on('-a', '--algorithm ALGORITHM', Amaze::Algorithm.all, 'The algorithm to generate the maze.', "One of #{Amaze::Algorithm.all.join(', ')}") do |algorithm|
-      options[:algorithm] = algorithm
-    end
-    opts.on('-S', '--seed SEED', Integer, 'Set random seed') do |seed|
-      Amaze::Algorithm.random_seed = seed
-    end
-    visualization_modes = %i( run autopause pause step )
-    opts.on('-v', '--visualize [MODE]', visualization_modes, 'Visualize the progress of the algorithm', "One of #{visualization_modes.join(', ')}") do |mode|
-      options[:visualize] = mode || :run
     end
 
     opts.separator "\nSolution options:"

@@ -16,7 +16,7 @@ class Amaze::Script
   end
   
   def options
-    parser.options
+    @options ||= parser.options
   end
   
   def ascii_options
@@ -50,7 +50,7 @@ class Amaze::Script
       algorithm.on grid do |stat|
         # print the maze
         ascii = Amaze::Formatter::ASCII.create options[:type], grid,
-          ascii_options(path_color: :blue, path_cells: stat.current)
+          ascii_options.merge(path_color: :blue, path_cells: stat.current)
           
         puts ascii.render
         
@@ -60,6 +60,7 @@ class Amaze::Script
   
         # wait for keystroke ?
         if (options[:visualize] == :pause && stat.pause? || options[:visualize] == :step)
+          puts "[SPACE] next | [R] run algorithm | [ESC] stop algorithm"
           case read_char
           when "\e"
             break
@@ -104,11 +105,11 @@ class Amaze::Script
     path = distances.path_to(finish).cells
 
     # Set render options
-    image_runtime_options[:distances] = distances if options[:distances]
     ascii_options[:path_cells] = path
     image_options[:path_cells] = path
     image_options[:path_start] = start
     image_options[:path_finish] = finish
+    image_options[:distances] = distances if options[:distances]
 
     # The length of the path
     distances[finish]
@@ -205,17 +206,18 @@ class Amaze::Script
   
   # Reads keypresses from the user including 2 and 3 escape character sequences.
   def read_char
-    STDIN.echo = false
-    STDIN.raw!
-
-    input = STDIN.getc.chr
-    if input == "\e" then
-      input << STDIN.read_nonblock(3) rescue nil
-      input << STDIN.read_nonblock(2) rescue nil
+    begin
+      STDIN.echo = false
+      STDIN.raw!
+      input = STDIN.getc.chr
+      if input == "\e" then
+        input << STDIN.read_nonblock(3) rescue nil
+        input << STDIN.read_nonblock(2) rescue nil
+      end
+    ensure
+      STDIN.echo = true
+      STDIN.cooked!
     end
-  ensure
-    STDIN.echo = true
-    STDIN.cooked!
     input
   end
 end

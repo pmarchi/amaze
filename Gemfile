@@ -9,4 +9,7 @@ end
 
 group :development do
   gem "guard-rspec", require: false
+  gem 'rb-inotify', :require => false
+  gem 'rb-fsevent', :require => false
+  gem 'terminal-notifier-guard'
 end

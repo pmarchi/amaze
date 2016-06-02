@@ -114,7 +114,7 @@ class Amaze::Formatter::Image
   end
   
   def gradient
-    options[:gradient_map]
+    Amaze::Gradient.load options[:gradient]
   end
   
   def self.colors

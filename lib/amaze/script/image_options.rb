@@ -12,7 +12,7 @@ module Amaze::Script::ImageOptions
       background_color: 'white',
       show_grid: false,
       hide_walls: false,
-      gradient_map: Amaze::GradientMap.create(options[:gradient_map] || :warm).map,
+      gradient: :cold,
     }
   end
 
@@ -48,8 +48,8 @@ module Amaze::Script::ImageOptions
     opts.on('--hide-walls', "Don't render the walls.") do
       image_options[:hide_walls] = true
     end
-    opts.on('--gradient-map NAME', Amaze::GradientMap.all, 'The gradient map to use for the distances color.', "One of #{Amaze::GradientMap.all.join(', ')}") do |map|
-      image_options[:gradient_map] = map
+    opts.on('--gradient NAME|FILE', String, 'The gradient map to use for the distances color.', "One of #{Amaze::Gradient.all.join(', ')}", "or a .yaml or a Photoshop .grd file") do |name|
+      image_options[:gradient] = name
     end
     opts.on('--all-image-colors', 'Print all the supported image colors.') do
       puts Amaze::Formatter::Image.colors.join(', ')

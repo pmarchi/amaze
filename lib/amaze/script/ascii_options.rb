@@ -25,9 +25,12 @@ module Amaze::Script::AsciiOptions
     opts.on('--ascii-distances-color NAME', Amaze::Formatter::ASCII.colors, 'The color of the distances.') do |color|
       ascii_options[:distances_color] = color
     end
-    opts.on('--all-ascii-colors', 'Print all the supported ascii colors.') do
+    opts.on('--all-ascii-colors', 'Print all supported ascii colors.') do
       puts Amaze::Formatter::ASCII.colors.map {|n| n.to_s.color(n) }.join(' ')
       exit 0
+    end
+    opts.on('--disable-ascii-colors', "Don't colorize ASCII mazes.") do
+      Rainbow.enabled = false
     end
     opts.separator ""
   end

@@ -38,6 +38,6 @@ class Amaze::Gradient
   end
   
   def self.all
-    %w( blue cold gold green monochrome red warm cobalt-iron-3 )
+    %w( blue cold gold green monochrome red warm )
   end
 end

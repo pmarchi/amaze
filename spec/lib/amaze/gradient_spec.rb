@@ -50,7 +50,7 @@ describe Amaze::Gradient do
   
   describe ".all" do
     it "returns a list of all built-in gradients" do
-      expect(described_class.all).to include(*%w( blue cold gold green monochrome red warm cobalt-iron-3 ))
+      expect(described_class.all).to include(*%w( blue cold gold green monochrome red warm ))
     end
   end
 end

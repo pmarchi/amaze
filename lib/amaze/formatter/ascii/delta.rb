@@ -42,7 +42,7 @@ class Amaze::Formatter::ASCII::Delta < Amaze::Formatter::ASCII
       
     end
   end
-
+  
   def draw_content cell
     x0, y0 = coord cell
     
@@ -65,6 +65,8 @@ class Amaze::Formatter::ASCII::Delta < Amaze::Formatter::ASCII
     end
   end
   
+  alias_method :draw_distances, :draw_content
+
   def draw_path cell
     x0, y0 = coord cell
     

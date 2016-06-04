@@ -33,6 +33,8 @@ class Amaze::Formatter::ASCII::Sigma < Amaze::Formatter::ASCII
     end
   end
 
+  alias_method :draw_distances, :draw_content
+
   def draw_path cell
     x, y = coord cell, :center
     # north-south

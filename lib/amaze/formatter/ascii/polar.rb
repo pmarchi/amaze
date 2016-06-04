@@ -35,6 +35,8 @@ class Amaze::Formatter::ASCII::Polar < Amaze::Formatter::ASCII
     end
   end
 
+  alias_method :draw_distances, :draw_content
+
   def draw_path cell
     # draw horizontal connections in cells with more than one outward path
     if outward_subdivided?(cell) && ! path?(:cw, cell) && ! path?(:ccw, cell)

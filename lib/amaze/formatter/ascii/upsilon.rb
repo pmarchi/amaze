@@ -66,6 +66,8 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     end
   end
 
+  alias_method :draw_distances, :draw_content
+
   def draw_path cell
     _, x1, x2, _, _, y1, y2, _ = coord cell
     

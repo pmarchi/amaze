@@ -18,19 +18,35 @@ class Amaze::Formatter::ASCII
   def char
     @char ||= Array.new(char_array_height) do |x|
       Array.new(char_array_width) do |y|
-        clear
+        blank
       end
     end
   end  
 
   def render
+    render_cells
+    render_distances if distances
+    render_path
+
+    ansi_clear + char.map{|l| l.join }.join("\n")
+  end
+  
+  def render_cells
     grid.each_cell do |cell|
       draw_cell cell
-      draw_content cell if distances
+    end
+  end
+  
+  def render_distances
+    grid.each_cell do |cell|
+      draw_distances cell
+    end
+  end
+  
+  def render_path
+    grid.each_cell do |cell|
       draw_path cell if path_cell? cell
     end
-    
-    ansi_clear + char.map{|l| l.join }.join("\n")
   end
   
   def path? direction, cell
@@ -41,7 +57,7 @@ class Amaze::Formatter::ASCII
     "\e[H\e[2J"
   end
   
-  def clear
+  def blank
     ' '
   end
   

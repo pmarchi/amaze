@@ -12,3 +12,6 @@ end
 def read_fixture *part
   File.read(fixture *part)
 end
+
+require 'rainbow'
+Rainbow.enabled = false

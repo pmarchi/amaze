@@ -2,63 +2,43 @@
 class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
   
   def draw_cell cell
-    left, right, top, bottom = coord cell
+    x0, y0 = coord cell
+
+    # north & south
+    h_wall.each_with_index do |c,i|
+      char[y0][x0+i] = c.color(grid_color) unless cell.linked_to?(:north)
+      char[y0+dy][x0+i] = c.color(grid_color) unless cell.linked_to?(:south)
+    end
     
-    # corners
-    char[top][left] = corner.color(grid_color)
-    char[top][right] = corner.color(grid_color)
-    char[bottom][left] = corner.color(grid_color)
-    char[bottom][right] = corner.color(grid_color)
-    # top & bottom
-    (left+1).upto(right-1) do |i|
-      # top
-      char[top][i] = h.color(grid_color) unless cell.linked_to?(:north)
-      # bottom
-      char[bottom][i] = h.color(grid_color) unless cell.linked_to?(:south)
-    end
-    # left & right
-    (top+1).upto(bottom-1) do |i|
-      # left
-      char[i][left] = v.color(grid_color) unless cell.linked_to?(:west)
-      # right
-      char[i][right] = v.color(grid_color) unless cell.linked_to?(:east)
+    # east & west
+    v_wall.each_with_index do |c,i|
+      char[y0+i][x0] = c.color(grid_color) unless cell.linked_to?(:west)
+      char[y0+i][x0+dx] = c.color(grid_color) unless cell.linked_to?(:east)
     end
   end
+  
+  def draw_distances cell
+    x0, _ = coord cell
+    _, my = center_coord cell
 
-  def draw_content cell
-    left, _, top, _ = coord cell
-
-    my = top + cell_size / 2 + 1
-    distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[my][left+1+i] = c.color(*distance_color(cell))
+    distance(cell).center(dx-1).chars.each_with_index do |c,i|
+      char[my][x0+1+i] = c.color(*distance_color(cell))
     end
   end
-
+  
   def draw_path cell
-    left, right, top, bottom = coord cell
+    mx, my = center_coord cell
 
-    mx = left + (cell_size * 3 + 1) / 2
-    my = top + cell_size / 2 + 1
+    # north-south
+    v_path.each_with_index do |c,i|
+      char[my+i+1][mx] = c.color(path_color)
+    end if path?(:south, cell)
     
-    # TODO: simplify paths, draw only north-south and east-west
-    
-    # to north
-    top.upto(my-1) do |i|
-      char[i][mx] = v.color(path_color) if path?(:north, cell)
-    end if top <= my-1
-    # to east
-    (mx+1).upto(right) do |i|
-      char[my][i] = h.color(path_color) if path?(:east, cell)
-    end if mx+1 <= right
-    # to south
-    (my+1).upto(bottom) do |i|
-      char[i][mx] = v.color(path_color) if path?(:south, cell)
-    end if my+1 <= bottom
-    # to west
-    left.upto(mx-1) do |i|
-      char[my][i] = h.color(path_color) if path?(:west, cell)
-    end if left <= mx-1
-    # center, select the char depeding on how many paths cross the cell
+    # east-west
+    h_path.each_with_index do |c,i|
+      char[my][mx+i+1] = c.color(path_color)
+    end if path?(:east, cell)
+
     center_char = center
     center_char = v if path?(:north, cell) && path?(:south, cell)
     center_char = h if path?(:east, cell) && path?(:west, cell)
@@ -66,25 +46,47 @@ class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
     char[my][mx] = center_char.color(path_color)
   end
   
-  # left, right, top, bottom
+  # x0, y0
   def coord cell
-    [x(cell.column), x(cell.column+1), y(cell.row), y(cell.row+1)]
+    [cell.column * dx, cell.row * dy]
   end
   
-  def x column
-    (cell_size * 3 + 1) * column
+  # mx, my
+  def center_coord cell
+    x0, y0 = coord cell
+    [x0 + dx / 2, y0 + dy / 2]
   end
   
-  def y row
-    (cell_size + 1) * row
+  def dx
+    cell_size * 3 + 1
+  end
+  
+  def dy
+    cell_size + 1
   end
   
   def char_array_width
-    x(grid.columns) + 1
+    grid.columns * dx + 1
   end
   
   def char_array_height
-    y(grid.rows) + 1
+    grid.rows * dy + 1
+  end
+  
+  def h_wall
+    (corner + h * (dx-1) + corner).chars
+  end
+  
+  def v_wall
+    (corner + v * (dy-1) + corner).chars
+  end
+  
+  def h_path
+    (h * (dx-1)).chars
+  end
+  
+  def v_path
+    (v * (dy-1)).chars
   end
   
   def h

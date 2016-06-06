@@ -2,61 +2,39 @@
 class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   
   def draw_cell cell
-    x0, x1, x2, x3, y0, y1, y2, y3 = coord cell
+    x0, y0 = coord cell
     
-    if (cell.row+cell.column).even?
-      # draw octo cell
-      # corners
-      char[y0][x1] = corner.color(grid_color)
-      char[y0][x2] = corner.color(grid_color)
-      char[y1][x0] = corner.color(grid_color)
-      char[y1][x3] = corner.color(grid_color)
-      char[y2][x0] = corner.color(grid_color)
-      char[y2][x3] = corner.color(grid_color)
-      char[y3][x1] = corner.color(grid_color)
-      char[y3][x2] = corner.color(grid_color)
-      1.upto(cell_size) do |i|
-        # northeast
-        char[y0+i][x2+i] = ne.color(grid_color) unless cell.linked_to?(:northeast)
-        # southeast
-        char[y2+i][x3-i] = se.color(grid_color) unless cell.linked_to?(:southeast)
-        # southwest
-        char[y2+i][x0+i] = sw.color(grid_color) unless cell.linked_to?(:southwest)
-        # northwest
-        char[y0+i][x1-i] = nw.color(grid_color) unless cell.linked_to?(:northwest)
-        # east
-        char[y1+i][x3] = v.color(grid_color) unless cell.linked_to?(:east)
-        # west
-        char[y1+i][x0] = v.color(grid_color) unless cell.linked_to?(:west)
+    if (cell.row + cell.column).even?
+      # octo cell
+      df_wall.each_with_index do |c,i|
+        char[y0+oy-i][x0+i] = c.color(grid_color) unless cell.linked_to?(:northwest)
+        char[y0+dy+oy-i][x0+dx+i] = c.color(grid_color) unless cell.linked_to?(:southeast)
       end
-      1.upto(cell_size*3) do |i|
-        # north
-        char[y0][x1+i] = h.color(grid_color) unless cell.linked_to?(:north)
-        # south
-        char[y3][x1+i] = h.color(grid_color) unless cell.linked_to?(:south)
+
+      db_wall.each_with_index do |c,i|
+        char[y0+i][x0+dx+i] = c.color(grid_color) unless cell.linked_to?(:northeast)
+        char[y0+dy+i][x0+i] = c.color(grid_color) unless cell.linked_to?(:southwest)
       end
+
+      y1, y2 = y0, y0 + dy + oy
+      x1, x2 = x0, x0 + dx + ox
     else
-      # draw square cell
-      # corners
-      char[y1][x1] = corner.color(grid_color)
-      char[y1][x2] = corner.color(grid_color)
-      char[y2][x1] = corner.color(grid_color)
-      char[y2][x2] = corner.color(grid_color)
-      1.upto(cell_size) do |i|
-        # east
-        char[y1+i][x2] = v.color(grid_color) unless cell.linked_to?(:east)
-        # west
-        char[y1+i][x1] = v.color(grid_color) unless cell.linked_to?(:west)
-      end
-      1.upto(cell_size*3) do |i|
-        # north
-        char[y1][x1+i] = h.color(grid_color) unless cell.linked_to?(:north)
-        # south
-        char[y2][x1+i] = h.color(grid_color) unless cell.linked_to?(:south)
-      end
+      # square cell
+      y1, y2 = y0 + oy, y0 + dy
+      x1, x2 = x0 + ox, x0 + dx
+    end
+
+    h_wall.each_with_index do |c,i|
+      char[y1][x0+ox+i] = c.color(grid_color) unless cell.linked_to?(:north)
+      char[y2][x0+ox+i] = c.color(grid_color) unless cell.linked_to?(:south)
+    end
+
+    v_wall.each_with_index do |c,i|
+      char[y0+oy+i][x1] = c.color(grid_color) unless cell.linked_to?(:west)
+      char[y0+oy+i][x2] = c.color(grid_color) unless cell.linked_to?(:east)
     end
   end
-
+  
   def draw_content cell
     _, x1, _, _, _, y1, y2, _ = coord cell
     
@@ -122,7 +100,7 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   end
   
   # left, right, top, bottom
-  def coord cell
+  def coord2 cell
     x0 = x(cell.column)
     x1 = x0 + cell_size + 1
     x2 = x1 + cell_size * 3 + 1
@@ -132,6 +110,11 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     y2 = y1 + cell_size + 1
     y3 = y2 + cell_size + 1
     [x0, x1, x2, x3, y0, y1, y2, y3]
+  end
+
+  # x0, y0
+  def coord cell
+    [cell.column * dx, cell.row * dy]
   end
   
   def x column
@@ -144,12 +127,42 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     (cell_size * 2 + 2) * row
   end
   
+  def ox
+    cell_size + 1
+  end
+  
+  alias_method :oy, :ox
+  
+  def dx
+    cell_size * 4 + 2
+  end
+  
+  def dy
+    cell_size * 2 + 2
+  end
+  
   def char_array_width
-    x(grid.columns) + cell_size + 2
+    grid.columns * dx + ox + 1
   end
   
   def char_array_height
-    y(grid.rows) + cell_size + 2
+    grid.rows * dy + oy + 1
+  end
+  
+  def h_wall
+    (corner + h * cell_size * 3 + corner).chars
+  end
+  
+  def v_wall
+    (corner + v * cell_size + corner).chars
+  end
+  
+  def df_wall
+    (corner + se * cell_size + corner).chars
+  end
+  
+  def db_wall
+    (corner + ne * cell_size + corner).chars
   end
   
   def h

@@ -20,13 +20,13 @@ describe Amaze::Formatter::ASCII::Upsilon do
   def prepare_path grid
     [
       grid[0,0], 
-      grid[0,1], 
-      grid[0,2], 
-      grid[1,0], 
       grid[1,1], 
-      grid[2,0], 
+      grid[0,2], 
+      grid[1,2], 
+      grid[2,2], 
       grid[2,1], 
-      grid[2,2],
+      grid[2,0], 
+      grid[1,0],
     ]
   end
 
@@ -58,33 +58,33 @@ describe Amaze::Formatter::ASCII::Upsilon do
           formatter.render_cells
         end
       
-        it "draws ascii grid" do
+        it "draws the ascii grid" do
           compare_ascii formatter.char, reference_grid
         end
       end
       
-      # context "render_distances" do
-      #   let(:distances) { grid[0,0].distances }
-      #   let(:options) { {cell_size: cell_size, distances: distances} }
-      #   before(:example) do
-      #     formatter.render_distances
-      #   end
-      #
-      #   it "draws the distances inside the cells" do
-      #     compare_ascii formatter.char, reference_distances
-      #   end
-      # end
+      context "#render_distances" do
+        let(:distances) { grid[0,0].distances }
+        let(:options) { {cell_size: cell_size, distances: distances} }
+        before(:example) do
+          formatter.render_distances
+        end
+
+        it "writes the distances inside the cells" do
+          compare_ascii formatter.char, reference_distances
+        end
+      end
       
-      # context "#render_path" do
-      #   let(:options) { {cell_size: cell_size, path_cells: path} }
-      #   before(:example) do
-      #     formatter.render_path
-      #   end
-      #
-      #   it "draws the path through the maze" do
-      #     compare_ascii formatter.char, reference_path
-      #   end
-      # end
+      context "#render_path" do
+        let(:options) { {cell_size: cell_size, path_cells: path} }
+        before(:example) do
+          formatter.render_path
+        end
+
+        it "draws the path through the maze" do
+          compare_ascii formatter.char, reference_path
+        end
+      end
     end
   end
 end

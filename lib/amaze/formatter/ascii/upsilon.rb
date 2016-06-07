@@ -35,96 +35,48 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     end
   end
   
-  def draw_content cell
-    _, x1, _, _, _, y1, y2, _ = coord cell
-    
-    y = y1 + (y2 - y1) / 2
+  def draw_distances cell
+    x0, _ = coord cell
+    _, my = center_coord cell
     distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[y][x1+1+i] = c.color(*distance_color(cell))
+      char[my][x0+ox+i+1] = c.color(*distance_color(cell))
     end
   end
-
-  alias_method :draw_distances, :draw_content
 
   def draw_path cell
-    _, x1, x2, _, _, y1, y2, _ = coord cell
-    
-    # middle of cell
-    mx0 = (x1 + x2) / 2
-    my0 = (y1 + y2) / 2
-    
-    # delta to middle of neighbor cell
-    dx = cell_size * 4 + 2
-    dy = cell_size * 2 + 2
-    
+    mx, my = center_coord cell
+
     # north-south
-    1.upto(dy-1) do |i|
-      char[my0+i][mx0] = v.color(path_color)
+    v_path.each_with_index do |c,i|
+      char[my+i][mx] = c.color(path_color)
     end if path?(:south, cell)
+
     # west-east
-    1.upto(dx-1) do |i|
-      char[my0][mx0+i] = h.color(path_color)
+    h_path.each_with_index do |c,i|
+      char[my][mx+i] = c.color(path_color)
     end if path?(:east, cell)
     
-    if (cell.column+cell.row).even?
-      # northwest-southeast
-      if path?(:southeast, cell)
-        mx1 = mx0 + dx / 2
-        my1 = my0 + dy / 2
+    return unless (cell.column+cell.row).even?
 
-        char[my1][mx1] = center.color(path_color)
-        1.upto(cell_size) do |i|
-          char[my0+i][mx0+i*2-1] = pnwse1.color(path_color)
-          char[my0+i][mx0+i*2] = pnwse2.color(path_color)
-          char[my1+i][mx1+i*2-1] = pnwse1.color(path_color)
-          char[my1+i][mx1+i*2] = pnwse2.color(path_color)
-        end
-      end
-      # northeast-southwest
-      if path?(:southwest, cell)
-        mx1 = mx0 - dx / 2
-        my1 = my0 + dy / 2
-
-        char[my1][mx1] = center.color(path_color)
-        1.upto(cell_size) do |i|
-          char[my0+i][mx0-i*2+1] = pswne1.color(path_color)
-          char[my0+i][mx0-i*2] = pswne2.color(path_color)
-          char[my1+i][mx1-i*2+1] = pswne1.color(path_color)
-          char[my1+i][mx1-i*2] = pswne2.color(path_color)
-        end
-      end
-    end
-
-    # center
-    char[my0][mx0] = center.color(path_color)
+    # northwest-southeast
+    db_path.each_with_index do |c,i|
+      char[my+db_path_i[i]][mx+i] = c.color(path_color)
+    end if path?(:southeast, cell)
+    
+    # northeast-southwest
+    df_path.each_with_index do |c,i|
+      char[my+df_path_i[i]][mx-i] = c.color(path_color)
+    end if path?(:southwest, cell)
   end
   
-  # left, right, top, bottom
-  def coord2 cell
-    x0 = x(cell.column)
-    x1 = x0 + cell_size + 1
-    x2 = x1 + cell_size * 3 + 1
-    x3 = x2 + cell_size + 1
-    y0 = y(cell.row)
-    y1 = y0 + cell_size + 1
-    y2 = y1 + cell_size + 1
-    y3 = y2 + cell_size + 1
-    [x0, x1, x2, x3, y0, y1, y2, y3]
-  end
-
   # x0, y0
   def coord cell
     [cell.column * dx, cell.row * dy]
   end
   
-  def x column
-    # x0 for octo cell
-    (cell_size * 4 + 2) * column
-  end
-  
-  def y row
-    # y0 for octo cell
-    (cell_size * 2 + 2) * row
+  def center_coord cell
+    x0, y0 = coord cell
+    [x0 + (dx + ox) / 2, y0 + (dy + oy) / 2]
   end
   
   def ox
@@ -158,12 +110,35 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   end
   
   def df_wall
-    (corner + se * cell_size + corner).chars
+    (corner + df * cell_size + corner).chars
   end
   
   def db_wall
-    (corner + ne * cell_size + corner).chars
+    (corner + db * cell_size + corner).chars
   end
+  
+  def h_path
+    (center + h * (dx-1) + center).chars
+  end
+  
+  def v_path
+    (center + v * (dy-1) + center).chars
+  end
+  
+  def df_path
+    (center + dfp * cell_size + center + dfp * cell_size + center).chars
+  end
+  
+  def db_path
+    (center + dbp * cell_size + center + dbp * cell_size + center).chars
+  end
+  
+  def df_path_i
+    o = cell_size + 1
+    [0, (1..cell_size).map{|i| [i,i,i+o,i+o] }, o, o+o].flatten.sort
+  end
+  
+  alias_method :db_path_i, :df_path_i
   
   def h
     '-'
@@ -173,31 +148,22 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     '|'
   end
   
-  def ne
-    '\\'
-  end
-  
-  def se
+  def df
     '/'
   end
   
-  alias_method :sw, :ne
-  alias_method :nw, :se
-  
-  def pnwse1
-    '`'
+  def db
+    '\\'
   end
   
-  def pnwse2
-    '.'
+  def dfp
+    '´.'
   end
   
-  def pswne1
-    '´'
+  def dbp
+    '`.'
   end
   
-  alias_method :pswne2, :pnwse2
-
   def center
     '∙'
   end
@@ -206,91 +172,3 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     '+'
   end
 end
-
-__END__
-
-     x           y
-c1   0  6  12    4   8  12      4  4  2  
-c2   0 10  20    6  12  18      8  6  4
-c3   0 14  28    8  16  24      12 8  6
-
-  +---+       +---+       +---+      
- /     \     /     \     /     \     
-+       +---+       +---+       +---+
-|   ∙-----∙ |   ∙   |   |       |   |
-+    `. +---+ .´|   +---+       +---+
- \     ∙     ∙  |  /     \     /     \
-  +---+ `. .´ + | +       +---+       +
-  |   |   ∙   | ∙ |       |   |       |
-  +---+       +---+       +---+       +
- /     \     /     \     /     \     /
-+       +---+       +---+       +---+
-|       |   |       |   |       |   |
-+       +---+       +---+       +---+
- \     /     \     /     \     /     \
-  +---+       +---+       +---+       +
-  |   |       |   |       |   |       |
-  +---+       +---+       +---+       +
- /     \     /     \     /     \     /
-+       +---+       +---+       +---+
-|       |   |       |   |       |   |
-+       +---+       +---+       +---+
- \     /     \     /     \     /     
-  +---+       +---+       +---+      
-
-   +------+            +------+            +------+      
-  /        \          /        \          /        \     
- /          \        /          \        /          \     
-+            +------+            +------+            +------+
-|     ∙---------∙   |     ∙      |      |            |      |
-|      `.           |   .´|      |      |            |      |
-+        `.  +------+ .´  |      +------+            +------+
- \         ∙         ∙    |     /        \          /        \ 
-  \         `.     .´     |    /          \        /          \
-   +------+   `. .´    +  |   +            +------+            +
-   |      |     ∙      |  ∙   |            |      |            |
-   |      |            |      |            |      |            |
-   +------+            +------+            +------+            +
-  /        \          /        \          /        \          /
- /          \        /          \        /          \        /
-+            +------+            +------+            +------+
-|            |      |            |      |            |      |
-|            |      |            |      |            |      |
-+            +------+            +------+            +------+
- \          /        \          /        \          /        \ 
-  \        /          \        /          \        /          \
-   +------+            +------+            +------+            +
-   |      |            |      |            |      |            |
-   |      |            |      |            |      |            |
-   +------+            +------+            +------+            +
-  /        \          /        \          /        \          /
- /          \        /          \        /          \        /
-+            +------+            +------+            +------+
-|            |      |            |      |            |      |
-|            |      |            |      |            |      |
-+            +------+            +------+            +------+
- \          /        \          /        \          /
-  \        /          \        /          \        /
-   +------+            +------+            +------+
-
-    +---------+                 +---------+                 +---------+      
-   /           \               /           \               /           \     
-  /             \             /             \             /             \     
- /               \           /               \           /               \    
-+                 +---------+                 +---------+                 +---------+
-|                           |                 |         |                 |         |
-|        ∙-------------∙    |        ∙        |         |                 |         |
-|         `.                |      .´|        |         |                 |         |
-+           `.    +---------+    .´  |        +---------+                 +---------+
- \            `.               .´    |       /           \               /           \ 
-  \             ∙             ∙      |      /             \             /             \ 
-   \             `.         .´       |     /               \           /               \
-    +---------+    `.     .´    +    |    +                 +---------+                 +
-    |         |      `. .´      |    |    |                 |         |
-    |         |        ∙        |    ∙    |                 |         |
-    |         |                 |         |                 |         |
-    +---------+                 +---------+                 +---------+      
-   /           \               /           \               /           \     
-  /             \             /             \             /             \     
- /               \           /               \           /               \    
-+                 +---------+                 +---------+                 +---------+

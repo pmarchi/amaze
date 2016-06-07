@@ -1,5 +1,6 @@
 
 class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
+  include Amaze::Formatter::ASCII::SquareHelper
   
   def draw_cell cell
     x0, y0 = coord cell
@@ -30,20 +31,16 @@ class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
     mx, my = center_coord cell
 
     # north-south
-    v_path.each_with_index do |c,i|
+    v_path[1..-1].each_with_index do |c,i|
       char[my+i+1][mx] = c.color(path_color)
     end if path?(:south, cell)
     
     # east-west
-    h_path.each_with_index do |c,i|
+    h_path[1..-1].each_with_index do |c,i|
       char[my][mx+i+1] = c.color(path_color)
     end if path?(:east, cell)
 
-    center_char = center
-    center_char = v if path?(:north, cell) && path?(:south, cell)
-    center_char = h if path?(:east, cell) && path?(:west, cell)
-    center_char = corner if [:north, :east, :south, :west].count{|d| path?(d, cell) } >= 3
-    char[my][mx] = center_char.color(path_color)
+    char[my][mx] = center_char(cell).color(path_color)
   end
   
   # x0, y0
@@ -55,6 +52,13 @@ class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
   def center_coord cell
     x0, y0 = coord cell
     [x0 + dx / 2, y0 + dy / 2]
+  end
+  
+  def center_char cell
+    return corner if [:north, :east, :south, :west].count{|d| path?(d, cell) } >= 3
+    return v if path?(:north, cell) && path?(:south, cell)
+    return h if path?(:east, cell) && path?(:west, cell)
+    center
   end
   
   def dx
@@ -71,37 +75,5 @@ class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
   
   def char_array_height
     grid.rows * dy + 1
-  end
-  
-  def h_wall
-    (corner + h * (dx-1) + corner).chars
-  end
-  
-  def v_wall
-    (corner + v * (dy-1) + corner).chars
-  end
-  
-  def h_path
-    (h * (dx-1)).chars
-  end
-  
-  def v_path
-    (v * (dy-1)).chars
-  end
-  
-  def h
-    '-'
-  end
-  
-  def v
-    '|'
-  end
-  
-  def center
-    '∙'
-  end
-    
-  def corner
-    '+'
   end
 end

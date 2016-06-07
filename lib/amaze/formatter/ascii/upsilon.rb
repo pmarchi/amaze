@@ -1,5 +1,6 @@
 
 class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
+  include Amaze::Formatter::ASCII::SquareHelper
   
   def draw_cell cell
     x0, y0 = coord cell
@@ -101,28 +102,12 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     grid.rows * dy + oy + 1
   end
   
-  def h_wall
-    (corner + h * cell_size * 3 + corner).chars
-  end
-  
-  def v_wall
-    (corner + v * cell_size + corner).chars
-  end
-  
   def df_wall
     (corner + df * cell_size + corner).chars
   end
   
   def db_wall
     (corner + db * cell_size + corner).chars
-  end
-  
-  def h_path
-    (center + h * (dx-1) + center).chars
-  end
-  
-  def v_path
-    (center + v * (dy-1) + center).chars
   end
   
   def df_path
@@ -140,14 +125,6 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   
   alias_method :db_path_i, :df_path_i
   
-  def h
-    '-'
-  end
-  
-  def v
-    '|'
-  end
-  
   def df
     '/'
   end
@@ -162,13 +139,5 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   
   def dbp
     '`.'
-  end
-  
-  def center
-    '∙'
-  end
-    
-  def corner
-    '+'
   end
 end

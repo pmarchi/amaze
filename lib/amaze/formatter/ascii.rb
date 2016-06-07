@@ -105,6 +105,7 @@ class Amaze::Formatter::ASCII
   end
 end
 
+require 'amaze/formatter/ascii/square_helper'
 require 'amaze/formatter/ascii/delta'
 require 'amaze/formatter/ascii/ortho'
 require 'amaze/formatter/ascii/sigma'

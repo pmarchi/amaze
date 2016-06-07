@@ -18,13 +18,10 @@ class Amaze::Formatter::ASCII::Ortho < Amaze::Formatter::ASCII
     end
   end
   
-  def draw_distances cell
-    x0, _ = coord cell
-    _, my = center_coord cell
-
-    distance(cell).center(dx-1).chars.each_with_index do |c,i|
-      char[my][x0+1+i] = c.color(*distance_color(cell))
-    end
+  def draw_distance_coord cell
+    x, _ = coord cell
+    _, y = center_coord cell
+    [x+1, y, dx-1]
   end
   
   def draw_path cell

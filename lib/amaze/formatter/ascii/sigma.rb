@@ -26,14 +26,10 @@ class Amaze::Formatter::ASCII::Sigma < Amaze::Formatter::ASCII
     end
   end
   
-  def draw_content cell
+  def draw_distance_coord cell
     x, y = coord cell
-    distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[y+cell_size][x+cell_size+i] = c.color(*distance_color(cell))
-    end
+    [x+cell_size, y+cell_size, cell_size * 3]
   end
-
-  alias_method :draw_distances, :draw_content
 
   def draw_path cell
     x, y = coord cell, :center

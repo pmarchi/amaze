@@ -39,7 +39,11 @@ class Amaze::Formatter::ASCII
   
   def render_distances
     grid.each_cell do |cell|
-      draw_distances cell
+      x, y, w = draw_distance_coord cell
+
+      distance(cell).center(w).chars.each_with_index do |c,i|
+        char[y][x+i] = c.color(*distance_color(cell))
+      end
     end
   end
   
@@ -106,6 +110,7 @@ class Amaze::Formatter::ASCII
 end
 
 require 'amaze/formatter/ascii/square_helper'
+require 'amaze/formatter/ascii/octo_helper'
 require 'amaze/formatter/ascii/delta'
 require 'amaze/formatter/ascii/ortho'
 require 'amaze/formatter/ascii/sigma'

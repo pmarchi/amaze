@@ -1,6 +1,7 @@
 
 class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   include Amaze::Formatter::ASCII::SquareHelper
+  include Amaze::Formatter::ASCII::OctoHelper
   
   def draw_cell cell
     x0, y0 = coord cell
@@ -24,7 +25,7 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
       y1, y2 = y0 + oy, y0 + dy
       x1, x2 = x0 + ox, x0 + dx
     end
-
+    
     h_wall.each_with_index do |c,i|
       char[y1][x0+ox+i] = c.color(grid_color) unless cell.linked_to?(:north)
       char[y2][x0+ox+i] = c.color(grid_color) unless cell.linked_to?(:south)
@@ -36,12 +37,10 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     end
   end
   
-  def draw_distances cell
-    x0, _ = coord cell
-    _, my = center_coord cell
-    distance(cell).center(cell_size * 3).chars.each_with_index do |c,i|
-      char[my][x0+ox+i+1] = c.color(*distance_color(cell))
-    end
+  def draw_distance_coord cell
+    x, _ = coord cell
+    _, y = center_coord cell
+    [x+ox+1, y, cell_size * 3]
   end
 
   def draw_path cell
@@ -59,15 +58,12 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
     
     return unless (cell.column+cell.row).even?
 
-    # northwest-southeast
-    db_path.each_with_index do |c,i|
-      char[my+db_path_i[i]][mx+i] = c.color(path_color)
-    end if path?(:southeast, cell)
-    
-    # northeast-southwest
-    df_path.each_with_index do |c,i|
-      char[my+df_path_i[i]][mx-i] = c.color(path_color)
-    end if path?(:southwest, cell)
+    d_path_i.each_with_index do |yi,i|
+      # northwest-southeast
+      char[my+yi][mx+i] = db_path[i].color(path_color) if path?(:southeast, cell)
+      # northeast-southwest
+      char[my+yi][mx-i] = df_path[i].color(path_color) if path?(:southwest, cell)
+    end
   end
   
   # x0, y0
@@ -100,44 +96,5 @@ class Amaze::Formatter::ASCII::Upsilon < Amaze::Formatter::ASCII
   
   def char_array_height
     grid.rows * dy + oy + 1
-  end
-  
-  def df_wall
-    (corner + df * cell_size + corner).chars
-  end
-  
-  def db_wall
-    (corner + db * cell_size + corner).chars
-  end
-  
-  def df_path
-    (center + dfp * cell_size + center + dfp * cell_size + center).chars
-  end
-  
-  def db_path
-    (center + dbp * cell_size + center + dbp * cell_size + center).chars
-  end
-  
-  def df_path_i
-    o = cell_size + 1
-    [0, (1..cell_size).map{|i| [i,i,i+o,i+o] }, o, o+o].flatten.sort
-  end
-  
-  alias_method :db_path_i, :df_path_i
-  
-  def df
-    '/'
-  end
-  
-  def db
-    '\\'
-  end
-  
-  def dfp
-    '´.'
-  end
-  
-  def dbp
-    '`.'
   end
 end

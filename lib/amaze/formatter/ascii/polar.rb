@@ -25,17 +25,13 @@ class Amaze::Formatter::ASCII::Polar < Amaze::Formatter::ASCII
     end
   end
 
-  def draw_content cell
+  def draw_distance_coord cell
     x1, x2, _, _ = coord cell
     _, my = center_coord cell
-    dx = x2 - x1 - 1 
-
-    distance(cell).center(dx).chars.each_with_index do |c,i|
-      char[my][x1+1+i] = c.color(*distance_color(cell))
-    end
+    dx = x2 - x1 - 1
+    
+    [x1 + 1, my, dx]
   end
-
-  alias_method :draw_distances, :draw_content
 
   def draw_path cell
     # draw horizontal connections in cells with more than one outward path

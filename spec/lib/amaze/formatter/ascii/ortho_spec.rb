@@ -57,19 +57,19 @@ describe Amaze::Formatter::ASCII::Ortho do
           formatter.render_cells
         end
       
-        it "draws ascii grid" do
+        it "draws the ascii grid" do
           compare_ascii formatter.char, reference_grid
         end
       end
       
-      context "render_distances" do
+      context "#render_distances" do
         let(:distances) { grid[0,0].distances }
         let(:options) { {cell_size: cell_size, distances: distances} }
         before(:example) do
           formatter.render_distances
         end
         
-        it "draws the distances inside the cells" do
+        it "writes the distances inside the cells" do
           compare_ascii formatter.char, reference_distances
         end
       end

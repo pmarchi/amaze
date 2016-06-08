@@ -111,6 +111,7 @@ end
 
 require 'amaze/formatter/ascii/square_helper'
 require 'amaze/formatter/ascii/octo_helper'
+require 'amaze/formatter/ascii/hex_helper'
 require 'amaze/formatter/ascii/delta'
 require 'amaze/formatter/ascii/ortho'
 require 'amaze/formatter/ascii/sigma'

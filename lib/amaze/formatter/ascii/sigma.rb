@@ -1,211 +1,80 @@
 
 class Amaze::Formatter::ASCII::Sigma < Amaze::Formatter::ASCII
+  include Amaze::Formatter::ASCII::HexHelper
 
   def draw_cell cell
-    x0, y0 = coord cell
-    x1 = x0 + cell_size
-    x2 = x0 + cell_size + cell_size * 3
-    y1 = y0 + cell_size
-
-    0.upto(cell_size*3-1) do |i|
+    x, y = coord cell
+    
+    h6_wall.each_with_index do |c,i|
       # north
-      char[y0][x1+i] = n.color(grid_color) unless cell.linked_to?(:north)
+      char[y][x+ox+i] = c.color(grid_color) unless cell.linked_to?(:north)
       # south
-      char[y0+cell_size*2][x1+i] = s.color(grid_color) unless cell.linked_to?(:south)
+      char[y+dy][x+ox+i] = c.color(grid_color) unless cell.linked_to?(:south)
     end
-
-    0.upto(cell_size-1) do |i|
-      # north east
-      char[y0+1+i][x2+i] = ne.color(grid_color) unless cell.linked_to?(:northeast)
-      # north west
-      char[y0+1+i][x0+cell_size-1-i] = nw.color(grid_color) unless cell.linked_to?(:northwest)
-      # south east
-      char[y1+1+i][x2+cell_size-1-i] = se.color(grid_color) unless cell.linked_to?(:southeast)
-      # south west
-      char[y1+1+i][x0+i] = sw.color(grid_color) unless cell.linked_to?(:southwest)
+    
+    db6_wall.each_with_index do |c,i|
+      # northeast
+      char[y+1+i][x+dx+i] = c.color(grid_color) unless cell.linked_to?(:northeast)
+      # southwest
+      char[y+oy+1+i][x+i] = c.color(grid_color) unless cell.linked_to?(:southwest)
+    end
+    
+    df6_wall.each_with_index do |c,i|
+      # northwest
+      char[y+1+i][x+ox-i-1] = c.color(grid_color) unless cell.linked_to?(:northwest)
+      # southeast
+      char[y+oy+1+i][x+dx+ox-i-1] = c.color(grid_color) unless cell.linked_to?(:southeast)
     end
   end
   
   def draw_distance_coord cell
     x, y = coord cell
-    [x+cell_size, y+cell_size, cell_size * 3]
+    [x + ox, y + oy, dx - ox]
   end
 
   def draw_path cell
-    x, y = coord cell, :center
+    x, y = center_coord cell
     # north-south
-    1.upto(cell_size*2) do |i|
-      char[y+i][x] = p.color(path_color)
+    v6_path.each_with_index do |c,i|
+      char[y+i][x] = c.color(path_color)
     end if path?(:south, cell)
-    # northwest-southeast
-    0.upto(cell_size-1) do |i|
-      char[y+i][x+i*4] = p.color(path_color)
-      char[y+i+1][x+i*4+2] = pnwse.color(path_color)
-    end if path?(:southeast, cell)
-    # southwest-northeast
-    0.upto(cell_size-1) do |i|
-      char[y-i][x+i*4] = p.color(path_color)
-      char[y-i][x+i*4+2] = pswne.color(path_color)
-    end if path?(:northeast, cell)
-    # center
-    char[y][x] = p.color(path_color)
-  end
-  
-  def coord cell, ref=:topleft
-    x = xpos(cell.column)
-    y = ypos(cell.row, cell.column.odd?)
-    if ref == :center
-      x = x + cell_size * 3 / 2 + cell_size
-      y = y + cell_size
+    
+    d6_path_i.each_with_index do |yi, i|
+      # southwest-northeast
+      char[y+yi][x-i*2] = df6_path[i].color(path_color) if path?(:southwest, cell)
+      # southeast-northwest
+      char[y+yi][x+i*2] = db6_path[i].color(path_color) if path?(:southeast, cell)
     end
-    [x, y]
   end
   
-  def xpos column
-    (cell_size * 4) * column
+  def coord cell
+    [cell.column * dx, cell.row * dy + (cell.column.odd? ? oy : 0)]
   end
   
-  def ypos row, odd=false
-    offset = odd ? cell_size : 0
-    (cell_size * 2) * row + offset
+  def center_coord cell
+    x, y = coord cell
+    [x + (dx + oy - 1) / 2, y + oy]
   end
   
+  def dx
+    cell_size * 4
+  end
+  
+  def dy
+    cell_size * 2
+  end
+  
+  def ox
+    cell_size
+  end
+  
+  alias_method :oy, :ox
+    
   def char_array_width
-    xpos(grid.columns) + cell_size
+    grid.columns * dx + cell_size
   end
   
   def char_array_height
-    ypos(grid.rows, true) + 1
+    grid.rows * dy + cell_size + 1
   end
-
-  def n
-    '_'
-  end
-  
-  def ne
-    '\\'
-  end
-  
-  def se
-    '/'
-  end
-  
-  def p
-    '.'
-  end
-  
-  def pnwse
-    '`'
-  end
-  
-  def pswne
-    '´'
-  end
-  
-  alias_method :s, :n
-  alias_method :sw, :ne
-  alias_method :nw, :se
 end
-
-__END__
-
-.___.....___.....___.....
-/...\___/...\___/...\___.
-\___/...\___/...\___/...\
-/...\___/...\___/...\___/
-\___/...\___/...\___/...\
-/...\___/...\___/...\___/
-\___/...\___/...\___/....
-....\___/...\___/........
-
-
-..______..........______..........______..........
-./......\......../......\......../......\.........
-/........\______/........\______/........\______..
-\......../......\......../......\......../......\.
-.\______/........\______/........\______/........\
-./......\......../......\......../......\......../
-/........\______/........\______/........\______/.
-\......../......\......../......\......../......\.
-.\______/........\______/........\______/........\
-./......\......../......\......../......\......../
-/........\______/........\______/........\______/.
-\......../......\......../......\......../......\.
-.\______/........\______/........\______/........\
-........\......../......\......../......\......../
-.........\______/........\______/........\______/.
-
-
-..._________..............._________..............._________
-../.........\............./.........\............./.........\
-./...........\.........../...........\.........../...........\
-/.............\_________/.............\_________/.............\_________
-\............./.........\............./.........\............./.........\
-.\.........../...........\.........../...........\.........../...........\
-..\_________/.............\_________/.............\_________/.............\
-../.........\............./.........\............./.........\............./
-./...........\.........../...........\.........../...........\.........../
-/.............\_________/.............\_________/.............\_________/
-\............./.........\............./.........\............./.........\
-.\.........../...........\.........../...........\.........../...........\
-..\_________/.............\_________/.............\_________/.............\
-../.........\............./.........\............./.........\............./
-./...........\.........../...........\.........../...........\.........../
-/.............\_________/.............\_________/.............\_________/
-\............./.........\............./.........\............./.........\
-.\.........../...........\.........../...........\.........../...........\
-..\_________/.............\_________/.............\_________/.............\
-............\............./.........\............./.........\............./
-.............\.........../...........\.........../...........\.........../
-..............\_________/.............\_________/.............\_________/
-
-
- ___     ___     ___     
-/ . \___/   \___/   \___ 
-\ . ` . \___/ . \___/   \
-/ . \___` . ´___/   \___/
-\___/   \___/   \___/   \
-/   \___/   \___/   \___/
-\___/   \___/   \___/    
-    \___/   \___/        
-
-
-  ______          ______          ______          
- /      \        /      \        /      \         
-/    .   \______/        \______/        \______  
-\    . ` .      \        /      \        /      \ 
- \   .     ` .   \______/    .   \______/        \
- /   .  \      ` .       . ´     /      \        /
-/    .   \______   ` . ´  ______/        \______/ 
-\    .   /      \        /      \        /      \ 
- \___.__/        \______/        \______/        \
- /      \        /      \        /      \        /
-/        \______/        \______/        \______/ 
-\        /      \        /      \        /      \ 
- \______/        \______/        \______/        \
-        \        /      \        /      \        /
-         \______/        \______/        \______/ 
-
-
-   _________               _________               _________
-  /         \             /         \             /         \
- /           \           /           \           /           \
-/      .      \_________/             \_________/             \_________
-\      . ` .            \             /         \             /         \
- \     .     ` .         \           /           \           /           \
-  \    .         ` .      \_________/             \_________/             \
-  /    .    \        ` .               .          /         \             /
- /     .     \           ` .       . ´           /           \           /
-/      .      \_________     ` . ´     _________/             \_________/
-\             /         \             /         \             /         \
- \           /           \           /           \           /           \
-  \_________/             \_________/             \_________/             \
-  /         \             /         \             /         \             /
- /           \           /           \           /           \           /
-/             \_________/             \_________/             \_________/
-\             /         \             /         \             /         \
- \           /           \           /           \           /           \
-  \_________/             \_________/             \_________/             \
-            \             /         \             /         \             /
-             \           /           \           /           \           /
-              \_________/             \_________/             \_________/

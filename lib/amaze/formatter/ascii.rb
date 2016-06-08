@@ -16,8 +16,8 @@ class Amaze::Formatter::ASCII
   end
   
   def char
-    @char ||= Array.new(char_array_height) do |x|
-      Array.new(char_array_width) do |y|
+    @char ||= Array.new(char_array_height) do
+      Array.new(char_array_width) do
         blank
       end
     end

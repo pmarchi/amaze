@@ -2,117 +2,119 @@
 class Amaze::Formatter::ASCII::Delta < Amaze::Formatter::ASCII
 
   def draw_cell cell
-    x0, y0 = coord cell
+    x, y = coord cell
     
-    # reverse triangle
-    if (cell.column + cell.row).even?
-      # corner
-      char[y0][x0] = corner.color(grid_color)
-      char[y0][x0+(cell_size+1)*2] = corner.color(grid_color)
-      char[y0+cell_size+1][x0+cell_size+1] = corner.color(grid_color)
-      
-      0.upto(cell_size*2) do |i|
-        # north
-        char[y0][x0+1+i] = h.color(grid_color)
-      end unless cell.linked_to?(:north)
-      1.upto(cell_size) do |i|
-        # west
-        char[y0+i][x0+i] = rw.color(grid_color) unless cell.linked_to?(:west)
-        # east
-        char[y0+i][x0+(cell_size+1)*2-i] = re.color(grid_color) unless cell.linked_to?(:east)
+    walls(cell).each do |direction, (chars, (ox, oy), (fx, fy))|
+      chars.each_with_index do |c,i|
+        char[y+oy+fy*i][x+ox+fx*i] = c.color(grid_color) unless cell.linked_to? direction
       end
-      
-    # normal triangle
-    else
-      # corner
-      char[y0+cell_size+1][x0] = corner.color(grid_color)
-      char[y0+cell_size+1][x0+(cell_size+1)*2] = corner.color(grid_color)
-      char[y0][x0+cell_size+1] = corner.color(grid_color)
-      
-      0.upto(cell_size*2) do |i|
-        # south
-        char[y0+cell_size+1][x0+1+i] = h.color(grid_color)
-      end unless cell.linked_to?(:south)
-      1.upto(cell_size) do |i|
-        # west
-        char[y0+i][x0+cell_size+1-i] = nw.color(grid_color) unless cell.linked_to?(:west)
-        # east
-        char[y0+i][x0+cell_size+1+i] = ne.color(grid_color) unless cell.linked_to?(:east)
-      end
-      
     end
   end
   
   def draw_distance_coord cell
+    oy = dy / 2
+    w = 2 * (dx - oy) - 1
+
     x0, y0 = coord cell
+    x = x0 + oy + 1
+    y = y0 + ((cell.column + cell.row).even? ? oy : dy - oy)
     
-    if cell_size == 1
-      my = y0 + 1
-      mx = x0 + 2
-      w = 1
-    else
-      mx = x0 + cell_size / 2 + 1
-      w = (cell_size+1) / 2 * 2 + 1
-      if (cell.column+cell.row).even?
-        my = y0 + cell_size / 2
-      else
-        my = y0 + (cell_size+3) / 2
-      end
-    end
-    
-    [mx, my, w]
+    return [x, y, w]
   end
   
   def draw_path cell
-    x0, y0 = coord cell
+    x, y = center_coord cell
     
-    mx = x0 + cell_size + 1
-    my = y0 + (cell_size + 1) / 2
-    
-    # center
-    char[my][mx] = center.color(path_color)
-    1.upto(cell_size) do |i|
-      # east-west
-      char[my][mx+i] = h.color(path_color) if path?(:east, cell)
-      # north-south
-      char[my+i][mx] = v.color(path_color) if path?(:south, cell)
+    paths(cell).each do |direction, (chars, (fx, fy))|
+      chars.each_with_index do |c,i|
+        char[y+fy*i][x+fx*i] = c.color(path_color) if path?(direction, cell)
+      end
     end
   end
   
   def coord cell
-    [xpos(cell.column), ypos(cell.row)]
+    [cell.column * dx, cell.row * dy]
   end
   
-  def xpos column
-    (cell_size + 1) * column
+  def center_coord cell
+    x, y = coord cell
+    [x + dx, y + dy / 2]
   end
   
-  def ypos row
-    (cell_size + 1) * row
+  def walls cell
+    if (cell.column + cell.row).even?
+      {
+        # dir   chars      ox  oy    fx fy
+        north: [h3_wall,  [0,   0], [1,  0]],
+        west:  [db3_wall, [0,   0], [1,  1]],
+        east:  [df3_wall, [dx, dy], [1, -1]],
+      }
+    else
+      {
+        # dir   chars      ox oy    fx fy
+        south: [h3_wall,  [0, dy], [1,  0]],
+        west:  [df3_wall, [0, dy], [1, -1]],
+        east:  [db3_wall, [dx, 0], [1,  1]],
+      }
+    end
   end
+  
+  def paths _
+    {
+      # dir   chars     fx fy
+      south: [v3_path, [0, 1]],
+      east:  [h3_path, [1, 0]],
+    }
+  end
+  
+  def h3_wall
+    (corner + h3 * (cell_size * 2 + 1) + corner).chars
+  end
+  
+  def df3_wall
+    (corner + df3 * cell_size + corner).chars
+  end
+  
+  def db3_wall
+    (corner + db3 * cell_size + corner).chars
+  end
+  
+  def h3_path
+    (center + h3 * cell_size + center).chars
+  end
+  
+  def v3_path
+    (center + v3 * cell_size + center).chars
+  end
+  
+  def dx
+    cell_size + 1
+  end
+  
+  alias_method :dy, :dx
   
   def char_array_width
-    xpos(grid.columns + 1) + 1
+    (grid.columns + 1) * dx + 1
   end
   
   def char_array_height
-    ypos(grid.rows) + 1
+    grid.rows * dy + 1
   end
   
-  def h
+  def h3
     '-'
   end
   
-  def v
+  def v3
     '|'
   end
   
-  def rw
-    '\\'
+  def df3
+    '/'
   end
   
-  def re
-    '/'
+  def db3
+    '\\'
   end
   
   def corner
@@ -120,6 +122,4 @@ class Amaze::Formatter::ASCII::Delta < Amaze::Formatter::ASCII
   end
   
   alias_method :center, :corner
-  alias_method :nw, :re
-  alias_method :ne, :rw
 end

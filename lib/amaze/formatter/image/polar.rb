@@ -1,5 +1,10 @@
 
 class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
+  include Amaze::Formatter::Image::Setup
+  
+  def canvas_options
+    {linecap: 'square'}
+  end
   
   def render_background
     canvas.stroke_antialias true
@@ -18,11 +23,7 @@ class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
   end
   
   def render_grid
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'square'
-    canvas.stroke 'gray90'
-    canvas.stroke_width 1
-    canvas.fill 'none'
+    setup_grid
 
     grid.each_cell do |cell|
       next if cell.row == 0
@@ -35,11 +36,7 @@ class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
   end
   
   def render_wall
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'square'
-    canvas.stroke wall_color
-    canvas.stroke_width wall_width
-    canvas.fill 'none'
+    setup_wall
 
     grid.each_cell do |cell|
       next if cell.row == 0
@@ -53,11 +50,7 @@ class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
   end
   
   def render_path
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'square'
-    canvas.fill 'none'
-    canvas.stroke path_color
-    canvas.stroke_width path_width
+    setup_path
 
     grid.each_cell do |cell|
       next unless path_cell? cell
@@ -105,10 +98,8 @@ class Amaze::Formatter::Image::Polar < Amaze::Formatter::Image
     end
     
     # draw start and finish
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'square'
-    canvas.fill path_color
-    canvas.stroke 'none'
+    setup_path_endpoints
+
     [path_start, path_finish].compact.each do |cell|
       radius, theta = center_coord cell, :radian
       # adjust the angle for cell(0,0)

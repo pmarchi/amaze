@@ -122,6 +122,7 @@ class Amaze::Formatter::Image
   end
 end
 
+require 'amaze/formatter/image/setup'
 require 'amaze/formatter/image/ortho'
 require 'amaze/formatter/image/sigma'
 require 'amaze/formatter/image/delta'

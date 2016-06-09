@@ -1,10 +1,14 @@
 
 class Amaze::Formatter::Image::Sigma < Amaze::Formatter::Image
+  include Amaze::Formatter::Image::Setup
+  
+  def canvas_options
+    {linecap: 'round', linejoin: 'round'}
+  end
   
   def render_background
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'square'
-    canvas.stroke 'none'
+    setup_background
+
     grid.each_cell do |cell|
       color = distance_color cell
       next unless color
@@ -15,12 +19,7 @@ class Amaze::Formatter::Image::Sigma < Amaze::Formatter::Image
   end
   
   def render_grid
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'round'
-    canvas.stroke_linejoin 'round'
-    canvas.stroke 'gray90'
-    canvas.stroke_width 1
-    canvas.fill 'none'
+    setup_grid
 
     grid.each_cell do |cell|
       x1, x2, x3, x4, y1, y2, y3 = coord cell
@@ -29,12 +28,7 @@ class Amaze::Formatter::Image::Sigma < Amaze::Formatter::Image
   end
   
   def render_wall
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'round'
-    canvas.stroke_linejoin 'round'
-    canvas.stroke wall_color
-    canvas.stroke_width wall_width
-    canvas.fill 'none'
+    setup_wall
 
     grid.each_cell do |cell|
       x1, x2, x3, x4, y1, y2, y3 = coord cell
@@ -49,12 +43,7 @@ class Amaze::Formatter::Image::Sigma < Amaze::Formatter::Image
   end
   
   def render_path
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'round'
-    canvas.stroke_linejoin 'round'
-    canvas.fill 'none'
-    canvas.stroke path_color
-    canvas.stroke_width path_width
+    setup_path
     
     grid.each_cell do |cell|
       next unless path_cell? cell
@@ -68,10 +57,8 @@ class Amaze::Formatter::Image::Sigma < Amaze::Formatter::Image
     end
 
     # draw start and finish
-    canvas.stroke_antialias true
-    canvas.stroke_linecap 'round'
-    canvas.fill path_color
-    canvas.stroke 'none'
+    setup_path_endpoints
+
     [path_start, path_finish].compact.each do |cell|
       x, y = center_coord cell
       canvas.ellipse x, y, path_width*2, path_width*2, 0, 360

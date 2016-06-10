@@ -25,7 +25,7 @@ class Amaze::Formatter::ASCII::Polar < Amaze::Formatter::ASCII
     end
   end
 
-  def draw_distance_coord cell
+  def distance_coord cell
     x1, x2, _, _ = coord cell
     _, my = center_coord cell
     dx = x2 - x1 - 1

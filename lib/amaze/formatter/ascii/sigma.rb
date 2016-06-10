@@ -1,59 +1,40 @@
 
 class Amaze::Formatter::ASCII::Sigma < Amaze::Formatter::ASCII
-  include Amaze::Formatter::ASCII::HexHelper
+  include Amaze::Formatter::ASCII::Symbols
 
-  def draw_cell cell
-    x, y = coord cell
-    
-    h6_wall.each_with_index do |c,i|
-      # north
-      char[y][x+ox+i] = c.color(grid_color) unless cell.linked_to?(:north)
-      # south
-      char[y+dy][x+ox+i] = c.color(grid_color) unless cell.linked_to?(:south)
-    end
-    
-    db6_wall.each_with_index do |c,i|
-      # northeast
-      char[y+1+i][x+dx+i] = c.color(grid_color) unless cell.linked_to?(:northeast)
-      # southwest
-      char[y+oy+1+i][x+i] = c.color(grid_color) unless cell.linked_to?(:southwest)
-    end
-    
-    df6_wall.each_with_index do |c,i|
-      # northwest
-      char[y+1+i][x+ox-i-1] = c.color(grid_color) unless cell.linked_to?(:northwest)
-      # southeast
-      char[y+oy+1+i][x+dx+ox-i-1] = c.color(grid_color) unless cell.linked_to?(:southeast)
-    end
-  end
-  
-  def draw_distance_coord cell
-    x, y = coord cell
-    [x + ox, y + oy, dx - ox]
-  end
-
-  def draw_path cell
-    x, y = center_coord cell
-    # north-south
-    v6_path.each_with_index do |c,i|
-      char[y+i][x] = c.color(path_color)
-    end if path?(:south, cell)
-    
-    d6_path_i.each_with_index do |yi, i|
-      # southwest-northeast
-      char[y+yi][x-i*2] = df6_path[i].color(path_color) if path?(:southwest, cell)
-      # southeast-northwest
-      char[y+yi][x+i*2] = db6_path[i].color(path_color) if path?(:southeast, cell)
-    end
-  end
-  
   def coord cell
     [cell.column * dx, cell.row * dy + (cell.column.odd? ? oy : 0)]
   end
   
+  def distance_coord cell
+    x, y = coord cell
+    [x + ox, y + oy, dx - ox]
+  end
+
   def center_coord cell
     x, y = coord cell
     [x + (dx + oy - 1) / 2, y + oy]
+  end
+  
+  def walls _
+    {
+      # dir       chars      ox  oy     fx fy
+      north:     [hex_h_wall,  [ox, 0],   [1,  0]],
+      south:     [hex_h_wall,  [ox, dy],  [1,  0]],
+      northeast: [hex_db_wall, [dx, 1],   [1,  1]],
+      southwest: [hex_db_wall, [0, oy+1], [1,  1]],
+      northwest: [hex_df_wall, [0, oy],   [1, -1]],
+      southeast: [hex_df_wall, [dx, dy],  [1, -1]],
+    }
+  end
+  
+  def paths _
+    {
+      # dir       chars      fx fy
+      south:     [v6_path,  [ 0, 1]],
+      southeast: [hex_db_path, [ 2, d6_path_i]],
+      southwest: [hex_df_path, [-2, d6_path_i]],
+    }
   end
   
   def dx
@@ -76,5 +57,33 @@ class Amaze::Formatter::ASCII::Sigma < Amaze::Formatter::ASCII
   
   def char_array_height
     grid.rows * dy + cell_size + 1
+  end
+
+  def hex_h_wall
+    (hex_h * cell_size * 3).chars
+  end
+  
+  def hex_df_wall
+    (hex_df * cell_size).chars
+  end
+  
+  def hex_db_wall
+    (hex_db * cell_size).chars
+  end
+  
+  def v6_path
+    (hex_p * (cell_size * 2 + 1)).chars
+  end
+  
+  def hex_df_path
+    [hex_p] + (1..cell_size).map{ [hex_p_df, hex_p] }.flatten
+  end
+  
+  def hex_db_path
+    [hex_p] + (1..cell_size).map{ [hex_p_db, hex_p] }.flatten
+  end
+  
+  def d6_path_i
+    [0] + (1..cell_size).map{|i| [i, i] }.flatten
   end
 end

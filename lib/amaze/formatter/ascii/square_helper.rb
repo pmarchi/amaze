@@ -1,34 +1,18 @@
 
 module Amaze::Formatter::ASCII::SquareHelper
-  def h_wall
-    (corner + h * cell_size * 3 + corner).chars
+  def squ_h_wall
+    (squ_cor + squ_h * cell_size * 3 + squ_cor).chars
   end
   
-  def v_wall
-    (corner + v * cell_size + corner).chars
+  def squ_v_wall
+    (squ_cor + squ_v * cell_size + squ_cor).chars
   end
   
-  def h_path
-    (center + h * (dx-1) + center).chars
+  def squ_h_path
+    (squ_cen + squ_h * (dx-1) + squ_cen).chars
   end
   
-  def v_path
-    (center + v * (dy-1) + center).chars
-  end
-  
-  def h
-    '-'
-  end
-  
-  def v
-    '|'
-  end
-  
-  def center
-    '∙'
-  end
-    
-  def corner
-    '+'
+  def squ_v_path
+    (squ_cen + squ_v * (dy-1) + squ_cen).chars
   end
 end

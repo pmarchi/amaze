@@ -39,11 +39,7 @@ class Amaze::Formatter::ASCII
   
   def render_distances
     grid.each_cell do |cell|
-      x, y, w = draw_distance_coord cell
-
-      distance(cell).center(w).chars.each_with_index do |c,i|
-        char[y][x+i] = c.color(*distance_color(cell))
-      end
+      draw_distance cell
     end
   end
   
@@ -53,6 +49,38 @@ class Amaze::Formatter::ASCII
     end
   end
   
+  def draw_cell cell
+    x, y = coord cell
+    
+    walls(cell).each do |direction, (chars, (ox, oy), (fx, fy))|
+      next if cell.linked_to? direction
+      chars.each_with_index do |c,i|
+        char[y+oy+fy*i][x+ox+fx*i] = c.color(grid_color)
+      end
+    end
+  end
+  
+  def draw_distance cell
+    x, y, w = distance_coord cell
+
+    distance(cell).center(w).chars.each_with_index do |c,i|
+      char[y][x+i] = c.color(*distance_color(cell))
+    end
+  end
+  
+  def draw_path cell
+    x, y = center_coord cell
+    
+    paths(cell).each do |direction, (chars, (fx, fy))|
+      next unless path?(direction, cell)
+      ox = fx.is_a?(Fixnum) ? ->(i) { fx * i } : ->(i) { fx[i] }
+      oy = fy.is_a?(Fixnum) ? ->(i) { fy * i } : ->(i) { fy[i] }
+      chars.each_with_index do |c,i|
+        char[y+oy.call(i)][x+ox.call(i)] = c.color(path_color)
+      end
+    end
+  end
+
   def path? direction, cell
     cell.linked?(cell.send(direction)) && path_cell?(cell.send(direction))
   end
@@ -109,9 +137,8 @@ class Amaze::Formatter::ASCII
   end
 end
 
+require 'amaze/formatter/ascii/symbols'
 require 'amaze/formatter/ascii/square_helper'
-require 'amaze/formatter/ascii/octo_helper'
-require 'amaze/formatter/ascii/hex_helper'
 require 'amaze/formatter/ascii/delta'
 require 'amaze/formatter/ascii/ortho'
 require 'amaze/formatter/ascii/sigma'

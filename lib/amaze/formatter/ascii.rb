@@ -26,7 +26,7 @@ class Amaze::Formatter::ASCII
   def render
     render_cells
     render_distances if distances
-    render_path
+    render_paths
 
     ansi_clear + char.map{|l| l.join }.join("\n")
   end
@@ -43,7 +43,7 @@ class Amaze::Formatter::ASCII
     end
   end
   
-  def render_path
+  def render_paths
     grid.each_cell do |cell|
       draw_path cell if path_cell? cell
     end

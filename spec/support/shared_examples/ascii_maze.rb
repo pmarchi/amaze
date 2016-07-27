@@ -52,7 +52,7 @@ shared_examples "ascii maze" do
         let(:reference_path) { remove_grid read_fixture("maze/ascii/#{type}/path#{cell_size}.txt"), reference_grid }
 
         before(:example) do
-          formatter.render_path
+          formatter.render_paths
         end
 
         it "draws the path through the maze" do

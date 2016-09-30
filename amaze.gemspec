@@ -29,4 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rainbow"
   spec.add_dependency "gradient"
   spec.add_dependency "rmagick"
+  
+  spec.requirements << 'imagemagick on macOS'
+  spec.requirements << 'libmagickwand-dev on ubuntu'
 end
